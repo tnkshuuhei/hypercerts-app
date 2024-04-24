@@ -24,6 +24,11 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.origin),
   title: { default: siteConfig.name, template: "%s | Hypercerts" },
   description: siteConfig.description,
+  icons: [
+    { rel: "shortcut icon", url: "/favicon.ico", type: "image/x-icon" },
+    { rel: "icon", url: "/favicon-16x16.png", sizes: "16x16" },
+    { rel: "icon", url: "/favicon-32x32.png", sizes: "32x32" },
+  ],
 };
 
 export default function RootLayout({
