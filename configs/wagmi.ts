@@ -1,6 +1,7 @@
 import { defaultWagmiConfig } from "@web3modal/wagmi/react/config";
 
-import { cookieStorage, createStorage } from "wagmi";
+import { cookieStorage, createStorage, http } from "wagmi";
+import { walletConnect } from "wagmi/connectors";
 import { celo, sepolia } from "viem/chains";
 import { siteConfig } from "./site";
 
@@ -18,11 +19,17 @@ const metadata = {
 
 // Create wagmiConfig
 export const config = defaultWagmiConfig({
-  chains: [sepolia, celo], // required
-  projectId, // required
-  metadata, // required
+  chains: [sepolia, celo],
+  connectors: [walletConnect({ projectId })],
+  projectId,
+  pollingInterval: 2_000,
+  metadata,
   ssr: true,
   storage: createStorage({
     storage: cookieStorage,
   }),
+  transports: {
+    [sepolia.id]: http(),
+    [celo.id]: http(),
+  },
 });
