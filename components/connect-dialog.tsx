@@ -35,8 +35,6 @@ export default function ConnectDialog({
   const coinbaseWalletSDKLogo =
     "https://avatars.githubusercontent.com/u/1885080";
 
-  console.log("connectors", connectors);
-
   const customConnectors = [...connectors].sort((a, b) => {
     if (a.type === "injected" && b.type !== "injected") return -1;
     if (a.type !== "injected" && b.type === "injected") return 1;
@@ -93,7 +91,7 @@ export default function ConnectDialog({
             ) : (
               <Wallet2 className="w-6 h-6" />
             )}
-            <p className="font-medium text-base lg:text-lg tracking-tight">
+            <p className="text-sm md:text-base lg:text-lg tracking-tight">
               {connector.name === "Injected"
                 ? "Browser wallet"
                 : connector.name}
@@ -117,7 +115,7 @@ export default function ConnectDialog({
 
         <DialogTrigger
           asChild
-          className={buttonVariants({ variant: "outline" })}
+          className={`${buttonVariants({ variant: "outline" })} cursor-pointer`}
         >
           <div className="flex items-center justify-center gap-2">
             Connect wallet
@@ -126,7 +124,7 @@ export default function ConnectDialog({
         </DialogTrigger>
 
         <DialogContent>
-          <DialogTitle className="font-serif text-4xl py-3 tracking-tight font-normal">
+          <DialogTitle className="font-sans text-4xl py-3 tracking-tight font-normal">
             Choose wallet
           </DialogTitle>
 
@@ -139,15 +137,18 @@ export default function ConnectDialog({
     <Drawer open={isOpen} onOpenChange={setIsOpen}>
       <DrawerClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground" />
 
-      <DrawerTrigger asChild className={buttonVariants({ variant: "outline" })}>
+      <DrawerTrigger
+        asChild
+        className={buttonVariants({ variant: "outline", size: "sm" })}
+      >
         <div className="flex items-center justify-center gap-2">
-          Connect wallet
           <Wallet2 size={16} />
+          Connect wallet
         </div>
       </DrawerTrigger>
 
       <DrawerContent className="container">
-        <DrawerTitle className="font-serif text-2xl py-3 tracking-normal text-center font-normal">
+        <DrawerTitle className="font-sans text-2xl py-3 tracking-tight font-semibold">
           Choose a wallet
         </DrawerTitle>
 
