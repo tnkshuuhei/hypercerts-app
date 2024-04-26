@@ -12,7 +12,7 @@ const Navbar = () => {
   const currentPath = usePathname();
 
   return (
-    <nav className="flex items-center justify-between p-4">
+    <nav className="flex items-center justify-between p-8 md:px-24">
       <div className="flex items-center space-x-4">
         <Link href="/">
           <span className="font-bold tex-base md:text-xl tracking-tight">
