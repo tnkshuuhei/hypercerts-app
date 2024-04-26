@@ -1,3 +1,5 @@
+import { Compass, Book, LucideIcon, PlusCircle } from "lucide-react";
+
 interface SiteConfig {
   name: string;
   origin: string;
@@ -8,6 +10,12 @@ interface SiteConfig {
     twitter: string;
     github: string;
   };
+  navLinks: {
+    title: string;
+    path: string;
+    type?: "external";
+    icon: LucideIcon;
+  }[];
 }
 
 export const siteConfig: SiteConfig = {
@@ -21,4 +29,14 @@ export const siteConfig: SiteConfig = {
     twitter: "https://twitter.com/hypercerts",
     github: "https://github.com/hypercerts-org/",
   },
+  navLinks: [
+    { title: "Explore", path: "/explore", icon: Compass },
+    { title: "Create", path: "/create", icon: PlusCircle },
+    {
+      title: "Docs",
+      path: "https://hypercerts.org/docs/",
+      type: "external",
+      icon: Book,
+    },
+  ],
 };

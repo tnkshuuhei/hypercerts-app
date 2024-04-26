@@ -7,6 +7,8 @@ import { headers } from "next/headers";
 import { cookieToInitialState } from "wagmi";
 import "./globals.css";
 import { Web3ModalProvider } from "@/contexts/wagmi";
+import Navbar from "@/components/global/navbar";
+import MobileNav from "@/components/global/mobile-nav";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -47,7 +49,9 @@ export default function RootLayout({
         )}
       >
         <Web3ModalProvider initialState={initialState}>
+          <Navbar />
           {children}
+          <MobileNav />
         </Web3ModalProvider>
       </body>
     </html>
