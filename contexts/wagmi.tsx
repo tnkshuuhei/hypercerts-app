@@ -2,26 +2,14 @@
 
 import type { ReactNode } from "react";
 
-// import { createWeb3Modal } from "@web3modal/wagmi/react";
-
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { config, projectId } from "@/configs/wagmi";
 import { type State, WagmiProvider } from "wagmi";
-// import { sepolia } from "viem/chains";
 
 // Setup queryClient
 const queryClient = new QueryClient();
 
 if (!projectId) throw new Error("Project ID is not defined");
-
-// Create modal
-// createWeb3Modal({
-//   wagmiConfig: config,
-//   projectId,
-//   defaultChain: sepolia, // TODO: Change for final release
-//   enableAnalytics: true,
-//   themeMode: "light",
-// });
 
 export function Web3ModalProvider({
   children,

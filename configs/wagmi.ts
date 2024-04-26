@@ -2,7 +2,7 @@ import { defaultWagmiConfig } from "@web3modal/wagmi/react/config";
 
 import { cookieStorage, createStorage, http } from "wagmi";
 import { walletConnect } from "wagmi/connectors";
-import { celo, sepolia } from "viem/chains";
+import { base, baseSepolia, celo, optimism, sepolia } from "viem/chains";
 import { siteConfig } from "./site";
 
 // Get projectId at https://cloud.walletconnect.com
@@ -19,7 +19,7 @@ const metadata = {
 
 // Create wagmiConfig
 export const config = defaultWagmiConfig({
-  chains: [sepolia, celo],
+  chains: [sepolia, celo, base, baseSepolia, optimism],
   connectors: [walletConnect({ projectId })],
   projectId,
   pollingInterval: 2_000,
@@ -31,5 +31,8 @@ export const config = defaultWagmiConfig({
   transports: {
     [sepolia.id]: http(),
     [celo.id]: http(),
+    [base.id]: http(),
+    [baseSepolia.id]: http(),
+    [optimism.id]: http(),
   },
 });
