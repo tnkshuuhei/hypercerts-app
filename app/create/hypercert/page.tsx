@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import HypercertCard from "@/components/hypercert-card";
 
 const formSchema = z.object({
   name: z.string().min(1),
@@ -52,11 +53,11 @@ export default function NewHypercertForm() {
   }
   return (
     <main className="flex min-h-screen flex-col justify-betweeen p-8">
-      <h1 className="font-serif text-5xl lg:text-8xl tracking-tight text-center">
+      <h1 className="font-serif text-5xl lg:text-8xl tracking-tight text-center fixed top-14 left-0 w-full">
         New hypercert
       </h1>
 
-      {/* TODO: Add form here */}
+      <HypercertCard />
     </main>
   );
 }
