@@ -1,19 +1,18 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Form } from "@/components/ui/form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import HypercertCard from "@/components/hypercert-card";
+import FormSteps from "./form-steps";
 
 const formSchema = z.object({
-  name: z.string().min(1),
-  logo: z.string().url(),
-  banner: z.string().url(),
-  description: z.string().min(1),
-  link: z.string().url(),
+  title: z.string().min(1, "We need a title for your hypercert"),
+  logo: z.string().url("Logo URL is not valid"),
+  banner: z.string().url("Banner URL is not valid"),
+  description: z.string().min(1, "We need a description for your hypercert"),
+  link: z.string().url("Link URL is not valid"),
   tags: z.array(z.string()),
   dateWorkStart: z.string(),
   dateWorkEnd: z.string(),
@@ -25,8 +24,10 @@ const formSchema = z.object({
   termsConfirmation: z.boolean(),
 });
 
-const formDefaultValues: z.infer<typeof formSchema> = {
-  name: "",
+export type HypercertFormValues = z.infer<typeof formSchema>;
+
+const formDefaultValues: HypercertFormValues = {
+  title: "",
   logo: "",
   banner: "",
   description: "",
@@ -43,21 +44,43 @@ const formDefaultValues: z.infer<typeof formSchema> = {
 };
 
 export default function NewHypercertForm() {
-  const form = useForm<z.infer<typeof formSchema>>({
+  const [currentStep, setCurrentStep] = useState(1);
+  const form = useForm<HypercertFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: formDefaultValues,
+    mode: "onChange",
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  function onSubmit(values: HypercertFormValues) {
     console.log(values);
   }
+
   return (
     <main className="flex min-h-screen flex-col justify-betweeen p-8">
-      <h1 className="font-serif text-5xl lg:text-8xl tracking-tight text-center fixed top-14 left-0 w-full">
+      <h1 className="font-serif text-5xl lg:text-8xl tracking-tight w-full">
         New hypercert
       </h1>
-
-      <HypercertCard />
+      <div className="p-6"></div>
+      <section className="flex flex-col space-y-4">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <FormSteps
+              form={form}
+              currentStep={currentStep}
+              setCurrentStep={setCurrentStep}
+            />
+          </form>
+        </Form>
+      </section>
+      {/* <div className="flex flex-col space-y-4 items-center">
+        <HypercertCard
+          title={form.getValues().title || undefined}
+          description={form.getValues().description || undefined}
+          banner={form.getValues().banner || undefined}
+          logo={form.getValues().logo || undefined}
+          displayOnly
+        />
+      </div> */}
     </main>
   );
 }
