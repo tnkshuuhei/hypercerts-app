@@ -1,6 +1,4 @@
-import { defaultWagmiConfig } from "@web3modal/wagmi/react/config";
-
-import { cookieStorage, createStorage, http } from "wagmi";
+import { cookieStorage, createConfig, createStorage, http } from "wagmi";
 import { walletConnect } from "wagmi/connectors";
 import { base, baseSepolia, celo, optimism, sepolia } from "viem/chains";
 import { siteConfig } from "./site";
@@ -18,12 +16,10 @@ const metadata = {
 };
 
 // Create wagmiConfig
-export const config = defaultWagmiConfig({
+export const config = createConfig({
   chains: [sepolia, celo, base, baseSepolia, optimism],
   connectors: [walletConnect({ projectId })],
-  projectId,
   pollingInterval: 2_000,
-  metadata,
   ssr: true,
   storage: createStorage({
     storage: cookieStorage,
