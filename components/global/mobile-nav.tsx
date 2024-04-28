@@ -22,7 +22,7 @@ const MobileNav = () => {
   if (isDesktop) return null;
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 bg-slate-100 md:hidden border-[1.5px] p-3 flex items-center justify-between rounded-xl backdrop-blur-sm">
+    <div className="fixed bottom-4 left-4 right-4 bg-slate-100/70 md:hidden border-[1.5px] p-3 flex items-center justify-between rounded-xl backdrop-blur-sm">
       <Link
         href={"/explore"}
         className={`${buttonVariants({ variant: "link" })} text-sm p-0 ${
