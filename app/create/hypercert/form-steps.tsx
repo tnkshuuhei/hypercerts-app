@@ -9,31 +9,71 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { ArrowLeftIcon, ArrowRightIcon } from "lucide-react";
-import { UseFormReturn } from "react-hook-form";
+import { UseFormRegisterReturn, UseFormReturn } from "react-hook-form";
 import { HypercertFormValues } from "@/app/create/hypercert/page";
+import { Textarea } from "@/components/ui/textarea";
 
 interface FormStepsProps {
   form: UseFormReturn<HypercertFormValues>;
   currentStep: number;
   setCurrentStep: (step: number) => void;
+  bannerRef: UseFormRegisterReturn<"banner">;
+  logoRef: UseFormRegisterReturn<"logo">;
 }
 
-const GeneralInformation = ({ form }: FormStepsProps) => {
+const GeneralInformation = ({ form, bannerRef, logoRef }: FormStepsProps) => {
   return (
-    <FormField
-      control={form.control}
-      name="title"
-      render={({ field }) => (
-        <FormItem>
-          <FormLabel>Title</FormLabel>
-          <FormControl>
-            <Input {...field} />
-          </FormControl>
-          <FormDescription>Make it short and descriptive</FormDescription>
-          <FormMessage />
-        </FormItem>
-      )}
-    />
+    <>
+      <FormField
+        control={form.control}
+        name="title"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Title</FormLabel>
+            <FormControl>
+              <Input {...field} autoFocus={true} autoCapitalize="words" />
+            </FormControl>
+            <FormDescription className="text-xs md:text-sm">
+              Keep it short but descriptive!
+            </FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name="banner"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Banner</FormLabel>
+            <FormControl>
+              <Input
+                type="file"
+                accept="image/jpeg, image/jpg, image/png, image/webp"
+                {...bannerRef}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name="description"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Description</FormLabel>
+            <FormControl>
+              <Textarea {...field} />
+            </FormControl>
+            <FormDescription className="text-xs md:text-sm">
+              Describe your project, why it was created, and how it works
+            </FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+    </>
   );
 };
 
@@ -45,24 +85,29 @@ const ReviewAndSubmit = ({ form }: FormStepsProps) => {
         Please review the information you&apos;ve provided and submit your
         hypercert for approval.
       </p>
-      <Button type="submit">Create Hypercert</Button>
     </section>
   );
 };
 
-const hypercertFormSteps = new Map([
+export const hypercertFormSteps = new Map([
   [
     1,
     {
       component: GeneralInformation,
       title: "General Information",
-      fields: ["title"],
+      fields: ["title", "banner", "description"],
     },
   ],
   [2, { component: ReviewAndSubmit, title: "Review and Submit" }],
 ]);
 
-const FormSteps = ({ form, currentStep, setCurrentStep }: FormStepsProps) => {
+const FormSteps = ({
+  form,
+  currentStep,
+  setCurrentStep,
+  bannerRef,
+  logoRef,
+}: FormStepsProps) => {
   const isLastStep = currentStep === hypercertFormSteps.size;
   const isCurrentStepValid = () => {
     const currentStepFields = hypercertFormSteps.get(currentStep)?.fields ?? [];
@@ -74,16 +119,14 @@ const FormSteps = ({ form, currentStep, setCurrentStep }: FormStepsProps) => {
     const currentStepErrors = currentStepFields.some(
       (field) => form.formState.errors[field as keyof HypercertFormValues]
     );
-    console.log({
-      fieldsTouched,
-      currentStepErrors,
-      touched: form.formState.touchedFields,
-    });
-    return fieldsTouched && !currentStepErrors;
+
+    const isBannerUploaded = form.getValues("banner")?.length > 0;
+
+    return fieldsTouched && !currentStepErrors && isBannerUploaded;
   };
 
   return (
-    <section>
+    <section className="space-y-5">
       <h5 className="text-xs font-semibold uppercase tracking-wider text-slate-500">
         Step {currentStep} of {hypercertFormSteps.size} &mdash;{" "}
         {hypercertFormSteps.get(currentStep)?.title}
@@ -92,6 +135,8 @@ const FormSteps = ({ form, currentStep, setCurrentStep }: FormStepsProps) => {
         form,
         currentStep,
         setCurrentStep,
+        bannerRef,
+        logoRef,
       })}
       <div className="flex justify-between items-center py-3">
         <Button
