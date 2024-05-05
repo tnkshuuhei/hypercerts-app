@@ -17,11 +17,9 @@ interface FormStepsProps {
   form: UseFormReturn<HypercertFormValues>;
   currentStep: number;
   setCurrentStep: (step: number) => void;
-  bannerRef: UseFormRegisterReturn<"banner">;
-  logoRef: UseFormRegisterReturn<"logo">;
 }
 
-const GeneralInformation = ({ form, bannerRef, logoRef }: FormStepsProps) => {
+const GeneralInformation = ({ form }: FormStepsProps) => {
   return (
     <>
       <FormField
@@ -33,26 +31,7 @@ const GeneralInformation = ({ form, bannerRef, logoRef }: FormStepsProps) => {
             <FormControl>
               <Input {...field} autoFocus={true} autoCapitalize="words" />
             </FormControl>
-            <FormDescription className="text-xs md:text-sm">
-              Keep it short but descriptive!
-            </FormDescription>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <FormField
-        control={form.control}
-        name="banner"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Banner</FormLabel>
-            <FormControl>
-              <Input
-                type="file"
-                accept="image/jpeg, image/jpg, image/png, image/webp"
-                {...bannerRef}
-              />
-            </FormControl>
+            <FormDescription>Keep it short but descriptive!</FormDescription>
             <FormMessage />
           </FormItem>
         )}
@@ -66,8 +45,24 @@ const GeneralInformation = ({ form, bannerRef, logoRef }: FormStepsProps) => {
             <FormControl>
               <Textarea {...field} />
             </FormControl>
-            <FormDescription className="text-xs md:text-sm">
+            <FormDescription>
               Describe your project, why it was created, and how it works
+            </FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name="banner"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Banner image</FormLabel>
+            <FormControl>
+              <Input {...field} placeholder="ipfs://" />
+            </FormControl>
+            <FormDescription>
+              The URL to an image to be displayed as the banner
             </FormDescription>
             <FormMessage />
           </FormItem>
@@ -101,13 +96,7 @@ export const hypercertFormSteps = new Map([
   [2, { component: ReviewAndSubmit, title: "Review and Submit" }],
 ]);
 
-const FormSteps = ({
-  form,
-  currentStep,
-  setCurrentStep,
-  bannerRef,
-  logoRef,
-}: FormStepsProps) => {
+const FormSteps = ({ form, currentStep, setCurrentStep }: FormStepsProps) => {
   const isLastStep = currentStep === hypercertFormSteps.size;
   const isCurrentStepValid = () => {
     const currentStepFields = hypercertFormSteps.get(currentStep)?.fields ?? [];
@@ -135,8 +124,6 @@ const FormSteps = ({
         form,
         currentStep,
         setCurrentStep,
-        bannerRef,
-        logoRef,
       })}
       <div className="flex justify-between items-center py-3">
         <Button
@@ -148,10 +135,11 @@ const FormSteps = ({
           Previous
         </Button>
         <Button
-          onClick={() => setCurrentStep(currentStep + 1)}
-          className={isLastStep || !isCurrentStepValid() ? "hidden" : ""}
+          onClick={() => (isLastStep ? null : setCurrentStep(currentStep + 1))}
+          className={!isCurrentStepValid() ? "hidden" : ""}
+          type={isLastStep ? "submit" : "button"}
         >
-          Next
+          {isLastStep ? "Submit" : "Next"}
           <ArrowRightIcon className="w-4 h-4 ml-2" />
         </Button>
       </div>
