@@ -129,22 +129,19 @@ const WorkScope = ({ form }: FormStepsProps) => {
                 {...field}
                 className="resize-none h-8"
                 placeholder="Tags are used to categorize your project."
-                onChange={(e) =>
-                  field.onChange(
-                    e.target.value === ""
-                      ? []
-                      : e.target.value
-                          .split(",")
-                          .map((tag) => tag.toLowerCase().trim())
-                  )
-                }
+                onChange={(e) => {
+                  const tags = e.target.value
+                    .split(",")
+                    .map((tag) => tag.trim().toLowerCase());
+                  field.onChange(tags.length > 0 ? tags : []);
+                }}
               />
             </FormControl>
             <FormDescription>Separate tags with commas.</FormDescription>
             <FormMessage />
-            {field.value.length > 0 && (
+            {field.value && field.value.length > 0 && (
               <div className="flex flex-wrap gap-0.5">
-                {field.value.map((tag) => (
+                {field?.value?.map((tag) => (
                   <Badge key={tag} variant="outline">
                     {tag}
                   </Badge>
