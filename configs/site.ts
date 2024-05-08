@@ -9,6 +9,7 @@ interface SiteConfig {
     discord: string;
     twitter: string;
     github: string;
+    docs: string;
   };
   navLinks: {
     title: string;
@@ -28,10 +29,10 @@ export const siteConfig: SiteConfig = {
     discord: "https://discord.gg/uExrjW4h7W",
     twitter: "https://twitter.com/hypercerts",
     github: "https://github.com/hypercerts-org/",
+    docs: "https://hypercerts.org/docs/",
   },
   navLinks: [
     { title: "Explore", path: "/explore", icon: Compass },
-    { title: "Create", path: "/create", icon: PlusCircle },
     {
       title: "Docs",
       path: "https://hypercerts.org/docs/",

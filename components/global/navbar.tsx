@@ -1,11 +1,17 @@
 "use client";
-import Link from "next/link";
 import ConnectDialog from "@/components/connect-dialog";
-import { useState } from "react";
-import { ArrowUpRight } from "lucide-react";
-import { buttonVariants } from "../ui/button";
-import { usePathname } from "next/navigation";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { siteConfig } from "@/configs/site";
+import { ArrowUpRight, ChevronDown } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
+import { buttonVariants } from "@/components/ui/button";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -52,6 +58,39 @@ const Navbar = () => {
               </Link>
             )
           )}
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              className={`${buttonVariants({
+                variant: "link",
+              })} group text-lg duration-300 ease-out opacity-70 hover:opacity-100}`}
+            >
+              Create <ChevronDown size={18} className="ml-1" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem
+                className={
+                  currentPath === "/create/hypercert"
+                    ? "bg-accent"
+                    : "bg-transparent"
+                }
+              >
+                <Link href="/create/hypercert" className="h-full w-full">
+                  New Hypercert
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className={
+                  currentPath === "/create/hyperboard"
+                    ? "bg-accent"
+                    : "bg-transparent"
+                }
+              >
+                <Link href="/create/hyperboard" className="h-full w-full">
+                  New Hyperboard
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
       <div className="hidden md:flex items-center space-x-4">
