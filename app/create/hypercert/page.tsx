@@ -8,14 +8,6 @@ import { z } from "zod";
 import FormSteps, { hypercertFormSteps } from "./form-steps";
 import { Button } from "@/components/ui/button";
 
-const MAX_FILE_SIZE = 3000000; // 3MB
-const ACCEPTED_IMAGE_TYPES = [
-  "image/jpeg",
-  "image/jpg",
-  "image/png",
-  "image/webp",
-];
-
 const formSchema = z.object({
   title: z.string().min(1, "We need a title for your hypercert"),
   logo: z.string().url("Logo URL is not valid"),

@@ -48,23 +48,29 @@ const Navbar = () => {
             <DropdownMenuContent>
               <DropdownMenuItem
                 className={
-                  currentPath === "/create/hypercert"
+                  currentPath === siteConfig.links.createHypercert
                     ? "bg-accent"
                     : "bg-transparent"
                 }
               >
-                <Link href="/create/hypercert" className="h-full w-full">
+                <Link
+                  href={siteConfig.links.createHypercert}
+                  className="h-full w-full"
+                >
                   New Hypercert
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem
                 className={
-                  currentPath === "/create/hyperboard"
+                  currentPath === siteConfig.links.createHyperboard
                     ? "bg-accent"
                     : "bg-transparent"
                 }
               >
-                <Link href="/create/hyperboard" className="h-full w-full">
+                <Link
+                  href={siteConfig.links.createHyperboard}
+                  className="h-full w-full"
+                >
                   New Hyperboard
                 </Link>
               </DropdownMenuItem>
