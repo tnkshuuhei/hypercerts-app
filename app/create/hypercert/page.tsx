@@ -18,26 +18,13 @@ const ACCEPTED_IMAGE_TYPES = [
 
 const formSchema = z.object({
   title: z.string().min(1, "We need a title for your hypercert"),
-  // logo: z.string().url("Logo URL is not valid"),
+  logo: z.string().url("Logo URL is not valid"),
   banner: z.string().url("Banner URL is not valid"),
-  // banner: z
-  //   .any()
-  //   .refine((fileList) => fileList?.length === 1, {
-  //     message: "Please upload an image",
-  //   })
-  //   .refine(
-  //     (fileList) => ACCEPTED_IMAGE_TYPES.includes(fileList[0]?.type),
-  //     "Must be a valid image type."
-  //   )
-  //   .refine(
-  //     (fileList) => fileList[0]?.size <= MAX_FILE_SIZE,
-  //     `Max file size is 3MB.`
-  //   ),
   description: z
     .string()
     .min(10, { message: "We need a longer description for your hypercert" }),
-  //   link: z.string().url("Link URL is not valid"),
-  //   tags: z.array(z.string()),
+  link: z.string().url("Link URL is not valid"),
+  tags: z.array(z.string()).min(1, "We need at least one tag"),
   //   dateWorkStart: z.string(),
   //   dateWorkEnd: z.string(),
   //   contributors: z.array(z.string()),
@@ -54,9 +41,9 @@ const formDefaultValues: HypercertFormValues = {
   title: "",
   banner: "",
   description: "",
-  // logo: "",
-  // link: "",
-  // tags: [],
+  logo: "",
+  link: "",
+  tags: [],
   // dateWorkStart: "",
   // dateWorkEnd: "",
   // contributors: [],
@@ -80,11 +67,11 @@ export default function NewHypercertForm() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col justify-betweeen p-8 pb-20">
-      <h1 className="font-serif text-5xl lg:text-8xl tracking-tight w-full">
+    <main className="flex flex-col justify-betweeen px-8 pt-4 pb-20">
+      <h1 className="font-serif text-4xl lg:text-8xl tracking-tight w-full">
         New hypercert
       </h1>
-      <div className="p-6"></div>
+      <div className="p-3"></div>
       <section className="flex flex-col space-y-4">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
