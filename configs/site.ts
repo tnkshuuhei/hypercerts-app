@@ -10,13 +10,10 @@ interface SiteConfig {
     twitter: string;
     github: string;
     docs: string;
+    createHypercert: string;
+    createHyperboard: string;
+    explore: string;
   };
-  navLinks: {
-    title: string;
-    path: string;
-    type?: "external";
-    icon: LucideIcon;
-  }[];
 }
 
 export const siteConfig: SiteConfig = {
@@ -30,14 +27,8 @@ export const siteConfig: SiteConfig = {
     twitter: "https://twitter.com/hypercerts",
     github: "https://github.com/hypercerts-org/",
     docs: "https://hypercerts.org/docs/",
+    createHypercert: "/create/hypercert",
+    createHyperboard: "/create/hyperboard",
+    explore: "/explore",
   },
-  navLinks: [
-    { title: "Explore", path: "/explore", icon: Compass },
-    {
-      title: "Docs",
-      path: "https://hypercerts.org/docs/",
-      type: "external",
-      icon: Book,
-    },
-  ],
 };

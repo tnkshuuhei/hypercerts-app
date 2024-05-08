@@ -1,53 +1,41 @@
 "use client";
-import { siteConfig } from "@/configs/site";
-import { buttonVariants } from "@/components/ui/button";
-import {
-  ArrowUpRight,
-  Book,
-  ChevronDown,
-  Menu,
-  MenuIcon,
-  Sparkle,
-} from "lucide-react";
-import Link from "next/link";
-import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
-import { usePathname } from "next/navigation";
 import ConnectDialog from "@/components/connect-dialog";
-import { createElement, useState } from "react";
-import { useMediaQuery } from "@/hooks/use-media-query";
-import { Popover, PopoverTrigger } from "@/components/ui/popover";
 import {
   Accordion,
+  AccordionContent,
   AccordionItem,
   AccordionTrigger,
-  AccordionContent,
 } from "@/components/ui/accordion";
+import { buttonVariants } from "@/components/ui/button";
 import {
   DropdownMenu,
-  DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { siteConfig } from "@/configs/site";
+import { useMediaQuery } from "@/hooks/use-media-query";
+import { ArrowUpRight, Book, Menu, Sparkle } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
 
 const MobileNav = () => {
   const currentPath = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const isDesktop = useMediaQuery("(min-width: 768px)");
-  const hiddenLinks = siteConfig.navLinks.filter(
-    (link) => link.title !== "Explore"
-  );
 
   if (isDesktop) return null;
 
   return (
     <div className="fixed bottom-4 left-4 right-4 bg-slate-100/70 md:hidden border-[1.5px] p-3 flex items-center justify-between rounded-xl backdrop-blur-sm">
       <Link
-        href={"/explore"}
+        href={siteConfig.links.explore}
         className={`${buttonVariants({
           variant: "link",
           size: "sm",
         })} text-sm p-0 ${
-          currentPath === "/explore"
+          currentPath === siteConfig.links.explore
             ? "opacity-1 font-semibold hover:opacity-100"
             : "opacity-70 hover:opacity-100"
         }`}
@@ -102,11 +90,11 @@ const MobileNav = () => {
                 <ul>
                   <li className="w-full bg-slate-50">
                     <Link
-                      href="/create/hypercert"
+                      href={siteConfig.links.createHypercert}
                       className={`${buttonVariants({
                         variant: "link",
                       })} text-sm ${
-                        currentPath === "/create/hypercert"
+                        currentPath === siteConfig.links.createHypercert
                           ? "opacity-1 font-semibold hover:opacity-100"
                           : "opacity-70 hover:opacity-100"
                       }`}
@@ -116,11 +104,11 @@ const MobileNav = () => {
                   </li>
                   <li className="w-full bg-slate-50">
                     <Link
-                      href="/create/hyperboard"
+                      href={siteConfig.links.createHyperboard}
                       className={`${buttonVariants({
                         variant: "link",
                       })} text-sm ${
-                        currentPath === "/create/hyperboard"
+                        currentPath === siteConfig.links.createHyperboard
                           ? "opacity-1 font-semibold hover:opacity-100"
                           : "opacity-70 hover:opacity-100"
                       }`}
