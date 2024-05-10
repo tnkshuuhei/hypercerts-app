@@ -1,3 +1,5 @@
+import { HypercertFormValues } from "@/app/create/hypercert/page";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   FormControl,
@@ -8,11 +10,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { ArrowLeftIcon, ArrowRightIcon } from "lucide-react";
-import { UseFormRegisterReturn, UseFormReturn } from "react-hook-form";
-import { HypercertFormValues } from "@/app/create/hypercert/page";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
+import { ArrowLeftIcon, ArrowRightIcon } from "lucide-react";
+import { UseFormReturn } from "react-hook-form";
 
 interface FormStepsProps {
   form: UseFormReturn<HypercertFormValues>;
@@ -104,20 +104,6 @@ const GeneralInformation = ({ form }: FormStepsProps) => {
 const WorkScope = ({ form }: FormStepsProps) => {
   return (
     <>
-      {/* <FormField
-        control={form.control}
-        name="title"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Title</FormLabel>
-            <FormControl>
-              <Input {...field} />
-            </FormControl>
-            <FormDescription>Keep it short but descriptive!</FormDescription>
-            <FormMessage />
-          </FormItem>
-        )}
-      /> */}
       <FormField
         control={form.control}
         name="tags"
@@ -142,7 +128,7 @@ const WorkScope = ({ form }: FormStepsProps) => {
             {field.value && field.value.length > 0 && (
               <div className="flex flex-wrap gap-0.5">
                 {field?.value?.map((tag) => (
-                  <Badge key={tag} variant="outline">
+                  <Badge key={tag} variant="secondary">
                     {tag}
                   </Badge>
                 ))}
@@ -151,50 +137,6 @@ const WorkScope = ({ form }: FormStepsProps) => {
           </FormItem>
         )}
       />
-      {/* <FormField
-        control={form.control}
-        name="link"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Link</FormLabel>
-            <FormControl>
-              <Input {...field} placeholder="https://" />
-            </FormControl>
-            <FormDescription>Paste a link to the project</FormDescription>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <FormField
-        control={form.control}
-        name="logo"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Logo</FormLabel>
-            <FormControl>
-              <Input {...field} placeholder="https://" />
-            </FormControl>
-            <FormDescription>The URL to your project logo</FormDescription>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <FormField
-        control={form.control}
-        name="banner"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Banner image</FormLabel>
-            <FormControl>
-              <Input {...field} placeholder="https://" />
-            </FormControl>
-            <FormDescription>
-              The URL to an image to be displayed as the banner
-            </FormDescription>
-            <FormMessage />
-          </FormItem>
-        )}
-      /> */}
     </>
   );
 };
@@ -215,13 +157,12 @@ export const hypercertFormSteps = new Map([
   [
     1,
     {
-      component: GeneralInformation,
       title: "General Information",
       fields: ["title", "banner", "description", "logo", "link"],
     },
   ],
-  [2, { component: WorkScope, title: "Work Scope", fields: ["tags"] }],
-  [3, { component: ReviewAndSubmit, title: "Review and Submit" }],
+  [2, { title: "Work Scope", fields: ["tags"] }],
+  [3, { title: "Review and Submit" }],
 ]);
 
 const FormSteps = ({ form, currentStep, setCurrentStep }: FormStepsProps) => {
@@ -246,28 +187,54 @@ const FormSteps = ({ form, currentStep, setCurrentStep }: FormStepsProps) => {
         Step {currentStep} of {hypercertFormSteps.size} &mdash;{" "}
         {hypercertFormSteps.get(currentStep)?.title}
       </h5>
-      {(hypercertFormSteps.get(currentStep)?.component ?? (() => null))({
-        form,
-        currentStep,
-        setCurrentStep,
-      })}
+      {currentStep === 1 && (
+        <GeneralInformation
+          form={form}
+          currentStep={currentStep}
+          setCurrentStep={setCurrentStep}
+        />
+      )}
+      {currentStep === 2 && (
+        <WorkScope
+          form={form}
+          currentStep={currentStep}
+          setCurrentStep={setCurrentStep}
+        />
+      )}
+      {currentStep === 3 && (
+        <ReviewAndSubmit
+          form={form}
+          currentStep={currentStep}
+          setCurrentStep={setCurrentStep}
+        />
+      )}
+
       <div className="flex justify-between items-center py-3">
         <Button
           onClick={() => setCurrentStep(currentStep - 1)}
           className={currentStep === 1 ? "hidden" : ""}
           variant={"outline"}
+          type="button"
         >
           <ArrowLeftIcon className="w-4 h-4 mr-2" />
           Previous
         </Button>
-        <Button
-          onClick={() => (isLastStep ? null : setCurrentStep(currentStep + 1))}
-          className={!isCurrentStepValid() ? "hidden" : ""}
-          type={isLastStep ? "submit" : "button"}
-        >
-          {isLastStep ? "Submit" : "Next"}
-          <ArrowRightIcon className="w-4 h-4 ml-2" />
-        </Button>
+        {!isLastStep && (
+          <Button
+            onClick={() => setCurrentStep(currentStep + 1)}
+            className={!isCurrentStepValid() ? "hidden" : ""}
+            type="button"
+          >
+            Next
+            <ArrowRightIcon className="w-4 h-4 ml-2" />
+          </Button>
+        )}
+        {isLastStep && (
+          <Button type="submit">
+            Mint hypercert
+            <ArrowRightIcon className="w-4 h-4 ml-2" />
+          </Button>
+        )}
       </div>
     </section>
   );

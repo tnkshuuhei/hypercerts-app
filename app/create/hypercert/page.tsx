@@ -5,8 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import FormSteps, { hypercertFormSteps } from "./form-steps";
-import { Button } from "@/components/ui/button";
+import FormSteps from "./form-steps";
 
 const formSchema = z.object({
   title: z.string().min(1, "We need a title for your hypercert"),
@@ -16,8 +15,7 @@ const formSchema = z.object({
     .string()
     .min(10, { message: "We need a longer description for your hypercert" }),
   link: z.string().url("Link URL is not valid"),
-  tags: z.array(z.string()).min(1, "We need at least one tag"),
-  //   dateWorkStart: z.string(),
+  tags: z.array(z.string()).nonempty("We need at least one tag"),
   //   dateWorkEnd: z.string(),
   //   contributors: z.array(z.string()),
   //   allowListURL: z.string().nullable(),
@@ -35,7 +33,7 @@ const formDefaultValues: HypercertFormValues = {
   description: "",
   logo: "",
   link: "",
-  tags: [],
+  tags: [""],
   // dateWorkStart: "",
   // dateWorkEnd: "",
   // contributors: [],
@@ -55,6 +53,7 @@ export default function NewHypercertForm() {
   });
 
   function onSubmit(values: HypercertFormValues) {
+    // TODO: remove empty tags
     console.log(values);
   }
 
