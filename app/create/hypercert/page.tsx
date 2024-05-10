@@ -7,23 +7,37 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import FormSteps from "./form-steps";
 
-const formSchema = z.object({
-  title: z.string().min(1, "We need a title for your hypercert"),
-  logo: z.string().url("Logo URL is not valid"),
-  banner: z.string().url("Banner URL is not valid"),
-  description: z
-    .string()
-    .min(10, { message: "We need a longer description for your hypercert" }),
-  link: z.string().url("Link URL is not valid"),
-  tags: z.array(z.string()).nonempty("We need at least one tag"),
-  //   dateWorkEnd: z.string(),
-  //   contributors: z.array(z.string()),
-  //   allowListURL: z.string().nullable(),
-  //   percentDistribution: z.number().nullable(),
-  //   mergeDistribution: z.boolean().nullable(),
-  //   contributorConfirmation: z.boolean().nullable(),
-  //   termsConfirmation: z.boolean(),
-});
+const formSchema = z
+  .object({
+    title: z.string().min(1, "We need a title for your hypercert"),
+    logo: z.string().url("Logo URL is not valid"),
+    banner: z.string().url("Banner URL is not valid"),
+    description: z
+      .string()
+      .min(10, { message: "We need a longer description for your hypercert" }),
+    link: z.string().url("Link URL is not valid"),
+    tags: z.array(z.string()).nonempty("We need at least one tag"),
+    projectDates: z.object(
+      {
+        from: z.date(),
+        to: z.date(),
+      },
+      {
+        required_error: "Please select a date range",
+      }
+    ),
+
+    //   contributors: z.array(z.string()),
+    //   allowListURL: z.string().nullable(),
+    //   percentDistribution: z.number().nullable(),
+    //   mergeDistribution: z.boolean().nullable(),
+    //   contributorConfirmation: z.boolean().nullable(),
+    //   termsConfirmation: z.boolean(),
+  })
+  .refine((data) => data.projectDates.from < data.projectDates.to, {
+    path: ["projectDates"],
+    message: "From date must be before to date",
+  });
 
 export type HypercertFormValues = z.infer<typeof formSchema>;
 
@@ -34,8 +48,10 @@ const formDefaultValues: HypercertFormValues = {
   logo: "",
   link: "",
   tags: [""],
-  // dateWorkStart: "",
-  // dateWorkEnd: "",
+  projectDates: {
+    from: new Date(),
+    to: new Date(),
+  },
   // contributors: [],
   // allowListURL: null,
   // percentDistribution: null,

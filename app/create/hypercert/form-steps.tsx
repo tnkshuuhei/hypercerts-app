@@ -1,6 +1,7 @@
 import { HypercertFormValues } from "@/app/create/hypercert/page";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import {
   FormControl,
   FormDescription,
@@ -10,8 +11,15 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeftIcon, ArrowRightIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { ArrowLeftIcon, ArrowRightIcon, CalendarIcon } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
 
 interface FormStepsProps {
@@ -139,6 +147,63 @@ const WorkScope = ({ form }: FormStepsProps) => {
           </FormItem>
         )}
       />
+
+      <FormField
+        control={form.control}
+        name="projectDates"
+        render={({ field }) => (
+          <FormItem className="flex flex-col">
+            <FormLabel>Project start and end date</FormLabel>
+            <Popover>
+              <PopoverTrigger asChild>
+                <FormControl>
+                  <Button
+                    variant={"outline"}
+                    className={cn(
+                      "w-full max-w-[280px] pl-3 text-left font-normal",
+                      !field.value && "text-muted-foreground"
+                    )}
+                  >
+                    {field.value.from ? (
+                      field.value.to ? (
+                        <>
+                          {format(field.value.from, "LLL dd, y")} &mdash;{" "}
+                          {format(field.value.to, "LLL dd, y")}
+                        </>
+                      ) : (
+                        format(field.value.from, "LLL dd, y")
+                      )
+                    ) : (
+                      <span>Pick a date</span>
+                    )}
+                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                  </Button>
+                </FormControl>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="range"
+                  selected={{
+                    from: field.value.from!,
+                    to: field.value.to,
+                  }}
+                  defaultMonth={field.value.from}
+                  onSelect={(selectedDates) => {
+                    field.onChange(selectedDates);
+                    field.onBlur();
+                  }}
+                  disabled={(date) => date < new Date("1900-01-01")}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+            <FormDescription>
+              The start and end date of the work considered in the hypercert
+            </FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
     </>
   );
 };
@@ -147,8 +212,7 @@ const ReviewAndSubmit = ({ form }: FormStepsProps) => {
   return (
     <section>
       <p className="text-slate-500">
-        Please review the information you&apos;ve provided and submit your
-        hypercert for approval.
+        Please accept the terms and conditions to mint your hypercert.
       </p>
     </section>
   );
@@ -162,8 +226,8 @@ export const hypercertFormSteps = new Map([
       fields: ["title", "banner", "description", "logo", "link"],
     },
   ],
-  [2, { title: "Work Scope", fields: ["tags"] }],
-  [3, { title: "Review and Submit" }],
+  [2, { title: "Project Scope", fields: ["tags", "projectDates"] }],
+  [3, { title: "Review and Mint" }],
 ]);
 
 const FormSteps = ({ form, currentStep, setCurrentStep }: FormStepsProps) => {
