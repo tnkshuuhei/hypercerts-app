@@ -40,7 +40,12 @@ const HypercertCard = ({
     <article className="relative w-[330px] h-[380px] rounded-xl border border-gray-200 overflow-clip">
       <header className="relative h-[150px] w-full object-contain rounded-b-xl overflow-clip z-0">
         {banner ? (
-          <Image src={banner} alt={`${title} banner`} layout="fill" />
+          <Image
+            src={banner}
+            alt={`${title} banner`}
+            layout="fill"
+            unoptimized
+          />
         ) : (
           <div className="flex items-center justify-center bg-slate-200 h-full w-full">
             <span className="text-slate-500 text-lg">Your banner here</span>
@@ -49,7 +54,13 @@ const HypercertCard = ({
       </header>
       <section className="absolute top-36 left-10 -translate-x-1/2 -translate-y-1/2 border-white border-4 rounded-full overflow-hidden">
         {logo ? (
-          <Image src={logo!} alt={`${title} logo`} width={40} height={40} />
+          <Image
+            src={logo!}
+            alt={`${title} logo`}
+            width={40}
+            height={40}
+            unoptimized
+          />
         ) : (
           <div className="flex items-center justify-center bg-slate-300 h-10 w-10">
             <Sparkle size={24} />
