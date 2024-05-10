@@ -114,7 +114,7 @@ const WorkScope = ({ form }: FormStepsProps) => {
               <Textarea
                 {...field}
                 className="resize-none h-8"
-                placeholder="Tags are used to categorize your project."
+                placeholder="Separate tags with commas"
                 onChange={(e) => {
                   const tags = e.target.value
                     .split(",")
@@ -123,7 +123,9 @@ const WorkScope = ({ form }: FormStepsProps) => {
                 }}
               />
             </FormControl>
-            <FormDescription>Separate tags with commas.</FormDescription>
+            <FormDescription>
+              Tags are used to categorize your project.
+            </FormDescription>
             <FormMessage />
             {field.value && field.value.length > 0 && (
               <div className="flex flex-wrap gap-0.5">
@@ -144,7 +146,6 @@ const WorkScope = ({ form }: FormStepsProps) => {
 const ReviewAndSubmit = ({ form }: FormStepsProps) => {
   return (
     <section>
-      <h3 className="text-xl font-semibold">Review and Submit</h3>
       <p className="text-slate-500">
         Please review the information you&apos;ve provided and submit your
         hypercert for approval.
@@ -183,10 +184,14 @@ const FormSteps = ({ form, currentStep, setCurrentStep }: FormStepsProps) => {
 
   return (
     <section className="space-y-5">
-      <h5 className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-        Step {currentStep} of {hypercertFormSteps.size} &mdash;{" "}
-        {hypercertFormSteps.get(currentStep)?.title}
-      </h5>
+      <div>
+        <h5 className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+          Step {currentStep} of {hypercertFormSteps.size}
+        </h5>
+        <h3 className="text-xl font-semibold">
+          {hypercertFormSteps.get(currentStep)?.title}
+        </h3>
+      </div>
       {currentStep === 1 && (
         <GeneralInformation
           form={form}
