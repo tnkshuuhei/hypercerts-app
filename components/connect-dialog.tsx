@@ -118,7 +118,7 @@ export default function ConnectDialog({
           className={`${buttonVariants({ variant: "outline" })} cursor-pointer`}
         >
           <div className="flex items-center justify-center gap-2">
-            Connect wallet
+            {isConnected ? "Connected" : "Connect wallet"}
             <Wallet2 size={16} />
           </div>
         </DialogTrigger>
