@@ -1,4 +1,5 @@
 import { HypercertFormValues } from "@/app/create/hypercert/page";
+import HypercertCard from "@/components/hypercert-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -211,6 +212,15 @@ const WorkScope = ({ form }: FormStepsProps) => {
 const ReviewAndSubmit = ({ form }: FormStepsProps) => {
   return (
     <section>
+      {/* <div className="flex flex-col space-y-4 items-center">
+        <HypercertCard
+          title={form.getValues().title || undefined}
+          description={form.getValues().description || undefined}
+          banner={form.getValues().banner || undefined}
+          logo={form.getValues().logo || undefined}
+          displayOnly
+        />
+      </div> */}
       <p className="text-slate-500">
         Please accept the terms and conditions to mint your hypercert.
       </p>
