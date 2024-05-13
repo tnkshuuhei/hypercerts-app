@@ -1,8 +1,9 @@
 "use client";
 import Link from "next/link";
 import { normalize } from "viem/ens";
-import { useAccount, useDisconnect, useEnsAvatar, useEnsName } from "wagmi";
+import { useAccount, useEnsAvatar, useEnsName } from "wagmi";
 
+import ConnectDialog from "@/components/connect-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -17,8 +18,7 @@ import { cn, truncateEthereumAddress } from "@/lib/utils";
 import { Loader2, VenetianMaskIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { mainnet } from "viem/chains";
-import ConnectDialog from "./connect-dialog";
-import DisconnectDialog from "./disconnect-dialog";
+import DisconnectDialog from "@/components/disconnect-dialog";
 
 const WalletProfile = ({
   alignment = "end",
@@ -36,20 +36,17 @@ const WalletProfile = ({
     address,
   });
 
-  // Use useEffect to react to nameData changes and setEnsName
   useEffect(() => {
     if (!nameError && nameData) {
       setEnsName(nameData);
     }
   }, [nameData, nameError]);
 
-  // Call useEnsAvatar with the normalized nameData when available
   const { data: avatarData, error: avatarError } = useEnsAvatar({
     chainId: nameData ? mainnet.id : undefined,
     name: nameData ? normalize(nameData) : undefined,
   });
 
-  // Use useEffect to react to avatarData changes and setEnsAvatar
   useEffect(() => {
     if (!avatarError && avatarData) {
       setEnsAvatar(avatarData);
@@ -67,7 +64,7 @@ const WalletProfile = ({
       <DropdownMenuTrigger
         asChild
         className={cn(
-          "relative w-10 h-10 rounded-full overflow-hidden ring-[1.5px] ring-vd-beige-300 focus:outline-none focus:ring-2 focus:ring-vd-beige-400"
+          "relative w-10 h-10 rounded-full overflow-hidden ring-[1.5px] ring-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-400"
         )}
       >
         <Avatar className="h-10 w-10 bg-stone-50">
@@ -84,7 +81,7 @@ const WalletProfile = ({
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent
-        className="w-56 bg-vd-beige-100"
+        className="w-56 bg-slate-50"
         align={alignment}
         forceMount
       >
@@ -115,6 +112,7 @@ const WalletProfile = ({
         <DisconnectDialog
           isDisconnectOpen={isDisconnectOpen}
           setIsDisconnectOpen={setIsDisconnectOpen}
+          setIsConnectOpen={setIsConnectOpen}
         />
       </DropdownMenuContent>
     </DropdownMenu>

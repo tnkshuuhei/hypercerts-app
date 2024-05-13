@@ -41,7 +41,7 @@ const MobileNav = () => {
       >
         <span className="hover:underline">Explore</span>
       </Link>
-      <WalletProfile />
+      <WalletProfile alignment="center" />
       <DropdownMenu>
         <DropdownMenuTrigger
           className={buttonVariants({ variant: "outline", size: "sm" })}
@@ -73,7 +73,7 @@ const MobileNav = () => {
             </a>
           </DropdownMenuItem>
 
-          <Accordion type="single" collapsible className="border-b-0">
+          <Accordion type="single" className="border-b-0">
             <AccordionItem value="create">
               <AccordionTrigger
                 className={`${buttonVariants({
