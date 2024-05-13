@@ -147,7 +147,6 @@ export default function ConnectDialog({
         className={buttonVariants({ variant: "outline", size: "sm" })}
       >
         <div className="flex items-center justify-center gap-2">
-          <Wallet2 size={16} />
           Connect wallet
         </div>
       </DrawerTrigger>
