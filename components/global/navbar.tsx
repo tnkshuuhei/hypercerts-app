@@ -1,5 +1,4 @@
 "use client";
-import ConnectDialog from "@/components/connect-dialog";
 import { buttonVariants } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -11,10 +10,9 @@ import { siteConfig } from "@/configs/site";
 import { ArrowUpRight, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { WalletProfile } from "@/components/wallet-profile";
 
 const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false);
   const currentPath = usePathname();
 
   return (
@@ -95,7 +93,7 @@ const Navbar = () => {
         </div>
       </div>
       <div className="hidden md:flex items-center space-x-4">
-        <ConnectDialog isOpen={isOpen} setIsOpen={setIsOpen} />
+        <WalletProfile />
       </div>
     </nav>
   );

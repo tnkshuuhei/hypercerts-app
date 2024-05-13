@@ -14,11 +14,9 @@ import { useMediaQuery } from "@/hooks/use-media-query";
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
 
 const MobileNav = () => {
   const currentPath = usePathname();
-  const [isOpen, setIsOpen] = useState(false);
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   if (isDesktop) return null;
