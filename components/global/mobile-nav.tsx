@@ -1,5 +1,4 @@
 "use client";
-import ConnectDialog from "@/components/connect-dialog";
 import {
   Accordion,
   AccordionContent,
@@ -13,6 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { WalletProfile } from "@/components/wallet-profile";
 import { siteConfig } from "@/configs/site";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { ArrowUpRight, Book, Menu, Sparkle } from "lucide-react";
@@ -22,7 +22,6 @@ import { useState } from "react";
 
 const MobileNav = () => {
   const currentPath = usePathname();
-  const [isOpen, setIsOpen] = useState(false);
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   if (isDesktop) return null;
@@ -42,7 +41,7 @@ const MobileNav = () => {
       >
         <span className="hover:underline">Explore</span>
       </Link>
-      <ConnectDialog isOpen={isOpen} setIsOpen={setIsOpen} />
+      <WalletProfile />
       <DropdownMenu>
         <DropdownMenuTrigger
           className={buttonVariants({ variant: "outline", size: "sm" })}
