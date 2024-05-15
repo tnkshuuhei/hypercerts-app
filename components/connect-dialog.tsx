@@ -124,8 +124,13 @@ export default function ConnectDialog({
         </DialogTrigger>
 
         <DialogContent>
-          <DialogTitle className="font-sans text-4xl py-3 tracking-tight font-normal">
-            Choose wallet
+          <DialogTitle>
+            <p className="text-sm text-muted-foreground uppercase font-semibold tracking-wide">
+              Connect wallet
+            </p>
+            <p className="text-2xl py-3 tracking-tight font-semibold">
+              Choose a wallet
+            </p>
           </DialogTitle>
 
           <ConnectorContent />
@@ -142,7 +147,6 @@ export default function ConnectDialog({
         className={buttonVariants({ variant: "outline", size: "sm" })}
       >
         <div className="flex items-center justify-center gap-2">
-          <Wallet2 size={16} />
           Connect wallet
         </div>
       </DrawerTrigger>
