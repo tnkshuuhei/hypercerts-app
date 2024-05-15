@@ -6,6 +6,16 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import FormSteps from "./form-steps";
+import { useHypercertClient } from "@/hooks/use-hypercert-client";
+import {
+  HypercertMetadata,
+  TransferRestrictions,
+  formatHypercertData,
+} from "@hypercerts-org/sdk";
+import { useMintClaim } from "@/hooks/use-mint-claim";
+
+const DEFAULT_NUM_FRACTIONS: number = 10000;
+const DEFAULT_HYPERCERT_VERSION: string = "0.0.1";
 
 const formSchema = z
   .object({
@@ -68,9 +78,52 @@ export default function NewHypercertForm() {
     mode: "onChange",
   });
 
+  const onMintComplete = () => {
+    console.log("Minting complete");
+  };
+
+  const { write: mintClaim, txPending: mintClaimPending } = useMintClaim({
+    onComplete: onMintComplete,
+  });
+
   function onSubmit(values: HypercertFormValues) {
     // TODO: remove empty tags
     console.log(values);
+
+    const metadata: HypercertMetadata = {
+      name: values.title,
+      description: values.description,
+      image: values.banner, // TODO: Change to canvas snapshot
+      external_url: values.link,
+    };
+
+    const formattedMetadata = formatHypercertData({
+      ...metadata,
+      version: "0.0.1",
+      properties: [
+        {
+          trait_type: "Minted by",
+          value: "true",
+        },
+      ],
+      impactScope: [],
+      excludedImpactScope: [],
+      workScope: [],
+      excludedWorkScope: [],
+      rights: [],
+      excludedRights: [],
+      workTimeframeStart: values.projectDates.from.getTime() * 1000,
+      workTimeframeEnd: values.projectDates.to.getTime() * 1000,
+      impactTimeframeStart: values.projectDates.from.getTime() * 1000,
+      impactTimeframeEnd: values.projectDates.to.getTime() * 1000,
+      contributors: [],
+    });
+
+    mintClaim(
+      formattedMetadata.data!,
+      DEFAULT_NUM_FRACTIONS,
+      TransferRestrictions.FromCreatorOnly
+    );
   }
 
   return (
