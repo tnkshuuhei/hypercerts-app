@@ -62,9 +62,9 @@ const MobileNav = () => {
         </MenubarContent>
       </MenubarMenu>
       <MenubarMenu>
-        <MenubarTrigger className="py-0 bg-none data-[state=open]:bg-none focus:bg-none">
+        <div className="pr-2 py-0 bg-none data-[state=open]:bg-none focus:bg-none">
           <WalletProfile />
-        </MenubarTrigger>
+        </div>
       </MenubarMenu>
     </Menubar>
   );
