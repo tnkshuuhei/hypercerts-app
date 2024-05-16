@@ -17,17 +17,21 @@ import { useMintClaim } from "@/hooks/use-mint-claim";
 const DEFAULT_NUM_FRACTIONS: number = 10000;
 const DEFAULT_HYPERCERT_VERSION: string = "0.0.1";
 
-const formSchema = z
-  .object({
-    title: z.string().min(1, "We need a title for your hypercert"),
-    logo: z.string().url("Logo URL is not valid"),
-    banner: z.string().url("Banner URL is not valid"),
-    description: z
-      .string()
-      .min(10, { message: "We need a longer description for your hypercert" }),
-    link: z.string().url("Link URL is not valid"),
-    tags: z.array(z.string()),
-    projectDates: z.object(
+const formSchema = z.object({
+  title: z.string().min(1, "We need a title for your hypercert"),
+  logo: z.string().url("Logo URL is not valid"),
+  banner: z.string().url("Banner URL is not valid"),
+  description: z
+    .string()
+    .min(10, { message: "We need a longer description for your hypercert" }),
+  link: z.string().url("Link URL is not valid"),
+  tags: z
+    .array(z.string())
+    .refine((data) => data.filter((tag) => tag !== "").length > 0, {
+      message: "We need at least one tag",
+    }),
+  projectDates: z
+    .object(
       {
         from: z.date(),
         to: z.date(),
@@ -35,30 +39,30 @@ const formSchema = z
       {
         required_error: "Please select a date range",
       }
+    )
+    .refine((data) => data.from < data.to, {
+      path: ["projectDates"],
+      message: "From date must be before to date",
+    }),
+  contributors: z
+    .array(z.string())
+    .refine(
+      (data) => data.filter((contributor) => contributor !== "").length > 0,
+      {
+        message: "We need at least one contributor",
+      }
     ),
-    contributors: z.array(z.string()),
-    //   allowListURL: z.string().nullable(),
-    //   percentDistribution: z.number().nullable(),
-    //   mergeDistribution: z.boolean().nullable(),
-    //   contributorConfirmation: z.boolean().nullable(),
-    //   termsConfirmation: z.boolean(),
-  })
-  .refine((data) => data.projectDates.from < data.projectDates.to, {
-    path: ["projectDates"],
-    message: "From date must be before to date",
-  })
-  .refine(
-    (data) =>
-      data.contributors.filter((contributor) => contributor !== "").length > 0,
-    {
-      path: ["contributors"],
-      message: "We need at least one contributor",
-    }
-  )
-  .refine((data) => data.tags.filter((tag) => tag !== "").length > 0, {
-    path: ["tags"],
-    message: "We need at least one tag",
-  });
+  acceptTerms: z.boolean().refine((data) => data === true, {
+    message: "You must accept the terms and conditions",
+  }),
+  confirmContributorsPermission: z.boolean().refine((data) => data === true, {
+    message: "You must confirm that all contributors gave their permission",
+  }),
+  //   allowListURL: z.string().nullable(),
+  //   percentDistribution: z.number().nullable(),
+  //   mergeDistribution: z.boolean().nullable(),
+  //   contributorConfirmation: z.boolean().nullable(),
+});
 
 export type HypercertFormValues = z.infer<typeof formSchema>;
 
@@ -74,6 +78,8 @@ const formDefaultValues: HypercertFormValues = {
     to: new Date(),
   },
   contributors: [""],
+  acceptTerms: false,
+  confirmContributorsPermission: false,
   // allowListURL: null,
   // percentDistribution: null,
   // mergeDistribution: null,

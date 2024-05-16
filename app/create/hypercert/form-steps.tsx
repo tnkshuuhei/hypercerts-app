@@ -4,6 +4,7 @@ import HypercertCard from "@/components/hypercert-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   FormControl,
   FormDescription,
@@ -20,8 +21,10 @@ import {
 } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import { CheckedState } from "@radix-ui/react-checkbox";
 import { format } from "date-fns";
 import { ArrowLeftIcon, ArrowRightIcon, CalendarIcon } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 import { UseFormReturn } from "react-hook-form";
 import { useAccount } from "wagmi";
@@ -250,13 +253,39 @@ const WorkScope = ({ form }: FormStepsProps) => {
           </FormItem>
         )}
       />
+
+      <FormField
+        control={form.control}
+        name="confirmContributorsPermission"
+        render={({ field }) => (
+          <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+            <FormControl>
+              <Checkbox
+                checked={field.value}
+                onCheckedChange={(checked) => {
+                  field.onChange(checked);
+                  if (checked === true) {
+                    field.onBlur();
+                  }
+                }}
+              />
+            </FormControl>
+            <div className="space-y-1 leading-none">
+              <FormLabel>
+                I confirm that all contributors listed have given their
+                permission to include their work in this hypercert.
+              </FormLabel>
+            </div>
+          </FormItem>
+        )}
+      />
     </section>
   );
 };
 
 const ReviewAndSubmit = ({ form }: FormStepsProps) => {
   return (
-    <section>
+    <section className="space-y-8">
       {/* <div className="flex flex-col space-y-4 items-center">
         <HypercertCard
           title={form.getValues().title || undefined}
@@ -269,6 +298,39 @@ const ReviewAndSubmit = ({ form }: FormStepsProps) => {
       <p className="text-slate-500">
         Please accept the terms and conditions to mint your hypercert.
       </p>
+
+      <FormField
+        control={form.control}
+        name="acceptTerms"
+        render={({ field }) => (
+          <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+            <FormControl>
+              <Checkbox
+                checked={field.value}
+                onCheckedChange={(checked) => {
+                  field.onChange(checked);
+                  if (checked === true) {
+                    field.onBlur();
+                  }
+                }}
+              />
+            </FormControl>
+            <div className="space-y-1 leading-none">
+              <FormLabel>
+                I have read and agree to the{" "}
+                <Link
+                  href="https://hypercerts.org/terms/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="underline text-slate-500"
+                >
+                  terms and conditions
+                </Link>
+              </FormLabel>
+            </div>
+          </FormItem>
+        )}
+      />
     </section>
   );
 };
@@ -285,16 +347,22 @@ export const hypercertFormSteps = new Map([
     2,
     {
       title: "Project Scope",
-      fields: ["tags", "projectDates", "contributors"],
+      fields: [
+        "tags",
+        "projectDates",
+        "contributors",
+        "confirmContributorsPermission",
+      ],
     },
   ],
-  [3, { title: "Review and Mint" }],
+  [3, { title: "Review and Mint", fields: ["acceptTerms"] }],
 ]);
 
 const FormSteps = ({ form, currentStep, setCurrentStep }: FormStepsProps) => {
   const isLastStep = currentStep === hypercertFormSteps.size;
   const { address } = useAccount();
   const [isOpen, setIsOpen] = useState(false);
+
   const isCurrentStepValid = () => {
     const currentStepFields = hypercertFormSteps.get(currentStep)?.fields ?? [];
     const fieldsTouched = currentStepFields.every(
@@ -361,13 +429,13 @@ const FormSteps = ({ form, currentStep, setCurrentStep }: FormStepsProps) => {
             <ArrowRightIcon className="w-4 h-4 ml-2" />
           </Button>
         )}
-        {isLastStep && address && (
+        {isLastStep && address && isCurrentStepValid() && (
           <Button type="submit">
             Mint hypercert
             <ArrowRightIcon className="w-4 h-4 ml-2" />
           </Button>
         )}
-        {isLastStep && !address && (
+        {isLastStep && !address && isCurrentStepValid() && (
           <ConnectDialog isOpen={isOpen} setIsOpen={setIsOpen} />
         )}
       </div>
