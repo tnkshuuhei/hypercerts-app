@@ -42,11 +42,6 @@ const MobileNav = () => {
                   New Hypercert
                 </Link>
               </MenubarItem>
-              <MenubarItem>
-                <Link href={siteConfig.links.createHyperboard}>
-                  New Hyperboard
-                </Link>
-              </MenubarItem>
             </MenubarSubContent>
           </MenubarSub>
           <MenubarSeparator />

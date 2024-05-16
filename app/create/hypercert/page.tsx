@@ -26,7 +26,7 @@ const formSchema = z
       .string()
       .min(10, { message: "We need a longer description for your hypercert" }),
     link: z.string().url("Link URL is not valid"),
-    tags: z.array(z.string()).nonempty("We need at least one tag"),
+    tags: z.array(z.string()),
     projectDates: z.object(
       {
         from: z.date(),
@@ -36,8 +36,7 @@ const formSchema = z
         required_error: "Please select a date range",
       }
     ),
-
-    //   contributors: z.array(z.string()),
+    contributors: z.array(z.string()),
     //   allowListURL: z.string().nullable(),
     //   percentDistribution: z.number().nullable(),
     //   mergeDistribution: z.boolean().nullable(),
@@ -47,6 +46,18 @@ const formSchema = z
   .refine((data) => data.projectDates.from < data.projectDates.to, {
     path: ["projectDates"],
     message: "From date must be before to date",
+  })
+  .refine(
+    (data) =>
+      data.contributors.filter((contributor) => contributor !== "").length > 0,
+    {
+      path: ["contributors"],
+      message: "We need at least one contributor",
+    }
+  )
+  .refine((data) => data.tags.filter((tag) => tag !== "").length > 0, {
+    path: ["tags"],
+    message: "We need at least one tag",
   });
 
 export type HypercertFormValues = z.infer<typeof formSchema>;
@@ -62,7 +73,7 @@ const formDefaultValues: HypercertFormValues = {
     from: new Date(),
     to: new Date(),
   },
-  // contributors: [],
+  contributors: [""],
   // allowListURL: null,
   // percentDistribution: null,
   // mergeDistribution: null,
@@ -116,7 +127,7 @@ export default function NewHypercertForm() {
       workTimeframeEnd: values.projectDates.to.getTime() * 1000,
       impactTimeframeStart: values.projectDates.from.getTime() * 1000,
       impactTimeframeEnd: values.projectDates.to.getTime() * 1000,
-      contributors: [],
+      contributors: values.contributors,
     });
 
     mintClaim(

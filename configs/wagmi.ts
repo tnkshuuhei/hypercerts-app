@@ -17,7 +17,8 @@ const metadata = {
 
 // Create wagmiConfig
 export const config = createConfig({
-  chains: [sepolia, celo, base, baseSepolia, optimism],
+  // chains: [sepolia, celo, base, baseSepolia, optimism],
+  chains: [sepolia],
   connectors: [walletConnect({ projectId })],
   pollingInterval: 2_000,
   ssr: true,
@@ -26,9 +27,9 @@ export const config = createConfig({
   }),
   transports: {
     [sepolia.id]: http(),
-    [celo.id]: http(),
-    [base.id]: http(),
-    [baseSepolia.id]: http(),
-    [optimism.id]: http(),
+    // [celo.id]: http(),
+    // [base.id]: http(),
+    // [baseSepolia.id]: http(),
+    // [optimism.id]: http(),
   },
 });

@@ -1,4 +1,5 @@
 import { HypercertFormValues } from "@/app/create/hypercert/page";
+import ConnectDialog from "@/components/connect-dialog";
 import HypercertCard from "@/components/hypercert-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -21,7 +22,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { ArrowLeftIcon, ArrowRightIcon, CalendarIcon } from "lucide-react";
+import { useState } from "react";
 import { UseFormReturn } from "react-hook-form";
+import { useAccount } from "wagmi";
 
 interface FormStepsProps {
   form: UseFormReturn<HypercertFormValues>;
@@ -31,7 +34,7 @@ interface FormStepsProps {
 
 const GeneralInformation = ({ form }: FormStepsProps) => {
   return (
-    <>
+    <section className="space-y-8">
       <FormField
         control={form.control}
         name="title"
@@ -53,7 +56,7 @@ const GeneralInformation = ({ form }: FormStepsProps) => {
           <FormItem>
             <FormLabel>Description</FormLabel>
             <FormControl>
-              <Textarea {...field} />
+              <Textarea {...field} className="resize-none h-32" />
             </FormControl>
             <FormDescription>
               Describe your project: why it was created, and how it works
@@ -106,13 +109,13 @@ const GeneralInformation = ({ form }: FormStepsProps) => {
           </FormItem>
         )}
       />
-    </>
+    </section>
   );
 };
 
 const WorkScope = ({ form }: FormStepsProps) => {
   return (
-    <>
+    <section className="space-y-8">
       <FormField
         control={form.control}
         name="tags"
@@ -122,7 +125,7 @@ const WorkScope = ({ form }: FormStepsProps) => {
             <FormControl>
               <Textarea
                 {...field}
-                className="resize-none h-8"
+                className="resize-none h-4"
                 placeholder="Separate tags with commas"
                 onChange={(e) => {
                   const tags = e.target.value
@@ -136,15 +139,16 @@ const WorkScope = ({ form }: FormStepsProps) => {
               Tags are used to categorize your project.
             </FormDescription>
             <FormMessage />
-            {field.value && field.value.length > 0 && (
-              <div className="flex flex-wrap gap-0.5">
-                {field?.value?.map((tag) => (
-                  <Badge key={tag} variant="secondary">
-                    {tag}
-                  </Badge>
-                ))}
-              </div>
-            )}
+            {field.value &&
+              field.value.filter((tag) => tag !== "").length > 0 && (
+                <div className="flex flex-wrap gap-0.5">
+                  {field?.value?.map((tag) => (
+                    <Badge key={tag} variant="secondary">
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+              )}
           </FormItem>
         )}
       />
@@ -205,7 +209,48 @@ const WorkScope = ({ form }: FormStepsProps) => {
           </FormItem>
         )}
       />
-    </>
+
+      <FormField
+        control={form.control}
+        name="contributors"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Contributors</FormLabel>
+            <FormControl>
+              <Textarea
+                {...field}
+                className="resize-none h-8"
+                placeholder="Separate contributors with commas"
+                onChange={(e) => {
+                  const contributors = e.target.value
+                    .split(",")
+                    .map((contributor) => contributor.trim().toLowerCase());
+                  field.onChange(contributors.length > 0 ? contributors : []);
+                }}
+              />
+            </FormControl>
+            <FormDescription>
+              Add contributors&apos; addresses, names or pseudonyms.
+            </FormDescription>
+            <FormMessage />
+            {field.value &&
+              field.value.filter((contributor) => contributor !== "").length >
+                0 && (
+                <div className="flex flex-wrap gap-0.5">
+                  <Badge variant="secondary">
+                    {
+                      field.value.filter((contributor) => contributor !== "")
+                        .length
+                    }{" "}
+                    {field.value.length > 1 ? "contributors" : "contributor"}{" "}
+                    added
+                  </Badge>
+                </div>
+              )}
+          </FormItem>
+        )}
+      />
+    </section>
   );
 };
 
@@ -236,12 +281,20 @@ export const hypercertFormSteps = new Map([
       fields: ["title", "banner", "description", "logo", "link"],
     },
   ],
-  [2, { title: "Project Scope", fields: ["tags", "projectDates"] }],
+  [
+    2,
+    {
+      title: "Project Scope",
+      fields: ["tags", "projectDates", "contributors"],
+    },
+  ],
   [3, { title: "Review and Mint" }],
 ]);
 
 const FormSteps = ({ form, currentStep, setCurrentStep }: FormStepsProps) => {
   const isLastStep = currentStep === hypercertFormSteps.size;
+  const { address } = useAccount();
+  const [isOpen, setIsOpen] = useState(false);
   const isCurrentStepValid = () => {
     const currentStepFields = hypercertFormSteps.get(currentStep)?.fields ?? [];
     const fieldsTouched = currentStepFields.every(
@@ -308,11 +361,14 @@ const FormSteps = ({ form, currentStep, setCurrentStep }: FormStepsProps) => {
             <ArrowRightIcon className="w-4 h-4 ml-2" />
           </Button>
         )}
-        {isLastStep && (
+        {isLastStep && address && (
           <Button type="submit">
             Mint hypercert
             <ArrowRightIcon className="w-4 h-4 ml-2" />
           </Button>
+        )}
+        {isLastStep && !address && (
+          <ConnectDialog isOpen={isOpen} setIsOpen={setIsOpen} />
         )}
       </div>
     </section>
