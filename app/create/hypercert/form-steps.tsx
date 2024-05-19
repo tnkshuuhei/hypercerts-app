@@ -258,7 +258,7 @@ const WorkScope = ({ form }: FormStepsProps) => {
         control={form.control}
         name="confirmContributorsPermission"
         render={({ field }) => (
-          <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+          <FormItem className="flex flex-row items-center space-x-3 space-y-0">
             <FormControl>
               <Checkbox
                 checked={field.value}
@@ -272,8 +272,8 @@ const WorkScope = ({ form }: FormStepsProps) => {
             </FormControl>
             <div className="space-y-1 leading-none">
               <FormLabel>
-                I confirm that all contributors listed have given their
-                permission to include their work in this hypercert.
+                I confirm that all listed contributors have permitted their
+                works&apos; inclusion in this hypercert.
               </FormLabel>
             </div>
           </FormItem>
