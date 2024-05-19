@@ -31,29 +31,30 @@ const MobileNav = () => {
           <Menu size={24} className="mr-1" /> Menu
         </MenubarTrigger>
         <MenubarContent>
-          <MenubarItem>
-            <Link href={siteConfig.links.explore}>Explore</Link>
-          </MenubarItem>
+          <Link href={siteConfig.links.explore} className="w-full h-full">
+            <MenubarItem>Explore</MenubarItem>
+          </Link>
           <MenubarSub>
             <MenubarSubTrigger>Create</MenubarSubTrigger>
             <MenubarSubContent>
-              <MenubarItem>
-                <Link href={siteConfig.links.createHypercert}>
-                  New Hypercert
-                </Link>
-              </MenubarItem>
+              <Link
+                href={siteConfig.links.createHypercert}
+                className="w-full h-full"
+              >
+                <MenubarItem>New Hypercert</MenubarItem>
+              </Link>
             </MenubarSubContent>
           </MenubarSub>
           <MenubarSeparator />
-          <MenubarItem>
-            <Link
-              href={siteConfig.links.docs}
-              className="w-full h-full flex justify-between"
-            >
+          <Link
+            href={siteConfig.links.docs}
+            className="w-full h-full flex justify-between"
+          >
+            <MenubarItem>
               Docs
               <ArrowUpRight size={14} className="opacity-50" />
-            </Link>
-          </MenubarItem>
+            </MenubarItem>
+          </Link>
         </MenubarContent>
       </MenubarMenu>
       <MenubarMenu>
