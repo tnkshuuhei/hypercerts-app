@@ -1,18 +1,18 @@
 "use client";
 
+import HypercertCard from "@/components/hypercert-card";
 import { Form } from "@/components/ui/form";
+import { useMintClaim } from "@/hooks/use-mint-claim";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import FormSteps from "./form-steps";
-import { useHypercertClient } from "@/hooks/use-hypercert-client";
 import {
   HypercertMetadata,
   TransferRestrictions,
   formatHypercertData,
 } from "@hypercerts-org/sdk";
-import { useMintClaim } from "@/hooks/use-mint-claim";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import FormSteps from "./form-steps";
 
 const DEFAULT_NUM_FRACTIONS: number = 10000;
 const DEFAULT_HYPERCERT_VERSION: string = "0.0.1";
@@ -25,6 +25,7 @@ const formSchema = z.object({
     .string()
     .min(10, { message: "We need a longer description for your hypercert" }),
   link: z.string().url("Link URL is not valid"),
+  cardImage: z.string().url("Card image not generated"),
   tags: z
     .array(z.string())
     .refine((data) => data.filter((tag) => tag !== "").length > 0, {
@@ -40,7 +41,7 @@ const formSchema = z.object({
         required_error: "Please select a date range",
       }
     )
-    .refine((data) => data.from < data.to, {
+    .refine((data) => data.from <= data.to, {
       path: ["projectDates"],
       message: "From date must be before to date",
     }),
@@ -72,6 +73,7 @@ const formDefaultValues: HypercertFormValues = {
   description: "",
   logo: "",
   link: "",
+  cardImage: "",
   tags: [""],
   projectDates: {
     from: new Date(),
@@ -105,12 +107,12 @@ export default function NewHypercertForm() {
 
   function onSubmit(values: HypercertFormValues) {
     // TODO: remove empty tags
-    console.log(values);
+    console.log({ formValues: values });
 
     const metadata: HypercertMetadata = {
       name: values.title,
       description: values.description,
-      image: values.banner, // TODO: Change to canvas snapshot
+      image: values.cardImage,
       external_url: values.link,
     };
 
@@ -144,31 +146,33 @@ export default function NewHypercertForm() {
   }
 
   return (
-    <main className="flex flex-col justify-betweeen px-8 pt-4 pb-20">
-      <h1 className="font-serif text-4xl lg:text-8xl tracking-tight w-full">
+    <main className="flex flex-col px-8 pt-4 pb-20 container max-w-screen-lg">
+      <h1 className="font-serif text-4xl lg:text-6xl tracking-tight w-full">
         New hypercert
       </h1>
       <div className="p-3"></div>
-      <section className="flex flex-col space-y-4">
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
-            <FormSteps
-              form={form}
-              currentStep={currentStep}
-              setCurrentStep={setCurrentStep}
-            />
-          </form>
-        </Form>
+      <section className="flex space-x-4 items-center">
+        <section className="flex flex-col space-y-4 flex-1 md:p-6 md:border-r-[1.5px] md:border-slate-200">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+              <FormSteps
+                form={form}
+                currentStep={currentStep}
+                setCurrentStep={setCurrentStep}
+              />
+            </form>
+          </Form>
+        </section>
+        <div className="hidden md:flex flex-col p-6 items-center">
+          <HypercertCard
+            title={form.getValues().title || undefined}
+            description={form.getValues().description || undefined}
+            banner={form.getValues().banner || undefined}
+            logo={form.getValues().logo || undefined}
+            displayOnly
+          />
+        </div>
       </section>
-      {/* <div className="flex flex-col space-y-4 items-center">
-        <HypercertCard
-          title={form.getValues().title || undefined}
-          description={form.getValues().description || undefined}
-          banner={form.getValues().banner || undefined}
-          logo={form.getValues().logo || undefined}
-          displayOnly
-        />
-      </div> */}
     </main>
   );
 }

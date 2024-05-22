@@ -21,11 +21,11 @@ import {
 } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import { CheckedState } from "@radix-ui/react-checkbox";
 import { format } from "date-fns";
+import { toPng } from "html-to-image";
 import { ArrowLeftIcon, ArrowRightIcon, CalendarIcon } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { UseFormReturn } from "react-hook-form";
 import { useAccount } from "wagmi";
 
@@ -284,20 +284,50 @@ const WorkScope = ({ form }: FormStepsProps) => {
 };
 
 const ReviewAndSubmit = ({ form }: FormStepsProps) => {
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  const takeCardSnapshot = useCallback(() => {
+    if (cardRef.current === null) {
+      return;
+    }
+
+    toPng(cardRef.current, {
+      cacheBust: true,
+      fetchRequestInit: { mode: "cors" },
+    })
+      .then((dataUrl) => {
+        form.setValue("cardImage", dataUrl);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, [cardRef, form]);
+
+  useEffect(() => {
+    takeCardSnapshot();
+  }, [takeCardSnapshot]);
+
   return (
     <section className="space-y-8">
-      {/* <div className="flex flex-col space-y-4 items-center">
+      <div className="flex flex-col space-y-4 items-center md:hidden">
         <HypercertCard
           title={form.getValues().title || undefined}
           description={form.getValues().description || undefined}
-          banner={form.getValues().banner || undefined}
-          logo={form.getValues().logo || undefined}
+          banner={
+            `https://cors-proxy.hypercerts.workers.dev/?url=${
+              form.getValues().banner
+            }` || undefined
+          }
+          logo={
+            `https://cors-proxy.hypercerts.workers.dev/?url=${
+              form.getValues().logo
+            }` || undefined
+          }
           displayOnly
+          id="hypercert-card"
+          ref={cardRef}
         />
-      </div> */}
-      <p className="text-slate-500">
-        Please accept the terms and conditions to mint your hypercert.
-      </p>
+      </div>
 
       <FormField
         control={form.control}
