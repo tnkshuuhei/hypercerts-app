@@ -147,12 +147,12 @@ export default function NewHypercertForm() {
 
   return (
     <main className="flex flex-col px-8 pt-4 pb-20 container max-w-screen-lg">
-      <h1 className="font-serif text-4xl lg:text-6xl tracking-tight w-full">
+      <h1 className="font-serif text-3xl lg:text-5xl tracking-tight w-full">
         New hypercert
       </h1>
       <div className="p-3"></div>
       <section className="flex space-x-4 items-center">
-        <section className="flex flex-col space-y-4 flex-1 md:p-6 md:border-r-[1.5px] md:border-slate-200">
+        <section className="flex flex-col space-y-4 flex-1 md:pr-5 md:border-r-[1.5px] md:border-slate-200">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
               <FormSteps

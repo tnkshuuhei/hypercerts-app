@@ -19,6 +19,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
@@ -112,13 +113,6 @@ const GeneralInformation = ({ form }: FormStepsProps) => {
           </FormItem>
         )}
       />
-    </section>
-  );
-};
-
-const WorkScope = ({ form }: FormStepsProps) => {
-  return (
-    <section className="space-y-8">
       <FormField
         control={form.control}
         name="tags"
@@ -143,9 +137,9 @@ const WorkScope = ({ form }: FormStepsProps) => {
             </FormDescription>
             <FormMessage />
             {field.value &&
-              field.value.filter((tag) => tag !== "").length > 0 && (
+              field.value.filter((tag: string) => tag !== "").length > 0 && (
                 <div className="flex flex-wrap gap-0.5">
-                  {field?.value?.map((tag) => (
+                  {field?.value?.map((tag: string) => (
                     <Badge key={tag} variant="secondary">
                       {tag}
                     </Badge>
@@ -155,7 +149,13 @@ const WorkScope = ({ form }: FormStepsProps) => {
           </FormItem>
         )}
       />
+    </section>
+  );
+};
 
+const DatesAndPeople = ({ form }: FormStepsProps) => {
+  return (
+    <section className="space-y-8">
       <FormField
         control={form.control}
         name="projectDates"
@@ -369,23 +369,18 @@ export const hypercertFormSteps = new Map([
   [
     1,
     {
-      title: "General Information",
-      fields: ["title", "banner", "description", "logo", "link"],
+      title: "General Details",
+      fields: ["title", "banner", "description", "logo", "link", "tags"],
     },
   ],
   [
     2,
     {
-      title: "Project Scope",
-      fields: [
-        "tags",
-        "projectDates",
-        "contributors",
-        "confirmContributorsPermission",
-      ],
+      title: "Dates & People",
+      fields: ["projectDates", "contributors", "confirmContributorsPermission"],
     },
   ],
-  [3, { title: "Review and Mint", fields: ["acceptTerms"] }],
+  [3, { title: "Review & Mint", fields: ["acceptTerms"] }],
 ]);
 
 const FormSteps = ({ form, currentStep, setCurrentStep }: FormStepsProps) => {
@@ -409,14 +404,33 @@ const FormSteps = ({ form, currentStep, setCurrentStep }: FormStepsProps) => {
 
   return (
     <section className="space-y-5">
-      <div>
-        <h5 className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-          Step {currentStep} of {hypercertFormSteps.size}
-        </h5>
-        <h3 className="text-xl font-semibold">
-          {hypercertFormSteps.get(currentStep)?.title}
-        </h3>
+      <div className="space-y-3">
+        <Progress value={(currentStep / 3) * 100} className="h-[6px]" />
+
+        <div className="flex justify-between gap-2">
+          {Array.from(hypercertFormSteps.entries()).map(([step, { title }]) => (
+            <p
+              className={`text-sm md:text-base text-center md:text-left px-3 py-2 rounded-md space-y-1 md:space-y-0 md:space-x-2 flex flex-col md:flex-row items-center ${
+                step === currentStep
+                  ? "text-slate-700 font-semibold bg-slate-100"
+                  : "text-slate-700/60"
+              }`}
+              key={step}
+            >
+              <Badge
+                variant={step === currentStep ? "default" : "outline"}
+                className={
+                  step === currentStep ? "text-slate-50" : "text-slate-700/60"
+                }
+              >
+                {step}
+              </Badge>
+              <span className="md:ml-2">{title}</span>
+            </p>
+          ))}
+        </div>
       </div>
+      <div className="p-1" />
       {currentStep === 1 && (
         <GeneralInformation
           form={form}
@@ -425,7 +439,7 @@ const FormSteps = ({ form, currentStep, setCurrentStep }: FormStepsProps) => {
         />
       )}
       {currentStep === 2 && (
-        <WorkScope
+        <DatesAndPeople
           form={form}
           currentStep={currentStep}
           setCurrentStep={setCurrentStep}
