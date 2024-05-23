@@ -59,10 +59,9 @@ const formSchema = z.object({
   confirmContributorsPermission: z.boolean().refine((data) => data === true, {
     message: "You must confirm that all contributors gave their permission",
   }),
-  //   allowListURL: z.string().nullable(),
+  allowlistURL: z.string().url("Allowlist URL is not valid").optional(),
   //   percentDistribution: z.number().nullable(),
   //   mergeDistribution: z.boolean().nullable(),
-  //   contributorConfirmation: z.boolean().nullable(),
 });
 
 export type HypercertFormValues = z.infer<typeof formSchema>;
@@ -82,11 +81,9 @@ const formDefaultValues: HypercertFormValues = {
   contributors: [""],
   acceptTerms: false,
   confirmContributorsPermission: false,
-  // allowListURL: null,
+  allowlistURL: "",
   // percentDistribution: null,
   // mergeDistribution: null,
-  // contributorConfirmation: null,
-  // termsConfirmation: false,
 };
 
 export default function NewHypercertForm() {
@@ -106,14 +103,12 @@ export default function NewHypercertForm() {
   });
 
   function onSubmit(values: HypercertFormValues) {
-    // TODO: remove empty tags
-    console.log({ formValues: values });
-
     const metadata: HypercertMetadata = {
       name: values.title,
       description: values.description,
       image: values.cardImage,
       external_url: values.link,
+      allowList: values.allowlistURL ?? undefined,
     };
 
     const formattedMetadata = formatHypercertData({

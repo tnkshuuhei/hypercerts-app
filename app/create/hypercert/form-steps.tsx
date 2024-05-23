@@ -279,6 +279,31 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
           </FormItem>
         )}
       />
+
+      <FormField
+        control={form.control}
+        name="allowlistURL"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Allowlist URL (optional)</FormLabel>
+            <FormControl>
+              <Input {...field} placeholder="https://" />
+            </FormControl>
+            <div className="inline-flex text-xs space-x-1">
+              <span>Create an allowlist at</span>
+              <Link
+                href="https://allowlist-creator.vercel.app/"
+                target="_blank"
+                rel="noreferrer"
+                className="underline text-slate-500 text-wrap hover:text-slate-700 transition-colors"
+              >
+                allowlist-creator.vercel.app
+              </Link>
+            </div>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
     </section>
   );
 };
