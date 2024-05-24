@@ -13,14 +13,13 @@ import { forwardRef } from "react";
  * @param {boolean} displayOnly - Whether the card is just for display (non-interactive) or not
  * @param {string} id - The unique identifier for the card
  */
-interface HypercertCardProps {
+export interface HypercertCardProps {
   title?: string;
   description?: string;
   banner?: string;
   logo?: string;
-  link?: string;
   displayOnly?: boolean;
-  id?: string;
+  hypercertId?: string;
 }
 
 const defaultValues: HypercertCardProps = {
@@ -35,8 +34,7 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
       description,
       banner,
       logo,
-      link,
-      id,
+      hypercertId,
       displayOnly = false,
     }: HypercertCardProps = defaultValues,
     ref
@@ -47,8 +45,7 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
     const CardContent = () => (
       <article
         ref={ref}
-        className="relative w-[330px] h-[300px] rounded-xl border border-slate-300 overflow-clip bg-white"
-        id={id}
+        className="relative w-full md:w-[280px] h-[250px] rounded-xl border-[1.5px] border-slate-400 overflow-clip bg-black"
       >
         <header className="relative h-[110px] w-full flex items-center justify-center rounded-b-xl overflow-clip">
           {banner ? (
@@ -76,14 +73,14 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
             )}
           </div>
         </section>
-        <section className="pt-6 px-3 pb-3 rounded-t-xl h-full space-y-2">
+        <section className="pt-8 px-3 pb-3 rounded-t-xl h-full bg-white border-t-[1.5px] border-black">
           <h5
-            className="text-xl font-semibold text-slate-800 line-clamp-2 text-ellipsis"
+            className="text-lg font-medium text-slate-800 line-clamp-1 text-ellipsis tracking-tight"
             title={title}
           >
             {title}
           </h5>
-          <p className="leading-snug tracking-normal pt-1 text-pretty text-slate-600 overflow-ellipsis line-clamp-3">
+          <p className="text-sm leading-tight text-pretty text-slate-500 overflow-ellipsis line-clamp-3 tracking-normal">
             {description}
           </p>
         </section>
@@ -93,9 +90,9 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
       <CardContent />
     ) : (
       <Link
-        href={link || "#"}
+        href={hypercertId ? `/hypercerts/${hypercertId}` : "#"}
         passHref
-        className="group group-hover:ring-[1.5px] group-hover:ring-slate-300 group-hover:ring-offset-2"
+        className="w-max hover:-translate-y-1 transition-transform duration-300 ease-out"
       >
         <CardContent />
       </Link>
