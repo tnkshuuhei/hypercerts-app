@@ -45,24 +45,6 @@ export default function Explore() {
               </Button>
             </article>
           </Link>
-          <Link href="/explore/hyperboards" className="group">
-            <article className="p-3 border-[1.5px] border-border rounded-md flex flex-col space-y-2">
-              <div className="flex flex-col space-y-2">
-                <h2 className="text-2xl lg:text-4xl tracking-tight font-medium">
-                  Hyperboards
-                </h2>
-                <p>Contributors to hypercerts are shown on hyperboards.</p>
-              </div>
-              <Button className="flex space-x-2" variant="outline">
-                Explore hyperboards
-                <ArrowRight
-                  size={18}
-                  className="ml-1 opacity-70 group-hover:translate-x-0.5 group-hover:opacity-100 transition-transform duration-300 ease-in-out"
-                  aria-hidden="true"
-                />
-              </Button>
-            </article>
-          </Link>
         </section>
       </main>
     </>
