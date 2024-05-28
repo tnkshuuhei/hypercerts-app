@@ -45,7 +45,7 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
     const CardContent = () => (
       <article
         ref={ref}
-        className="relative w-full md:w-[280px] h-[250px] rounded-xl border-[1.5px] border-slate-400 overflow-clip bg-black"
+        className="relative w-full max-w-[280px] h-[250px] rounded-xl border-[1.5px] border-slate-500 overflow-clip bg-black"
       >
         <header className="relative h-[110px] w-full flex items-center justify-center rounded-b-xl overflow-clip">
           {banner ? (
@@ -62,10 +62,10 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
             </div>
           )}
         </header>
-        <section className="absolute top-28 left-10 -translate-x-1/2 -translate-y-1/2 border-white border-4 rounded-full overflow-hidden bg-slate-200">
+        <section className="absolute top-[88px] left-3 border-white border-4 rounded-full overflow-hidden bg-slate-200">
           <div className="relative w-10 h-10 flex items-center justify-center border border-slate-300 rounded-full overflow-hidden">
             {logo ? (
-              <Image src={logo!} alt={`${title} logo`} fill unoptimized />
+              <Image src={logo} alt={`${title} logo`} fill unoptimized />
             ) : (
               <div className="flex items-center justify-center bg-slate-300 h-10 w-10">
                 <Sparkle size={24} />
@@ -92,7 +92,7 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
       <Link
         href={hypercertId ? `/hypercerts/${hypercertId}` : "#"}
         passHref
-        className="w-max hover:-translate-y-1 transition-transform duration-300 ease-out"
+        className="w-max hover:-translate-y-1 transition-transform duration-200 ease-[cubic-bezier(.44,.95,.63,.96)]"
       >
         <CardContent />
       </Link>
