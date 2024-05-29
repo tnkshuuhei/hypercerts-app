@@ -35,7 +35,7 @@ export default function Explore() {
       const response = await client?.storage.getMetadata(uri);
       const { data, valid, errors } = validateMetaData(response);
       if (valid) {
-        return data;
+        return { hypercertId: uri, ...(data as HypercertCardProps) };
       } else {
         console.log(errors);
       }
@@ -67,6 +67,10 @@ export default function Explore() {
     };
     getHypercerts();
   }, [client]);
+
+  if (hypercerts) {
+    console.log(hypercerts[0]);
+  }
 
   return (
     <>
