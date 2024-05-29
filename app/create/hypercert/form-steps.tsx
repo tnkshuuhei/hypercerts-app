@@ -349,7 +349,6 @@ const ReviewAndSubmit = ({ form }: FormStepsProps) => {
             }` || undefined
           }
           displayOnly
-          id="hypercert-card"
           ref={cardRef}
         />
       </div>
