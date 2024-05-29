@@ -336,7 +336,7 @@ const ReviewAndSubmit = ({ form }: FormStepsProps) => {
     <section className="space-y-8">
       <div className="flex flex-col space-y-4 items-center md:hidden">
         <HypercertCard
-          title={form.getValues().title || undefined}
+          name={form.getValues().title || undefined}
           description={form.getValues().description || undefined}
           banner={
             `https://cors-proxy.hypercerts.workers.dev/?url=${
