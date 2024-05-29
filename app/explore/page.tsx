@@ -1,10 +1,10 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import HypercertCard, {
+  type HypercertCardProps,
+} from "@/components/hypercert-card";
 import { useHypercertClient } from "@/hooks/use-hypercert-client";
 import { validateMetaData } from "@hypercerts-org/sdk";
-import { ArrowRight } from "lucide-react";
-import Link from "next/link";
 import { useEffect, useState } from "react";
 
 // export const metadata = {
@@ -13,9 +13,22 @@ import { useEffect, useState } from "react";
 //     "The best place to discover and contribute to hypercerts and hyperboards.",
 // };
 
+type HypercertResponseData = {
+  __typename?: "Hypercert";
+  hypercert_id?: string | null;
+  owner_address?: string | null;
+  units?: any | null;
+  uri?: string | null;
+  contract?: {
+    __typename?: "Contract";
+    chain_id?: any | null;
+  } | null;
+};
+
 export default function Explore() {
   const { client } = useHypercertClient();
   const [loading, setLoading] = useState(true);
+  const [hypercerts, setHypercerts] = useState<HypercertCardProps[]>([]);
 
   useEffect(() => {
     const getHypercertMetadata = async (uri: string) => {
@@ -29,12 +42,12 @@ export default function Explore() {
       return response;
     };
     const getHypercerts = async () => {
-      let hypercerts;
       try {
         const response = await client?.indexer.recentHypercerts({ first: 10 });
-        const hypercertData = response?.hypercerts.data;
+        const hypercertData = response?.hypercerts
+          .data as HypercertResponseData[];
         if (hypercertData) {
-          hypercerts = await Promise.all(
+          const metadata = await Promise.all(
             hypercertData.map(async (hypercert) => {
               if (hypercert.uri) {
                 const metadata = await getHypercertMetadata(hypercert.uri);
@@ -42,14 +55,15 @@ export default function Explore() {
               }
             })
           );
+          setHypercerts(metadata as unknown as HypercertCardProps[]);
         }
       } catch (error) {
         console.error("Failed to fetch recent hypercerts:", error);
-        hypercerts = [];
+        setHypercerts([]);
       }
       setLoading(false);
-      console.log(hypercerts);
-      return hypercerts;
+      // console.log(hypercerts);
+      // return hypercerts;
     };
     getHypercerts();
   }, [client]);
@@ -58,7 +72,7 @@ export default function Explore() {
     <>
       <main className="flex flex-col p-8 md:p-24 pb-24">
         <section>
-          <h1 className="font-serif text-5xl lg:text-8xl tracking-tight">
+          <h1 className="font-serif text-3xl lg:text-5xl tracking-tight">
             Explore
           </h1>
           <div className="p-1"></div>
@@ -69,28 +83,11 @@ export default function Explore() {
         </section>
 
         <div className="p-3"></div>
-        <section className="flex flex-col space-y-2">
-          <Link href="/explore/hypercerts" className="group">
-            <article className="p-3 border-[1.5px] border-border rounded-md flex flex-col space-y-2">
-              <h2 className="text-2xl lg:text-4xl tracking-tight font-medium">
-                Hypercerts
-              </h2>
-              <p>
-                Hypercerts publicly represent specific works and their impact,
-                allowing projects to issue and distribute them to contributors
-                on-chain.
-              </p>
-              <Button className="flex space-x-2" variant="outline">
-                Explore hypercerts
-                <ArrowRight
-                  size={18}
-                  className="ml-1 opacity-70 group-hover:translate-x-0.5 group-hover:opacity-100 transition-transform duration-300 ease-in-out"
-                  aria-hidden="true"
-                />
-              </Button>
-            </article>
-          </Link>
-        </section>
+        <div className="flex flex-wrap gap-5">
+          {hypercerts.map((hypercert) => (
+            <HypercertCard {...hypercert} key={hypercert.hypercertId} />
+          ))}
+        </div>
       </main>
     </>
   );
