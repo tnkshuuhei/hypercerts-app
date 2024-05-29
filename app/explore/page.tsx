@@ -4,6 +4,13 @@ import { ComboSelect } from "@/components/combobox";
 import HypercertCard from "@/components/hypercert-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useHypercertClient } from "@/hooks/use-hypercert-client";
 import { SUPPORTED_CHAINS } from "@/lib/constants";
 import { HypercertMetadata, validateMetaData } from "@hypercerts-org/sdk";
@@ -37,16 +44,16 @@ const SearchBar = ({
   setSearchInput: (searchInput: string) => void;
   executeSearch: (searchInput: string) => void;
 }) => (
-  <div className="relative flex-1 max-w-xl">
+  <div className="relative">
     <span className="absolute top-1/2 left-2 transform -translate-y-1/2">
-      <Search className="text-slate-00" />
+      <Search className="text-slate-400" />
     </span>
 
-    <div className="flex w-full gap-1">
+    <div className="flex gap-2">
       <Input
         value={searchInput}
-        className="pl-10 h-10 border-vd-blue-500 bg-vd-beige-100 py-2 text-sm md:text-base font-medium placeholder:text-vd-blue-500/60 ring-offset-white focus-visible:ring-offset-2 focus-visible:ring-vd-blue-400 focus-visible:ring-2"
-        placeholder="Search"
+        className="max-w-xs pl-10 h-10 border-slate-500 bg-slate-50 py-2 text-sm md:text-base font-medium placeholder:text-slate-500/60 ring-offset-white focus-visible:ring-offset-2 focus-visible:ring-slate-400 focus-visible:ring-2"
+        placeholder="Search hypercerts"
         onChange={(e) => setSearchInput(e.target.value)}
       />
       <Button className="rounded-md" onClick={() => executeSearch(searchInput)}>
@@ -89,7 +96,7 @@ export default function Explore() {
     const dynamicOptions = supportedChains
       .filter((chain) => chains.includes(chain.value))
       .map((chain) => ({
-        value: chain.value.toString(),
+        value: chain.label,
         label: chain.label,
       }));
 
@@ -180,20 +187,34 @@ export default function Explore() {
             hyperboards.
           </p>
         </section>
-
-        <SearchBar
-          searchInput={searchInput}
-          setSearchInput={setSearchInput}
-          executeSearch={executeSearch}
-        />
-
-        {chainFilterOptions.length > 0 && (
-          <ComboSelect
-            options={chainFilterOptions}
-            groupLabel="chain"
-            groupLabelPlural="chains"
+        <section className="flex flex-col md:flex-row gap-4">
+          <SearchBar
+            searchInput={searchInput}
+            setSearchInput={setSearchInput}
+            executeSearch={executeSearch}
           />
-        )}
+
+          <div className="flex gap-2">
+            {chainFilterOptions.length > 0 && (
+              <ComboSelect
+                options={chainFilterOptions}
+                groupLabel="chain"
+                groupLabelPlural="chains"
+              />
+            )}
+
+            <Select defaultValue="recent">
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="recent">Recently added</SelectItem>
+                <SelectItem value="a-z">Title (A-Z)</SelectItem>
+                <SelectItem value="z-a">Title (Z-A)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </section>
         <div className="flex justify-center md:justify-start flex-wrap gap-5">
           {hypercerts.map((hypercert) => (
             <HypercertCard
