@@ -1,12 +1,12 @@
 "use client";
 
-import HypercertCard, {
-  type HypercertCardProps,
-} from "@/components/hypercert-card";
+import { ComboSelect } from "@/components/combobox";
+import HypercertCard from "@/components/hypercert-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useHypercertClient } from "@/hooks/use-hypercert-client";
-import { validateMetaData } from "@hypercerts-org/sdk";
+import { SUPPORTED_CHAINS } from "@/lib/constants";
+import { HypercertMetadata, validateMetaData } from "@hypercerts-org/sdk";
 import { Search } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
@@ -71,60 +71,101 @@ const deDuplicateHypercerts = (hypercerts: HypercertResponseData[]) => {
 export default function Explore() {
   const { client } = useHypercertClient();
   const [loading, setLoading] = useState(true);
-  const [hypercerts, setHypercerts] = useState<HypercertCardProps[]>([]);
+  const [hypercerts, setHypercerts] = useState<
+    { hypercertId: string; chainId: number; metadata: HypercertMetadata }[]
+  >([]);
   const [searchInput, setSearchInput] = useState("");
+  const [chainFilterOptions, setChainFilterOptions] = useState<
+    { value: string; label: string }[]
+  >([]);
+
+  const createChainFilterOptions = (chains: number[]) => {
+    const supportedChains = Array.from(SUPPORTED_CHAINS.entries()).map(
+      ([chainId, chainName]) => ({
+        value: chainId,
+        label: chainName,
+      })
+    );
+    const dynamicOptions = supportedChains
+      .filter((chain) => chains.includes(chain.value))
+      .map((chain) => ({
+        value: chain.value.toString(),
+        label: chain.label,
+      }));
+
+    const chainOptions = [{ value: "", label: "All" }, ...dynamicOptions];
+
+    return setChainFilterOptions(chainOptions);
+  };
 
   const executeSearch = useCallback((searchInput: string) => {
     console.log(searchInput);
   }, []);
 
-  useEffect(() => {
-    const getHypercertMetadata = async (uri: string, chainId: number) => {
+  const getHypercertMetadata = useCallback(
+    async (uri: string, chainId: number) => {
       const response = await client?.storage.getMetadata(uri);
       const { data, valid, errors } = validateMetaData(response);
       if (valid) {
-        return { hypercertId: uri, chainId, ...(data as HypercertCardProps) };
+        return {
+          hypercertId: uri,
+          chainId,
+          metadata: data as HypercertMetadata,
+        };
       } else {
         console.log(errors);
       }
       return response;
-    };
+    },
+    [client]
+  );
 
-    const getHypercerts = async () => {
-      try {
-        const response = await client?.indexer.recentHypercerts({ first: 10 });
-        const hypercertData = response?.hypercerts
-          .data as HypercertResponseData[];
-        console.log(hypercertData);
-        if (hypercertData) {
-          const nonDuplicateHypercerts = deDuplicateHypercerts(hypercertData);
-          const metadata = await Promise.all(
-            nonDuplicateHypercerts.map(async (hypercert) => {
-              if (hypercert.uri) {
-                const metadata = await getHypercertMetadata(
-                  hypercert.uri,
-                  hypercert.contract?.chain_id
-                );
-                return metadata;
-              }
-            })
-          );
-          setHypercerts(metadata as unknown as HypercertCardProps[]);
-        }
-      } catch (error) {
-        console.error("Failed to fetch recent hypercerts:", error);
-        setHypercerts([]);
-      }
-      setLoading(false);
-      // console.log(hypercerts);
-      // return hypercerts;
-    };
-    getHypercerts();
-  }, [client]);
+  const getHypercerts = useCallback(async () => {
+    try {
+      const response = await client?.indexer.recentHypercerts({ first: 20 });
+      const hypercertData = response?.hypercerts
+        .data as HypercertResponseData[];
+      console.log(hypercertData);
+      return hypercertData;
+    } catch (error) {
+      console.error("Failed to fetch recent hypercerts:", error);
+      setHypercerts([]);
+    }
+    setLoading(false);
+  }, [client, setLoading, setHypercerts]);
 
-  if (hypercerts) {
-    console.log(hypercerts[0]);
-  }
+  const setupHypercertPageData = useCallback(async () => {
+    const hypercerts = await getHypercerts();
+
+    if (hypercerts) {
+      const dedupedHypercerts = deDuplicateHypercerts(hypercerts);
+      const chainIds = dedupedHypercerts
+        .map((hypercert) => hypercert.contract?.chain_id)
+        .filter((chainId) => chainId);
+      createChainFilterOptions(chainIds);
+      const metadataPromises = dedupedHypercerts
+        .filter((hypercert) => hypercert.uri) // Only process if URI is present
+        .map((hypercert) =>
+          getHypercertMetadata(
+            hypercert.uri!,
+            hypercert.contract?.chain_id || 1
+          )
+        );
+
+      const metadatas = await Promise.all(metadataPromises);
+      setHypercerts(
+        metadatas as unknown as {
+          hypercertId: string;
+          chainId: number;
+          metadata: HypercertMetadata;
+        }[]
+      );
+    }
+  }, [getHypercerts, getHypercertMetadata, setHypercerts]);
+
+  useEffect(() => {
+    setupHypercertPageData();
+  }, [setupHypercertPageData]);
 
   return (
     <>
@@ -145,9 +186,21 @@ export default function Explore() {
           setSearchInput={setSearchInput}
           executeSearch={executeSearch}
         />
+
+        {chainFilterOptions.length > 0 && (
+          <ComboSelect
+            options={chainFilterOptions}
+            groupLabel="chain"
+            groupLabelPlural="chains"
+          />
+        )}
         <div className="flex justify-center md:justify-start flex-wrap gap-5">
           {hypercerts.map((hypercert) => (
-            <HypercertCard {...hypercert} key={hypercert.hypercertId} />
+            <HypercertCard
+              {...hypercert.metadata}
+              hypercertId={hypercert.hypercertId}
+              key={hypercert.hypercertId}
+            />
           ))}
         </div>
       </main>
