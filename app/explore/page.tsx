@@ -1,14 +1,59 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
+import { useHypercertClient } from "@/hooks/use-hypercert-client";
+import { validateMetaData } from "@hypercerts-org/sdk";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
-export const metadata = {
-  title: "Explore",
-  description:
-    "The best place to discover and contribute to hypercerts and hyperboards.",
-};
+// export const metadata = {
+//   title: "Explore",
+//   description:
+//     "The best place to discover and contribute to hypercerts and hyperboards.",
+// };
 
 export default function Explore() {
+  const { client } = useHypercertClient();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const getHypercertMetadata = async (uri: string) => {
+      const response = await client?.storage.getMetadata(uri);
+      const { data, valid, errors } = validateMetaData(response);
+      if (valid) {
+        return data;
+      } else {
+        console.log(errors);
+      }
+      return response;
+    };
+    const getHypercerts = async () => {
+      let hypercerts;
+      try {
+        const response = await client?.indexer.recentHypercerts({ first: 10 });
+        const hypercertData = response?.hypercerts.data;
+        if (hypercertData) {
+          hypercerts = await Promise.all(
+            hypercertData.map(async (hypercert) => {
+              if (hypercert.uri) {
+                const metadata = await getHypercertMetadata(hypercert.uri);
+                return metadata;
+              }
+            })
+          );
+        }
+      } catch (error) {
+        console.error("Failed to fetch recent hypercerts:", error);
+        hypercerts = [];
+      }
+      setLoading(false);
+      console.log(hypercerts);
+      return hypercerts;
+    };
+    getHypercerts();
+  }, [client]);
+
   return (
     <>
       <main className="flex flex-col p-8 md:p-24 pb-24">
