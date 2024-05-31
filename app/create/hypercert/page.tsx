@@ -18,11 +18,12 @@ const DEFAULT_NUM_FRACTIONS: number = 10000;
 const DEFAULT_HYPERCERT_VERSION: string = "0.0.1";
 
 const formSchema = z.object({
-  title: z.string().min(1, "We need a title for your hypercert"),
+  title: z.string().trim().min(1, "We need a title for your hypercert"),
   logo: z.string().url("Logo URL is not valid"),
   banner: z.string().url("Banner URL is not valid"),
   description: z
     .string()
+    .trim()
     .min(10, { message: "We need a longer description for your hypercert" }),
   link: z.string().url("Link URL is not valid"),
   cardImage: z.string().url("Card image not generated"),
@@ -59,7 +60,7 @@ const formSchema = z.object({
   confirmContributorsPermission: z.boolean().refine((data) => data === true, {
     message: "You must confirm that all contributors gave their permission",
   }),
-  allowlistURL: z.string().url("Allowlist URL is not valid").optional(),
+  allowlistURL: z.union([z.string().url(), z.literal(""), z.null().optional()]),
   //   percentDistribution: z.number().nullable(),
   //   mergeDistribution: z.boolean().nullable(),
 });
@@ -102,7 +103,7 @@ export default function NewHypercertForm() {
     onComplete: onMintComplete,
   });
 
-  function onSubmit(values: HypercertFormValues) {
+  async function onSubmit(values: HypercertFormValues) {
     const metadata: HypercertMetadata = {
       name: values.title,
       description: values.description,
@@ -113,27 +114,23 @@ export default function NewHypercertForm() {
 
     const formattedMetadata = formatHypercertData({
       ...metadata,
-      version: "0.0.1",
-      properties: [
-        {
-          trait_type: "Minted by",
-          value: "true",
-        },
-      ],
-      impactScope: [],
+      version: "2.0",
+      properties: [],
+      impactScope: ["all"],
       excludedImpactScope: [],
-      workScope: [],
+      workScope: values.tags,
       excludedWorkScope: [],
-      rights: [],
+      rights: ["Public Display"],
       excludedRights: [],
-      workTimeframeStart: values.projectDates.from.getTime() * 1000,
-      workTimeframeEnd: values.projectDates.to.getTime() * 1000,
-      impactTimeframeStart: values.projectDates.from.getTime() * 1000,
-      impactTimeframeEnd: values.projectDates.to.getTime() * 1000,
+      workTimeframeStart: values.projectDates.from.getTime() / 1000,
+      workTimeframeEnd: values.projectDates.to.getTime() / 1000,
+      impactTimeframeStart: values.projectDates.from.getTime() / 1000,
+      impactTimeframeEnd: values.projectDates.to.getTime() / 1000,
       contributors: values.contributors,
     });
+    console.log({ formattedMetadata });
 
-    mintClaim(
+    await mintClaim(
       formattedMetadata.data!,
       DEFAULT_NUM_FRACTIONS,
       TransferRestrictions.FromCreatorOnly
