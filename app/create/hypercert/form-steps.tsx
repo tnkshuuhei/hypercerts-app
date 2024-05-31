@@ -287,7 +287,11 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
           <FormItem>
             <FormLabel>Allowlist URL (optional)</FormLabel>
             <FormControl>
-              <Input {...field} placeholder="https://" />
+              <Input
+                {...field}
+                value={field.value || ""}
+                placeholder="https://"
+              />
             </FormControl>
             <div className="inline-flex text-xs space-x-1">
               <span>Create an allowlist at</span>
@@ -433,7 +437,7 @@ const FormSteps = ({ form, currentStep, setCurrentStep }: FormStepsProps) => {
 
         <div className="flex justify-between gap-2">
           {Array.from(hypercertFormSteps.entries()).map(([step, { title }]) => (
-            <p
+            <div
               className={`text-sm md:text-base text-center md:text-left px-3 py-2 rounded-md space-y-1 md:space-y-0 md:space-x-2 flex flex-col md:flex-row items-center ${
                 step === currentStep
                   ? "text-slate-700 font-semibold bg-slate-100"
@@ -449,8 +453,8 @@ const FormSteps = ({ form, currentStep, setCurrentStep }: FormStepsProps) => {
               >
                 {step}
               </Badge>
-              <span className="md:ml-2">{title}</span>
-            </p>
+              <p className="md:ml-2">{title}</p>
+            </div>
           ))}
         </div>
       </div>
