@@ -1,68 +1,182 @@
-import HypercertCard, {
-  type HypercertCardProps,
-} from "@/components/hypercert-card";
+"use client";
 
-export const metadata = {
-  title: "Explore",
-  description:
-    "The best place to discover and contribute to hypercerts and hyperboards.",
+import { ComboSelect } from "@/components/combobox";
+import HypercertCard from "@/components/hypercert-card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useHypercertClient } from "@/hooks/use-hypercert-client";
+import { SUPPORTED_CHAINS } from "@/lib/constants";
+import { HypercertMetadata, validateMetaData } from "@hypercerts-org/sdk";
+import { Search } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+
+// export const metadata = {
+//   title: "Explore",
+//   description:
+//     "The best place to discover and contribute to hypercerts and hyperboards.",
+// };
+
+type HypercertResponseData = {
+  __typename?: "Hypercert";
+  hypercert_id?: string | null;
+  owner_address?: string | null;
+  units?: any | null;
+  uri?: string | null;
+  contract?: {
+    __typename?: "Contract";
+    chain_id?: any | null;
+  } | null;
 };
 
-const cardData: HypercertCardProps[] = [
-  {
-    title: "Moslev's Supreme Treasure Hunt",
-    description:
-      "A treasure hunt to find the hidden treasure in the hypercerts.",
-    hypercertId: "0x12234",
-    banner:
-      "https://www.kathrynwilking.com/wp-content/uploads/2018/03/Treasure-Box-blog-iStock-542285574.jpg",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/c/cc/Treasure_logo_2023.png",
-  },
-  {
-    title: "Global Reforestation Initiative",
-    description:
-      "Join efforts to plant trees worldwide and combat deforestation.",
-    hypercertId: "0x334455",
-    banner: "https://images.unsplash.com/photo-1518837695005-2083093ee35b",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/2/21/The_logo_of_the_two_swords_and_the_palm_tree.jpg",
-  },
-  {
-    title: "Ocean Cleanup Project",
-    description: "Help remove plastics and other waste from our oceans.",
-    hypercertId: "0x556677",
-    banner: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/5/5a/Nick_Mason_DW_%22Waves%22_Kit_2022.jpg",
-  },
-  {
-    title: "Renewable Energy Research",
-    description:
-      "Support advancements in sustainable and renewable energy sources.",
-    hypercertId: "0x778899",
-    banner: "https://images.unsplash.com/photo-1504196606672-aef5c9cefc92",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/e/ef/Cristian_Sun_Logo_Transparente.png",
-  },
-  {
-    title: "Wildlife Conservation Network",
-    description:
-      "Contribute to the protection of endangered species and their habitats.",
-    hypercertId: "0x9900aa",
-    banner: "https://images.unsplash.com/photo-1470770903676-69b98201ea1c",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/d/d1/Logo_du_groupe_wolf_pack.jpg",
-  },
-  {
-    title: "Clean Air Initiative",
-    description:
-      "Promote projects that aim to reduce air pollution in urban areas.",
-    hypercertId: "0xbbccdd",
-    banner: "https://images.unsplash.com/photo-1495954484750-af469f2f9be5",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/4/40/Wind_logo_2017.svg",
-  },
-];
+const SearchBar = ({
+  searchInput,
+  setSearchInput,
+  executeSearch,
+}: {
+  searchInput: string;
+  setSearchInput: (searchInput: string) => void;
+  executeSearch: (searchInput: string) => void;
+}) => (
+  <div className="relative">
+    <span className="absolute top-1/2 left-2 transform -translate-y-1/2">
+      <Search className="text-slate-400" />
+    </span>
+
+    <div className="flex gap-2">
+      <Input
+        value={searchInput}
+        className="max-w-xs pl-10 h-10 border-slate-500 bg-slate-50 py-2 text-sm md:text-base font-medium placeholder:text-slate-500/60 ring-offset-white focus-visible:ring-offset-2 focus-visible:ring-slate-400 focus-visible:ring-2"
+        placeholder="Search hypercerts"
+        onChange={(e) => setSearchInput(e.target.value)}
+      />
+      <Button className="rounded-md" onClick={() => executeSearch(searchInput)}>
+        Search
+      </Button>
+    </div>
+  </div>
+);
+
+const deDuplicateHypercerts = (hypercerts: HypercertResponseData[]) => {
+  const uniqueHypercerts = [];
+  const seenUris = new Set();
+  for (const hypercert of hypercerts) {
+    if (!seenUris.has(hypercert.uri)) {
+      seenUris.add(hypercert.uri);
+      uniqueHypercerts.push(hypercert);
+    }
+  }
+  return uniqueHypercerts;
+};
 
 export default function Explore() {
+  const { client } = useHypercertClient();
+  const [loading, setLoading] = useState(true);
+  const [hypercerts, setHypercerts] = useState<
+    { hypercertId: string; chainId: number; metadata: HypercertMetadata }[]
+  >([]);
+  const [searchInput, setSearchInput] = useState("");
+  const [chainFilterOptions, setChainFilterOptions] = useState<
+    { value: string; label: string }[]
+  >([]);
+
+  const createChainFilterOptions = (chains: number[]) => {
+    const supportedChains = Array.from(SUPPORTED_CHAINS.entries()).map(
+      ([chainId, chainName]) => ({
+        value: chainId,
+        label: chainName,
+      })
+    );
+    const dynamicOptions = supportedChains
+      .filter((chain) => chains.includes(chain.value))
+      .map((chain) => ({
+        value: chain.label,
+        label: chain.label,
+      }));
+
+    const chainOptions = [{ value: "", label: "All" }, ...dynamicOptions];
+
+    return setChainFilterOptions(chainOptions);
+  };
+
+  const executeSearch = useCallback((searchInput: string) => {
+    console.log(searchInput);
+  }, []);
+
+  const getHypercertMetadata = useCallback(
+    async (uri: string, chainId: number) => {
+      const response = await client?.storage.getMetadata(uri);
+      const { data, valid, errors } = validateMetaData(response);
+      if (valid) {
+        return {
+          hypercertId: uri,
+          chainId,
+          metadata: data as HypercertMetadata,
+        };
+      } else {
+        console.log(errors);
+      }
+      return response;
+    },
+    [client]
+  );
+
+  const getHypercerts = useCallback(async () => {
+    try {
+      const response = await client?.indexer.recentHypercerts({ first: 20 });
+      const hypercertData = response?.hypercerts
+        .data as HypercertResponseData[];
+      console.log(hypercertData);
+      return hypercertData;
+    } catch (error) {
+      console.error("Failed to fetch recent hypercerts:", error);
+      setHypercerts([]);
+    }
+    setLoading(false);
+  }, [client, setLoading, setHypercerts]);
+
+  const setupHypercertPageData = useCallback(async () => {
+    const hypercerts = await getHypercerts();
+
+    if (hypercerts) {
+      const dedupedHypercerts = deDuplicateHypercerts(hypercerts);
+      const chainIds = dedupedHypercerts
+        .map((hypercert) => hypercert.contract?.chain_id)
+        .filter((chainId) => chainId);
+      createChainFilterOptions(chainIds);
+      const metadataPromises = dedupedHypercerts
+        .filter((hypercert) => hypercert.uri) // Only process if URI is present
+        .map((hypercert) =>
+          getHypercertMetadata(
+            hypercert.uri!,
+            hypercert.contract?.chain_id || 1
+          )
+        );
+
+      const metadatas = await Promise.all(metadataPromises);
+      setHypercerts(
+        metadatas as unknown as {
+          hypercertId: string;
+          chainId: number;
+          metadata: HypercertMetadata;
+        }[]
+      );
+    }
+  }, [getHypercerts, getHypercertMetadata, setHypercerts]);
+
+  useEffect(() => {
+    setupHypercertPageData();
+  }, [setupHypercertPageData]);
+
   return (
     <>
-      <main className="flex flex-col p-8 md:p-24 pb-24">
+      <main className="flex flex-col p-8 md:p-24 pb-24 space-y-4">
         <section>
           <h1 className="font-serif text-3xl lg:text-5xl tracking-tight">
             Explore
@@ -73,18 +187,41 @@ export default function Explore() {
             hyperboards.
           </p>
         </section>
+        <section className="flex flex-col md:flex-row gap-4">
+          <SearchBar
+            searchInput={searchInput}
+            setSearchInput={setSearchInput}
+            executeSearch={executeSearch}
+          />
 
-        <div className="p-3"></div>
-        <div className="flex flex-wrap gap-5">
-          {cardData.map((card) => (
-            <article
-              key={card.hypercertId}
-              className="w-[280px] h-[250px] p-3 bg-slate-100 rounded-xl relative"
-            >
-              <HypercertCard {...card} key={card.hypercertId} />
-              <p>{card.title}</p>
-              <p>{card.description}</p>
-            </article>
+          <div className="flex gap-2">
+            {chainFilterOptions.length > 0 && (
+              <ComboSelect
+                options={chainFilterOptions}
+                groupLabel="chain"
+                groupLabelPlural="chains"
+              />
+            )}
+
+            <Select defaultValue="recent">
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="recent">Recently added</SelectItem>
+                <SelectItem value="a-z">Title (A-Z)</SelectItem>
+                <SelectItem value="z-a">Title (Z-A)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </section>
+        <div className="flex justify-center md:justify-start flex-wrap gap-5">
+          {hypercerts.map((hypercert) => (
+            <HypercertCard
+              {...hypercert.metadata}
+              hypercertId={hypercert.hypercertId}
+              key={hypercert.hypercertId}
+            />
           ))}
         </div>
       </main>
