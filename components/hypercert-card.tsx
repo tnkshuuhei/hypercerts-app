@@ -18,7 +18,7 @@ export interface HypercertCardProps {
   description?: string;
   banner?: string;
   logo?: string;
-  image?: string;
+  dateRange?: string;
   displayOnly?: boolean;
   hypercertId?: string;
 }
@@ -34,7 +34,7 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
       name: title,
       description,
       banner,
-      image,
+      dateRange,
       logo,
       hypercertId,
       displayOnly = false,
@@ -52,7 +52,7 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
         <header className="relative h-[80px] w-full flex items-center justify-center rounded-b-xl overflow-clip">
           {banner ? (
             <Image
-              src={image}
+              src={banner}
               alt={`${title} banner`}
               className="object-cover"
               fill
@@ -82,9 +82,7 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
           >
             {title}
           </h5>
-          <p className="text-xs text-slate-600">
-            Jan 23, 2024 &mdash; Feb 23, 2024
-          </p>
+          <p className="text-xs text-slate-600">{dateRange}</p>
         </section>
       </article>
     );
