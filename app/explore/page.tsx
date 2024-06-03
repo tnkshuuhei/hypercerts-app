@@ -77,7 +77,14 @@ export default function Explore() {
         <div className="p-3"></div>
         <div className="flex flex-wrap gap-5">
           {cardData.map((card) => (
-            <HypercertCard {...card} key={card.hypercertId} />
+            <article
+              key={card.hypercertId}
+              className="w-[280px] h-[250px] p-3 bg-slate-100 rounded-xl relative"
+            >
+              <HypercertCard {...card} key={card.hypercertId} />
+              <p>{card.title}</p>
+              <p>{card.description}</p>
+            </article>
           ))}
         </div>
       </main>
