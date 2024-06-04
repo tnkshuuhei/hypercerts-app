@@ -5,52 +5,54 @@ import { forwardRef } from "react";
 
 /**
  * HypercertCard component
- * @param {string} title - The title of the card
- * @param {string} description - The description of the card
- * @param {string} banner - The banner image of the card
- * @param {string} logo - The logo image of the card
- * @param {string} link - The link of the card
+ * @param {string} name - The name of the hypercert
+ * @param {string} description - The description of the hypercert
+ * @param {string} banner - The banner image of the hypercert
+ * @param {string} logo - The logo image of the hypercert
+ * @param {string} link - The link of the hypercert
  * @param {boolean} displayOnly - Whether the card is just for display (non-interactive) or not
- * @param {string} id - The unique identifier for the card
+ * @param {string} hypercertId - The unique identifier for the hypercert
  */
 export interface HypercertCardProps {
-  title?: string;
+  name?: string;
   description?: string;
   banner?: string;
   logo?: string;
+  image?: string;
   displayOnly?: boolean;
   hypercertId?: string;
 }
 
 const defaultValues: HypercertCardProps = {
-  title: "Your title here",
+  name: "Your title here",
   description: "Your description here",
 };
 
 const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
   (
     {
-      title,
+      name: title,
       description,
       banner,
+      image,
       logo,
       hypercertId,
       displayOnly = false,
     }: HypercertCardProps = defaultValues,
     ref
   ) => {
-    title = title ?? defaultValues.title;
+    title = title ?? defaultValues.name;
     description = description ?? defaultValues.description;
 
     const CardContent = () => (
       <article
         ref={ref}
-        className="relative w-full max-w-[280px] h-[250px] rounded-xl border-[1.5px] border-slate-500 overflow-clip bg-black"
+        className="relative w-[280px] h-[250px] rounded-xl border-[1.5px] border-slate-500 overflow-clip bg-black"
       >
         <header className="relative h-[110px] w-full flex items-center justify-center rounded-b-xl overflow-clip">
-          {banner ? (
+          {image ? (
             <Image
-              src={banner}
+              src={image}
               alt={`${title} banner`}
               className="object-cover"
               fill

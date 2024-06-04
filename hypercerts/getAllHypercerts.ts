@@ -15,6 +15,17 @@ export type ClaimsOrderBy =
   | "attestations_asc"
   | "attestations_desc";
 
+export function isClaimsOrderBy(value: string): value is ClaimsOrderBy {
+  return [
+    "timestamp_asc",
+    "timestamp_desc",
+    "name_asc",
+    "name_desc",
+    "attestations_asc",
+    "attestations_desc",
+  ].includes(value);
+}
+
 export type ClaimsFilter = "all" | "evaluated";
 
 const query = gqlHypercerts(
@@ -63,9 +74,11 @@ function createOrderBy({
 function createFilter({
   filter,
   search,
+  chainId,
 }: {
   filter?: ClaimsFilter;
   search?: string;
+  chainId?: number;
 }): VariableTypes["where"] {
   const where: VariableTypes["where"] = {};
   if (search && search.length > 2) {
@@ -74,15 +87,23 @@ function createFilter({
   if (filter === "evaluated") {
     where.attestations = {};
   }
+  if (chainId) {
+    where.contract = {
+      chain_id: {
+        eq: chainId,
+      },
+    };
+  }
   return where;
 }
 
-type GetAllHypercertsParams = {
+export type GetAllHypercertsParams = {
   first: number;
   offset: number;
   orderBy?: ClaimsOrderBy;
   search?: string;
   filter?: ClaimsFilter;
+  chainId?: number;
 };
 
 export async function getAllHypercerts({
@@ -91,12 +112,13 @@ export async function getAllHypercerts({
   orderBy,
   search,
   filter,
+  chainId,
 }: GetAllHypercertsParams) {
   const res = await request(HYPERCERTS_API_URL, query, {
     first,
     offset,
     sort: createOrderBy({ orderBy }),
-    where: createFilter({ search, filter }),
+    where: createFilter({ search, filter, chainId }),
   });
 
   // TODO: Throw error?

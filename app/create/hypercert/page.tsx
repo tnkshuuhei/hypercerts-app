@@ -160,7 +160,7 @@ export default function NewHypercertForm() {
         </section>
         <div className="hidden md:flex flex-col p-6 items-center">
           <HypercertCard
-            title={form.getValues().title || undefined}
+            name={form.getValues().title || undefined}
             description={form.getValues().description || undefined}
             banner={form.getValues().banner || undefined}
             logo={form.getValues().logo || undefined}
