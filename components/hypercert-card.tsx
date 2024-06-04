@@ -1,6 +1,6 @@
-import { Sparkle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { Sparkle } from "lucide-react";
 import { forwardRef } from "react";
 
 /**
@@ -92,7 +92,7 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
       <CardContent />
     ) : (
       <Link
-        href={hypercertId ? `/hypercerts/${hypercertId}` : "#"}
+        href={hypercertId ? `/hypercert/${hypercertId}` : "#"}
         passHref
         className="w-max hover:-translate-y-1 transition-transform duration-200 ease-[cubic-bezier(.44,.95,.63,.96)]"
       >
