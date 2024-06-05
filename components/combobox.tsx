@@ -1,5 +1,4 @@
-"use client";
-import { Button } from "@/components/ui/button";
+import { Check, ChevronsUpDown } from "lucide-react";
 import {
   Command,
   CommandEmpty,
@@ -13,8 +12,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Check, ChevronsUpDown } from "lucide-react";
 import { useState } from "react";
 
 interface Option {
@@ -26,17 +26,18 @@ interface ComboSelectProps {
   options: Option[];
   groupLabel: string;
   groupLabelPlural: string;
+  onValueChange: (value: string) => void;
 }
 
 export function ComboSelect({
   options,
   groupLabel,
   groupLabelPlural,
+  onValueChange,
 }: ComboSelectProps) {
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState(options[0].value);
 
-  console.log({ options });
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -63,6 +64,7 @@ export function ComboSelect({
                   key={option.value}
                   value={option.value.toString()}
                   onSelect={(currentValue) => {
+                    onValueChange(currentValue);
                     setSelected(currentValue);
                     setOpen(false);
                   }}
