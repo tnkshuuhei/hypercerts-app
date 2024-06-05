@@ -174,16 +174,14 @@ export default function NewHypercertForm() {
             </form>
           </Form>
         </section>
-        <div className="hidden md:flex relative overflow-visible">
-          <div className="p-6 sticky top-2 right-2 h-full">
-            <HypercertCard
-              title={form.getValues().title || undefined}
-              description={form.getValues().description || undefined}
-              banner={form.getValues().banner || undefined}
-              logo={form.getValues().logo || undefined}
-              displayOnly
-            />
-          </div>
+        <div className="hidden md:flex flex-col p-6 items-center">
+          <HypercertCard
+            name={form.getValues().title || undefined}
+            description={form.getValues().description || undefined}
+            banner={form.getValues().banner || undefined}
+            logo={form.getValues().logo || undefined}
+            displayOnly
+          />
         </div>
       </section>
       {mintStep !== "preparing" && (
