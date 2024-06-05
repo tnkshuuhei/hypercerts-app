@@ -1,19 +1,18 @@
-import { ComboSelect } from "@/components/combobox";
-import HypercertMiniDisplay from "@/components/hypercert-mini-display";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import HypercertMiniDisplay, {
+  HypercertMiniDisplayProps,
+} from "@/components/hypercert-mini-display";
+import { Suspense } from "react";
+import ChainFilterSelect from "@/components/explore/ChainFilterSelect";
+import OrderBySelect from "@/components/explore/OrderBySelect";
+import Pagination from "@/components/explore/Pagination";
+import SearchBar from "@/components/explore/SearchBar";
+import { HYPERCERTS_PER_PAGE } from "@/configs/ui";
 import {
   GetAllHypercertsParams,
   getAllHypercerts,
   isClaimsOrderBy,
-} from "../../hypercerts/getAllHypercerts";
-import Pagination from "../../components/explore/Pagination";
-import { HYPERCERTS_PER_PAGE } from "../../configs/ui";
-import { Suspense } from "react";
+} from "@/hypercerts/getAllHypercerts";
 import Loading from "./loading";
-import ChainFilterSelect from "../../components/explore/ChainFilterSelect";
-import SearchBar from "../../components/explore/SearchBar";
-import OrderBySelect from "../../components/explore/OrderBySelect";
 
 async function ExplorePageInner({
   searchParams,
@@ -64,10 +63,15 @@ async function ExplorePageInner({
         )}
         <div className="flex justify-center md:justify-start flex-wrap gap-5">
           {hypercerts?.data?.map((hypercert) => {
+            const props: HypercertMiniDisplayProps = {
+              hypercertId: hypercert.hypercert_id as string,
+              name: hypercert.metadata?.name as string,
+              image: hypercert.metadata?.image as string,
+            };
             return (
               <HypercertMiniDisplay
-                hypercert={hypercert}
-                key={hypercert.hypercertId}
+                {...props}
+                key={hypercert.hypercert_id as string}
               />
             );
           })}
