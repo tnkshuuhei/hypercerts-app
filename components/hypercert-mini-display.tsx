@@ -50,21 +50,21 @@ const HypercertMiniDisplay = ({
           </p>
         </div>
         <section className="p-3 bg-white text-primary overflow-hidden rounded-lg border-[1.5px] border-slate-500 space-y-3">
-          <div className="flex gap-1 items-center justify-between">
-            <p className="flex-1 text-sm font-semibold line-clamp-1 text-ellipsis">
+          <div className="flex gap-1 items-center justify-between h-10">
+            <p className="flex-1 text-sm font-semibold line-clamp-2 text-ellipsis">
               {name}
             </p>
             {hasTrustedEvaluator && (
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger>
-                    <div className="p-1 rounded-full bg-green-600 text-white flex items-center justify-center">
-                      <ShieldCheck size={12} />
+                    <div className="p-1 rounded-full bg-green-200 text-green-800 flex items-center justify-center">
+                      <ShieldCheck size={14} />
                     </div>
                   </TooltipTrigger>
                   <TooltipContent
                     side="left"
-                    className="bg-green-600 text-white"
+									className="bg-green-100 text-green-800 font-medium"
                   >
                     <small>Evaluated by a trusted attester</small>
                   </TooltipContent>
