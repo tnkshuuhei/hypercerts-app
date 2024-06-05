@@ -9,13 +9,13 @@ import {
 } from "@/components/ui/tooltip";
 import { ShieldCheck } from "lucide-react";
 
-interface HypercertMiniDisplayProps {
+export interface HypercertMiniDisplayProps {
   hypercertId: string;
   name: string;
   image: string;
-  hasTrustedEvaluator: boolean;
-  percentAvailable: number;
-  lowestPrice: string;
+  hasTrustedEvaluator?: boolean;
+  percentAvailable?: number;
+  lowestPrice?: string;
 }
 
 const HypercertMiniDisplay = ({
@@ -64,7 +64,7 @@ const HypercertMiniDisplay = ({
                   </TooltipTrigger>
                   <TooltipContent
                     side="left"
-									className="bg-green-100 text-green-800 font-medium"
+                    className="bg-green-100 text-green-800 font-medium"
                   >
                     <small>Evaluated by a trusted attester</small>
                   </TooltipContent>
