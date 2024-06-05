@@ -1,16 +1,21 @@
 "use client";
 
+import StepProcessDialog from "@/components/global/step-process-dialog";
 import HypercertCard from "@/components/hypercert-card";
 import { Form } from "@/components/ui/form";
-import { useMintClaim } from "@/hooks/use-mint-claim";
+import { mintSteps, useMintClaim } from "@/hooks/use-mint-claim";
+import useProcessDialog, { StepData } from "@/hooks/useProcessDialog";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   HypercertMetadata,
   TransferRestrictions,
   formatHypercertData,
 } from "@hypercerts-org/sdk";
-import { useState } from "react";
+import { ArrowUpRightIcon } from "lucide-react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { TransactionReceipt } from "viem";
 import { z } from "zod";
 import FormSteps from "./form-steps";
 
@@ -18,11 +23,12 @@ const DEFAULT_NUM_FRACTIONS: number = 10000;
 const DEFAULT_HYPERCERT_VERSION: string = "0.0.1";
 
 const formSchema = z.object({
-  title: z.string().min(1, "We need a title for your hypercert"),
+  title: z.string().trim().min(1, "We need a title for your hypercert"),
   logo: z.string().url("Logo URL is not valid"),
   banner: z.string().url("Banner URL is not valid"),
   description: z
     .string()
+    .trim()
     .min(10, { message: "We need a longer description for your hypercert" }),
   link: z.string().url("Link URL is not valid"),
   cardImage: z.string().url("Card image not generated"),
@@ -59,7 +65,7 @@ const formSchema = z.object({
   confirmContributorsPermission: z.boolean().refine((data) => data === true, {
     message: "You must confirm that all contributors gave their permission",
   }),
-  allowlistURL: z.string().url("Allowlist URL is not valid").optional(),
+  allowlistURL: z.union([z.string().url(), z.literal(""), z.null().optional()]),
   //   percentDistribution: z.number().nullable(),
   //   mergeDistribution: z.boolean().nullable(),
 });
@@ -67,18 +73,19 @@ const formSchema = z.object({
 export type HypercertFormValues = z.infer<typeof formSchema>;
 
 const formDefaultValues: HypercertFormValues = {
-  title: "",
-  banner: "",
-  description: "",
-  logo: "",
-  link: "",
+  title: "A Grave Matter",
+  banner:
+    "https://www.bungie.net/common/destiny2_content/icons/2f1a39b33e30b98402b2badaa13f8631.jpg",
+  description: "Complete the 'Ghosts of the Deep' Dungeon solo, flawlessly.",
+  logo: "https://www.bungie.net/common/destiny2_content/icons/cb01f3cbfd11000b1d19537e73922f55.jpg",
+  link: "https://destinyemblemcollector.com/emblem?id=2069797998",
   cardImage: "",
-  tags: [""],
+  tags: ["ghosts,deep,legend"],
   projectDates: {
     from: new Date(),
     to: new Date(),
   },
-  contributors: [""],
+  contributors: ["0x123, 0xlos, peter.eth"],
   acceptTerms: false,
   confirmContributorsPermission: false,
   allowlistURL: "",
@@ -88,21 +95,31 @@ const formDefaultValues: HypercertFormValues = {
 
 export default function NewHypercertForm() {
   const [currentStep, setCurrentStep] = useState(1);
+  const { dialogSteps, setStep } = useProcessDialog(mintSteps);
   const form = useForm<HypercertFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: formDefaultValues,
     mode: "onChange",
   });
 
-  const onMintComplete = () => {
-    console.log("Minting complete");
+  const [txReceipt, setTxReceipt] = useState<TransactionReceipt | null>(null);
+  const onMintComplete = (receipt: TransactionReceipt) => {
+    setTxReceipt(receipt);
   };
 
-  const { write: mintClaim, txPending: mintClaimPending } = useMintClaim({
+  const {
+    write: mintClaim,
+    txPending: mintClaimPending,
+    currentStep: mintStep,
+  } = useMintClaim({
     onComplete: onMintComplete,
   });
 
-  function onSubmit(values: HypercertFormValues) {
+  useEffect(() => {
+    setStep(mintStep as StepData["id"]);
+  }, [mintStep]);
+
+  async function onSubmit(values: HypercertFormValues) {
     const metadata: HypercertMetadata = {
       name: values.title,
       description: values.description,
@@ -113,31 +130,30 @@ export default function NewHypercertForm() {
 
     const formattedMetadata = formatHypercertData({
       ...metadata,
-      version: "0.0.1",
-      properties: [
-        {
-          trait_type: "Minted by",
-          value: "true",
-        },
-      ],
-      impactScope: [],
+      version: "2.0",
+      properties: [],
+      impactScope: ["all"],
       excludedImpactScope: [],
-      workScope: [],
+      workScope: values.tags,
       excludedWorkScope: [],
-      rights: [],
+      rights: ["Public Display"],
       excludedRights: [],
-      workTimeframeStart: values.projectDates.from.getTime() * 1000,
-      workTimeframeEnd: values.projectDates.to.getTime() * 1000,
-      impactTimeframeStart: values.projectDates.from.getTime() * 1000,
-      impactTimeframeEnd: values.projectDates.to.getTime() * 1000,
+      workTimeframeStart: values.projectDates.from.getTime() / 1000,
+      workTimeframeEnd: values.projectDates.to.getTime() / 1000,
+      impactTimeframeStart: values.projectDates.from.getTime() / 1000,
+      impactTimeframeEnd: values.projectDates.to.getTime() / 1000,
       contributors: values.contributors,
     });
+    console.log({ formattedMetadata });
 
-    mintClaim(
+    await mintClaim(
       formattedMetadata.data!,
       DEFAULT_NUM_FRACTIONS,
       TransferRestrictions.FromCreatorOnly
     );
+
+    form.reset();
+    setCurrentStep(1);
   }
 
   return (
@@ -146,7 +162,7 @@ export default function NewHypercertForm() {
         New hypercert
       </h1>
       <div className="p-3"></div>
-      <section className="flex space-x-4 items-center">
+      <section className="flex space-x-4 items-stretch md:justify-start">
         <section className="flex flex-col space-y-4 flex-1 md:pr-5 md:border-r-[1.5px] md:border-slate-200">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -158,16 +174,41 @@ export default function NewHypercertForm() {
             </form>
           </Form>
         </section>
-        <div className="hidden md:flex flex-col p-6 items-center">
-          <HypercertCard
-            title={form.getValues().title || undefined}
-            description={form.getValues().description || undefined}
-            banner={form.getValues().banner || undefined}
-            logo={form.getValues().logo || undefined}
-            displayOnly
-          />
+        <div className="hidden md:flex relative overflow-visible">
+          <div className="p-6 sticky top-2 right-2 h-full">
+            <HypercertCard
+              title={form.getValues().title || undefined}
+              description={form.getValues().description || undefined}
+              banner={form.getValues().banner || undefined}
+              logo={form.getValues().logo || undefined}
+              displayOnly
+            />
+          </div>
         </div>
       </section>
+      {mintStep !== "preparing" && (
+        <StepProcessDialog
+          steps={dialogSteps}
+          currentStep={mintStep}
+          title="Mint your hypercert"
+          triggerLabel="Mint hypercert"
+          extraContent={
+            txReceipt && (
+              <Link
+                href={`https://sepolia.etherscan.io/tx/${txReceipt.transactionHash}`}
+                className="flex items-center underline underline-offset-2 hover:opacity-70 font-medium text-blue-700 tracking-tight group"
+                target="_blank"
+              >
+                View transaction on etherscan
+                <ArrowUpRightIcon
+                  size={16}
+                  className="ml-1 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-200"
+                />
+              </Link>
+            )
+          }
+        />
+      )}
     </main>
   );
 }
