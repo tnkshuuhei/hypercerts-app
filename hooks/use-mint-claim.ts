@@ -10,7 +10,7 @@ import {
 export const useMintClaim = ({ onComplete }: { onComplete?: () => void }) => {
   const [txPending, setTxPending] = useState(false);
 
-  const { client, isLoading } = useHypercertClient();
+  const { client } = useHypercertClient();
   const publicClient = usePublicClient();
 
   const stepDescriptions = {
@@ -98,6 +98,6 @@ export const useMintClaim = ({ onComplete }: { onComplete?: () => void }) => {
       await initializeWrite(metaData, units, transferRestrictions);
     },
     txPending,
-    readOnly: isLoading || !client || client.readonly,
+    readOnly: txPending,
   };
 };
