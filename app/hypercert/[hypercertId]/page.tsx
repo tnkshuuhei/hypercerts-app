@@ -11,7 +11,7 @@ export default async function HypercertPage({
   const hypercert = await getHypercert(hypercertId);
 
   if (!hypercert) {
-    return <div>Hypercert not found</div>;
+    throw new Error("Hypercert not found.");
   }
 
   return (
