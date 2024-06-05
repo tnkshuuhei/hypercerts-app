@@ -6,29 +6,47 @@ import {
   type HypercertMetadata,
   TransferRestrictions,
 } from "@hypercerts-org/sdk";
+import { type StepData } from "@/hooks/useProcessDialog";
+import { TransactionReceipt } from "viem";
 
-export const useMintClaim = ({ onComplete }: { onComplete?: () => void }) => {
+export const mintSteps: StepData[] = [
+  {
+    id: "preparing",
+    description: "Preparing to mint hypercert...",
+  },
+  {
+    id: "minting",
+    description: "Minting hypercert on-chain...",
+  },
+  {
+    id: "confirming",
+    description: "Awaiting confirmation...",
+  },
+  {
+    id: "done",
+    description: "Minting complete!",
+  },
+];
+
+export const useMintClaim = ({
+  onComplete,
+}: {
+  onComplete?: (receipt: TransactionReceipt) => void;
+}) => {
   const [txPending, setTxPending] = useState(false);
+  const [currentStep, setCurrentStep] = useState<StepData["id"]>(
+    mintSteps[0].id
+  );
 
   const { client } = useHypercertClient();
   const publicClient = usePublicClient();
-
-  const stepDescriptions = {
-    preparing: "Preparing to mint hypercert",
-    minting: "Minting hypercert on-chain",
-    waiting: "Awaiting confirmation",
-    complete: "Done minting",
-  };
-
-  // const { setStep, showModal, hideModal } = useContractModal();
-  // const parseError = useParseBlockchainError();
 
   const initializeWrite = async (
     metaData: HypercertMetadata,
     units: number,
     transferRestrictions: TransferRestrictions
   ) => {
-    // setStep("minting");
+    setCurrentStep("minting");
     try {
       setTxPending(true);
 
@@ -54,12 +72,11 @@ export const useMintClaim = ({ onComplete }: { onComplete?: () => void }) => {
         return;
       }
 
+      setCurrentStep("confirming");
       const receipt = await publicClient?.waitForTransactionReceipt({
         confirmations: 3,
         hash,
       });
-
-      // setStep("waiting");
 
       if (receipt?.status === "reverted") {
         // toast("Minting failed", {
@@ -72,8 +89,8 @@ export const useMintClaim = ({ onComplete }: { onComplete?: () => void }) => {
         // toast(mintInteractionLabels.toastSuccess, { type: "success" });
         console.log("Minting succeeded");
 
-        // setStep("complete");
-        onComplete?.();
+        setCurrentStep("done");
+        onComplete?.(receipt);
       }
     } catch (error) {
       // toast(parseError(error, mintInteractionLabels.toastError), {
@@ -92,12 +109,12 @@ export const useMintClaim = ({ onComplete }: { onComplete?: () => void }) => {
       units: number,
       transferRestrictions: TransferRestrictions = TransferRestrictions.FromCreatorOnly
     ) => {
-      // showModal({ stepDescriptions });
-      // setStep("preparing");
       console.log("Minting hypercert");
       await initializeWrite(metaData, units, transferRestrictions);
     },
     txPending,
-    readOnly: txPending,
+    mintSteps,
+    currentStep,
+    readOnly: !client || client.readonly,
   };
 };
