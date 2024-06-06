@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint"
   },
+  "packageManager": "pnpm@9.2.0",
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",
     "@hypercerts-org/sdk": "2.0.0-alpha.10",
