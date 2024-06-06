@@ -16,5 +16,9 @@ export default function FormattedDate({
 
   const date = new Date(seconds * 1000);
 
-  return <div {...props}>{date.toISOString().substring(0, 10)}</div>;
+  return (
+    <div {...props}>
+      {new Intl.DateTimeFormat("en-US", { dateStyle: "medium" }).format(date)}
+    </div>
+  );
 }
