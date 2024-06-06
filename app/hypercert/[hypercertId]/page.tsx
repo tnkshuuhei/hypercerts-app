@@ -1,3 +1,4 @@
+import ExternalUrl from "../../../components/hypercert/external-url";
 import ReadMore from "../../../components/read-more";
 import WorkScope from "../../../components/hypercert/scope";
 import WorkTimeFrame from "../../../components/hypercert/time-frame";
@@ -22,6 +23,7 @@ export default async function HypercertPage({
           {hypercert?.metadata?.name}
         </h1>
         <ReadMore text={hypercert?.metadata?.description} length={280} />
+        <ExternalUrl url={hypercert?.metadata?.external_url} />
         <div className="flex">
           <WorkTimeFrame hypercert={hypercert} />
           <WorkScope hypercert={hypercert} />
