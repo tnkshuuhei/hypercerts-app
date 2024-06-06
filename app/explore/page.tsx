@@ -66,7 +66,6 @@ async function ExplorePageInner({
           const props: HypercertMiniDisplayProps = {
             hypercertId: hypercert.hypercert_id as string,
             name: hypercert.metadata?.name as string,
-            image: hypercert.metadata?.image as string,
           };
           return (
             <HypercertMiniDisplay
