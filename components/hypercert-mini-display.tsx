@@ -34,11 +34,10 @@ const HypercertMiniDisplay = ({
         <div className="relative h-[170px] w-full rounded-lg overflow-hidden">
           <Image
             src={`/hypercert/${hypercertId}/image`}
-            alt={name}
+            alt={name || "Untitled"}
             unoptimized
             fill
-            objectFit="cover"
-            objectPosition="top"
+            className="object-cover object-top"
           />
         </div>
         <div className="absolute top-4 right-4">
@@ -48,8 +47,12 @@ const HypercertMiniDisplay = ({
         </div>
         <section className="p-3 bg-white text-primary overflow-hidden rounded-lg border-[1.5px] border-slate-500 space-y-3">
           <div className="flex gap-1 items-center justify-between h-10">
-            <p className="flex-1 text-sm font-semibold line-clamp-2 text-ellipsis">
-              {name}
+            <p
+              className={`flex-1 text-sm font-semibold line-clamp-2 text-ellipsis ${
+                name ? "text-slate-700" : "text-slate-500"
+              }`}
+            >
+              {name || "[Untitled]"}
             </p>
             {hasTrustedEvaluator && (
               <TooltipProvider>
@@ -73,13 +76,13 @@ const HypercertMiniDisplay = ({
           <div className="flex justify-between">
             <div>
               <p className="text-sm text-slate-700 font-semibold">
-                {percentAvailable}%
+                {percentAvailable ? `${percentAvailable}%` : "--"}
               </p>
               <p className="text-xs text-slate-500">Available</p>
             </div>
             <div className="text-right">
               <p className="text-sm text-slate-700 font-semibold">
-                {lowestPrice}
+                {lowestPrice ? lowestPrice : "--"}
               </p>
               <p className="text-xs text-slate-500">Lowest per %</p>
             </div>
