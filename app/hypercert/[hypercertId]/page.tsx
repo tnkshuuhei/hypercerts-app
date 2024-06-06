@@ -1,3 +1,4 @@
+import CreatedDate from "../../../components/hypercert/created-date";
 import Creator from "../../../components/hypercert/creator";
 import ExternalUrl from "../../../components/hypercert/external-url";
 import ReadMore from "../../../components/read-more";
@@ -32,11 +33,11 @@ export default async function HypercertPage({
           <WorkScope hypercert={hypercert} />
         </div>
         <Separator />
-
         <div className="flex">
           <Creator hypercert={hypercert} />
-          <WorkScope hypercert={hypercert} />
+          <CreatedDate hypercert={hypercert} />
         </div>
+        <Separator />
       </section>
     </main>
   );
