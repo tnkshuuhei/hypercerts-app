@@ -8,9 +8,18 @@ import {
 
 import EthAddress from "../eth-address";
 import { HypercertFull } from "../../hypercerts/fragments/hypercert-full.fragment";
+import { isAddress } from "viem";
 import { useState } from "react";
 
 const MAX_CONTRIBUTORS_DISPLAYED = 5;
+
+function Contributor({ contributor }: { contributor: string }) {
+  return isAddress(contributor) ? (
+    <EthAddress address={contributor} />
+  ) : (
+    <div>{contributor}</div>
+  );
+}
 
 export default function Contributors({
   hypercert,
@@ -26,8 +35,9 @@ export default function Contributors({
       <div className="flex flex-col w-full">
         <span>Contributors</span>
         <div>
+          {hypercert.metadata?.contributors.length === 0 && "No contributors"}
           {hypercert.metadata?.contributors.map((contributor) => (
-            <EthAddress address={contributor} key={contributor} />
+            <Contributor contributor={contributor} key={contributor} />
           ))}
         </div>
       </div>
@@ -42,14 +52,14 @@ export default function Contributors({
           {hypercert.metadata?.contributors
             .slice(0, MAX_CONTRIBUTORS_DISPLAYED)
             .map((contributor) => (
-              <EthAddress address={contributor} key={contributor} />
+              <Contributor contributor={contributor} key={contributor} />
             ))}
         </div>
       )}
       <Collapsible onOpenChange={setIsOpen}>
         <CollapsibleContent>
           {hypercert.metadata?.contributors.map((contributor) => (
-            <EthAddress address={contributor} key={contributor} />
+            <Contributor contributor={contributor} key={contributor} />
           ))}
         </CollapsibleContent>
         <CollapsibleTrigger>Read more</CollapsibleTrigger>
