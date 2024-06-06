@@ -4,12 +4,15 @@ export const HypercertListFragment = gqlHypercerts(`
   fragment HypercertListFragment on Hypercert {
     metadata {
       name
-      description
+			image
     }
     attestations {
       count
     }
     creation_block_timestamp
     hypercert_id
+		contract {
+        chain_id
+      }
   }
 `);

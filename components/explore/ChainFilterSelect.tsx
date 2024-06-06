@@ -2,8 +2,8 @@
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-import { ComboSelect } from "../combobox";
-import { SUPPORTED_CHAINS } from "../../lib/constants";
+import { ComboSelect } from "@/components/combobox";
+import { SUPPORTED_CHAINS } from "@/lib/constants";
 
 export default function ChainFilterSelect() {
   const pathname = usePathname();
