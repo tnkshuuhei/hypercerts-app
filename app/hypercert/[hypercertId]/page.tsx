@@ -1,13 +1,13 @@
-import Contributors from "../../../components/hypercert/contributors";
-import CreatedDate from "../../../components/hypercert/created-date";
-import Creator from "../../../components/hypercert/creator";
-import ExternalUrl from "../../../components/hypercert/external-url";
-import Fractions from "../../../components/hypercert/fractions";
-import ReadMore from "../../../components/read-more";
-import { Separator } from "../../../components/ui/separator";
-import WorkScope from "../../../components/hypercert/scope";
-import WorkTimeFrame from "../../../components/hypercert/time-frame";
-import { getHypercert } from "../../../hypercerts/getHypercert";
+import Contributors from "@/components/hypercert/contributors";
+import CreatedDate from "@/components/hypercert/created-date";
+import Creator from "@/components/hypercert/creator";
+import ExternalUrl from "@/components/hypercert/external-url";
+import Fractions from "@/components/hypercert/fractions";
+import WorkScope from "@/components/hypercert/scope";
+import WorkTimeFrame from "@/components/hypercert/time-frame";
+import ReadMore from "@/components/read-more";
+import { Separator } from "@/components/ui/separator";
+import { getHypercert } from "@/hypercerts/getHypercert";
 
 export default async function HypercertPage({
   params,
