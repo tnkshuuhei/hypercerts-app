@@ -1,6 +1,6 @@
 import * as R from "remeda";
 
-import { HypercertFull } from "../../hypercerts/fragments/hypercert-full.fragment";
+import { type HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
 
 export default function WorkScope({ hypercert }: { hypercert: HypercertFull }) {
   const workScope =
