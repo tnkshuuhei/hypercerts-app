@@ -1,5 +1,4 @@
 import Contributors from "@/components/hypercert/contributors";
-import CreatedDate from "@/components/hypercert/created-date";
 import Creator from "@/components/hypercert/creator";
 import ExternalUrl from "@/components/hypercert/external-url";
 import Fractions from "@/components/hypercert/fractions";
@@ -8,6 +7,35 @@ import WorkTimeFrame from "@/components/hypercert/time-frame";
 import ReadMore from "@/components/read-more";
 import { Separator } from "@/components/ui/separator";
 import { getHypercert } from "@/hypercerts/getHypercert";
+import { ArrowLeftIcon } from "lucide-react";
+import { Metadata, ResolvingMetadata } from "next";
+import Image from "next/image";
+import Link from "next/link";
+import { Fragment } from "react";
+
+type Props = {
+  params: { hypercertId: string };
+  searchParams: { [key: string]: string | string[] | undefined };
+};
+
+export async function generateMetadata(
+  { params, searchParams }: Props,
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  const { hypercertId } = params;
+  const hypercert = await getHypercert(hypercertId);
+
+  // optionally access and extend (rather than replace) parent metadata
+  const previousImages = (await parent).openGraph?.images || [];
+
+  return {
+    title: hypercert?.metadata?.name || "Untitled Hypercert",
+    description: hypercert?.metadata?.description || "",
+    openGraph: {
+      images: [`/hypercert/${hypercertId}/image`, ...previousImages],
+    },
+  };
+}
 
 export default async function HypercertPage({
   params,
@@ -22,27 +50,57 @@ export default async function HypercertPage({
   }
 
   return (
-    <main className="flex flex-col p-8 md:p-24 pb-24 space-y-4">
+    <main className="flex flex-col p-8 md:px-24 md:pt-14 pb-24 space-y-4">
+      <Link href={`/explore`}>
+        <div className="flex items-center space-x-2 text-sm text-gray-700 font-medium">
+          <ArrowLeftIcon className="w-4 h-4" />
+          <span>Explore more hypercerts</span>
+        </div>
+      </Link>
       <section className="flex flex-col space-y-4">
-        <h1 className="font-serif text-3xl lg:text-5xl tracking-tight">
-          {hypercert?.metadata?.name}
-        </h1>
-        <ReadMore text={hypercert?.metadata?.description} length={280} />
-        <ExternalUrl url={hypercert?.metadata?.external_url} />
+        <article className="space-y-4 lg:flex lg:space-y-0 lg:space-x-6">
+          <div className="h-[300px] lg:h-[350px] min-w-[300px] lg:min-w-[500px] max-w-[500px]">
+            <div className="relative w-full h-full bg-black border border-slate-800 rounded-lg overflow-hidden ">
+              <Image
+                src={`/hypercert/${hypercertId}/image`}
+                alt={hypercert?.metadata?.name || ""}
+                fill
+                className="object-contain object-top p-2"
+              />
+            </div>
+          </div>
+          <section className="space-y-4">
+            <h1 className="font-serif text-3xl lg:text-4xl tracking-tight line-clamp-2 text-ellipsis w-full">
+              {hypercert?.metadata?.name || "[Untitled]"}
+            </h1>
+            <Creator hypercert={hypercert} />
+            <ReadMore text={hypercert?.metadata?.description} length={280} />
+            <ExternalUrl url={hypercert?.metadata?.external_url} />
+            {(hypercert?.metadata?.work_timeframe_from as string) && (
+              <Fragment>
+                <Separator />
+                <WorkTimeFrame hypercert={hypercert} />
+              </Fragment>
+            )}
+          </section>
+        </article>
+
         <Separator />
-        <div className="flex">
-          <WorkTimeFrame hypercert={hypercert} />
-          <WorkScope hypercert={hypercert} />
-        </div>
-        <Separator />
-        <div className="flex">
-          <Creator hypercert={hypercert} />
-          <CreatedDate hypercert={hypercert} />
-        </div>
-        <Separator />
-        <Contributors hypercert={hypercert} />
-        <Separator />
-        <Fractions hypercert={hypercert} />
+        <section className="space-y-4 lg:flex lg:space-y-0 lg:space-x-8">
+          {hypercert?.metadata?.contributors && (
+            <Fragment>
+              <Contributors hypercert={hypercert} />
+            </Fragment>
+          )}
+
+          <Fractions hypercert={hypercert} />
+        </section>
+        {hypercert?.metadata?.work_scope && (
+          <Fragment>
+            <Separator />
+            <WorkScope hypercert={hypercert} />
+          </Fragment>
+        )}
       </section>
     </main>
   );

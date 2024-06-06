@@ -1,17 +1,20 @@
 "use client";
 
+import EthAddress from "@/components/eth-address";
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "../ui/collapsible";
-
-import EthAddress from "../eth-address";
-import { HypercertFull } from "../../hypercerts/fragments/hypercert-full.fragment";
-import { isAddress } from "viem";
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import { type HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
+import { UserCircle2 } from "lucide-react";
 import { useState } from "react";
+import { isAddress } from "viem";
 
-const MAX_CONTRIBUTORS_DISPLAYED = 5;
+const MAX_CONTRIBUTORS_DISPLAYED = 10;
 
 function Contributor({ contributor }: { contributor: string }) {
   return isAddress(contributor) ? (
@@ -30,40 +33,39 @@ export default function Contributors({
 
   if (!hypercert || !hypercert.metadata?.contributors) return null;
 
-  if (hypercert.metadata?.contributors.length <= MAX_CONTRIBUTORS_DISPLAYED) {
-    return (
-      <div className="flex flex-col w-full">
-        <span>Contributors</span>
-        <div>
-          {hypercert.metadata?.contributors.length === 0 && "No contributors"}
-          {hypercert.metadata?.contributors.map((contributor) => (
-            <Contributor contributor={contributor} key={contributor} />
-          ))}
-        </div>
-      </div>
-    );
-  }
+  // if (hypercert.metadata?.contributors.length <= MAX_CONTRIBUTORS_DISPLAYED) {
+  //   return (
+  //     <div className="flex flex-col w-full">
+  //       <span>Contributors</span>
+  //       <div>
+  //         {hypercert.metadata?.contributors.length === 0 && "No contributors"}
+  //         {hypercert.metadata?.contributors.map((contributor) => (
+  //           <Contributor contributor={contributor} key={contributor} />
+  //         ))}
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
-    <div className="flex flex-col w-full">
-      <span>Contributors</span>
-      {!isOpen && (
-        <div>
-          {hypercert.metadata?.contributors
-            .slice(0, MAX_CONTRIBUTORS_DISPLAYED)
-            .map((contributor) => (
-              <Contributor contributor={contributor} key={contributor} />
+    <section className="flex flex-col gap-y-2 w-full max-w-[500px]">
+      <h5 className="uppercase text-sm text-gray-500 font-medium tracking-wider">
+        Contributors
+      </h5>
+      <Command className="rounded-lg border-[1.5px] border-slate-200">
+        <CommandInput placeholder="Find a contributor..." />
+        <CommandList>
+          <CommandEmpty>No results found.</CommandEmpty>
+          <CommandGroup>
+            {hypercert.metadata?.contributors.map((contributor) => (
+              <CommandItem key={contributor}>
+                <UserCircle2 className="mr-2 h-4 w-4" />
+                <Contributor contributor={contributor} />
+              </CommandItem>
             ))}
-        </div>
-      )}
-      <Collapsible onOpenChange={setIsOpen}>
-        <CollapsibleContent>
-          {hypercert.metadata?.contributors.map((contributor) => (
-            <Contributor contributor={contributor} key={contributor} />
-          ))}
-        </CollapsibleContent>
-        <CollapsibleTrigger>Read more</CollapsibleTrigger>
-      </Collapsible>
-    </div>
+          </CommandGroup>
+        </CommandList>
+      </Command>
+    </section>
   );
 }

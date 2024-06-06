@@ -1,6 +1,6 @@
 import * as R from "remeda";
 
-import { HypercertFull } from "../../hypercerts/fragments/hypercert-full.fragment";
+import { type HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
 
 export default function WorkTimeFrame({
   hypercert,
@@ -14,6 +14,11 @@ export default function WorkTimeFrame({
     return null;
   }
 
+  const formatDate = (date: Date) =>
+    new Intl.DateTimeFormat("en-US", {
+      dateStyle: "medium",
+    }).format(date);
+
   let workTimeFrameFrom = hypercert.metadata?.work_timeframe_from
     ? new Date(hypercert.metadata?.work_timeframe_from)
     : null;
@@ -21,16 +26,19 @@ export default function WorkTimeFrame({
     ? new Date(hypercert.metadata.work_timeframe_to)
     : null;
 
+  const workTimeFrame =
+    workTimeFrameFrom && workTimeFrameTo
+      ? formatDate(workTimeFrameFrom) === formatDate(workTimeFrameTo)
+        ? `${formatDate(workTimeFrameFrom)}`
+        : `${formatDate(workTimeFrameFrom)} — ${formatDate(workTimeFrameTo)}`
+      : null;
+
   return (
-    <div className="flex flex-col w-full">
-      <span>Work Timeframe</span>
-      <p>
-        {workTimeFrameFrom && workTimeFrameTo
-          ? workTimeFrameFrom.toISOString().substring(0, 10) +
-            " → " +
-            workTimeFrameTo.toISOString().substring(0, 10)
-          : "No work time frame"}
-      </p>
+    <div className="space-y-2 w-full">
+      <h5 className="uppercase text-sm text-gray-500 font-medium tracking-wider">
+        TIMEFRAME
+      </h5>
+      <p className="text-base text-gray-800 font-medium">{workTimeFrame}</p>
     </div>
   );
 }
