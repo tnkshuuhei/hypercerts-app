@@ -4,7 +4,6 @@ export const HypercertListFragment = gqlHypercerts(`
   fragment HypercertListFragment on Hypercert {
     metadata {
       name
-			image
     }
     attestations {
       count

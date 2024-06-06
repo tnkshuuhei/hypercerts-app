@@ -1,18 +1,18 @@
-import Image from "next/image";
-import Link from "next/link";
-import React from "react";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+
+import Image from "next/image";
+import Link from "next/link";
+import React from "react";
 import { ShieldCheck } from "lucide-react";
 
 export interface HypercertMiniDisplayProps {
   hypercertId: string;
   name: string;
-  image: string;
   hasTrustedEvaluator?: boolean;
   percentAvailable?: number;
   lowestPrice?: string;
@@ -21,7 +21,6 @@ export interface HypercertMiniDisplayProps {
 const HypercertMiniDisplay = ({
   hypercertId,
   name,
-  image,
   hasTrustedEvaluator,
   percentAvailable,
   lowestPrice,
@@ -32,18 +31,16 @@ const HypercertMiniDisplay = ({
         className="w-[275px] rounded-lg overflow-hidden transition-transform duration-300 hover:-translate-y-2 bg-slate-800 relative"
         title={name}
       >
-        {image && (
-          <div className="relative h-[170px] w-full rounded-lg overflow-hidden">
-            <Image
-              src={image}
-              alt={name}
-              unoptimized
-              fill
-              objectFit="cover"
-              objectPosition="top"
-            />
-          </div>
-        )}
+        <div className="relative h-[170px] w-full rounded-lg overflow-hidden">
+          <Image
+            src={`/hypercert/${hypercertId}/image`}
+            alt={name}
+            unoptimized
+            fill
+            objectFit="cover"
+            objectPosition="top"
+          />
+        </div>
         <div className="absolute top-4 right-4">
           <p className="text-[10px] px-2 py-0.5 rounded-full bg-black/60 text-white tracking-wide">
             Sepolia Testnet
