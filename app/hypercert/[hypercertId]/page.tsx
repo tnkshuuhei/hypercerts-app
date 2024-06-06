@@ -1,5 +1,7 @@
+import Creator from "../../../components/hypercert/creator";
 import ExternalUrl from "../../../components/hypercert/external-url";
 import ReadMore from "../../../components/read-more";
+import { Separator } from "../../../components/ui/separator";
 import WorkScope from "../../../components/hypercert/scope";
 import WorkTimeFrame from "../../../components/hypercert/time-frame";
 import { getHypercert } from "../../../hypercerts/getHypercert";
@@ -24,8 +26,15 @@ export default async function HypercertPage({
         </h1>
         <ReadMore text={hypercert?.metadata?.description} length={280} />
         <ExternalUrl url={hypercert?.metadata?.external_url} />
+        <Separator />
         <div className="flex">
           <WorkTimeFrame hypercert={hypercert} />
+          <WorkScope hypercert={hypercert} />
+        </div>
+        <Separator />
+
+        <div className="flex">
+          <Creator hypercert={hypercert} />
           <WorkScope hypercert={hypercert} />
         </div>
       </section>
