@@ -37,5 +37,4 @@ export const HypercertFullFragment = gqlHypercerts(`
     token_id
   }
 `);
-
 export type HypercertFull = ResultOf<typeof HypercertFullFragment>;
