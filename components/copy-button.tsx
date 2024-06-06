@@ -3,8 +3,10 @@ import { Copy } from "lucide-react";
 
 export function CopyButton({
   textToCopy,
+  ...props
 }: {
   textToCopy?: string;
+  [key: string]: any;
 }): JSX.Element {
   return (
     <Button
@@ -23,6 +25,7 @@ export function CopyButton({
       }}
       variant={"outline"}
       size={"icon"}
+      {...props}
     >
       <Copy />
     </Button>

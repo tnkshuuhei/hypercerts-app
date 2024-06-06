@@ -1,3 +1,4 @@
+import Contributors from "../../../components/hypercert/contributors";
 import CreatedDate from "../../../components/hypercert/created-date";
 import Creator from "../../../components/hypercert/creator";
 import ExternalUrl from "../../../components/hypercert/external-url";
@@ -38,6 +39,7 @@ export default async function HypercertPage({
           <CreatedDate hypercert={hypercert} />
         </div>
         <Separator />
+        <Contributors hypercert={hypercert} />
       </section>
     </main>
   );

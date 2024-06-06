@@ -34,7 +34,7 @@ export default function EthAddress({
 
   return (
     <div
-      className="flex items-center gap-1 content-center cursor-pointer"
+      className="flex items-center gap-2 content-center cursor-pointer"
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
@@ -44,7 +44,7 @@ export default function EthAddress({
           ? ensName
           : address.slice(0, 6) + "..." + address.slice(-4)}
       </div>
-      {hover && <CopyButton textToCopy={address} />}
+      {hover && <CopyButton textToCopy={address} className="w-4 h-4" />}
     </div>
   );
 }

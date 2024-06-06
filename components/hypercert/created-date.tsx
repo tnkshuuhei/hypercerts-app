@@ -9,9 +9,7 @@ export default function CreatedDate({
   return (
     <div className="flex flex-col w-full">
       <span>Created on</span>
-      <p>
-        <FormattedDate seconds={hypercert.creation_block_timestamp} />
-      </p>
+      <FormattedDate seconds={hypercert.creation_block_timestamp} />
     </div>
   );
 }
