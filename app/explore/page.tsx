@@ -1,19 +1,26 @@
+import HypercertMiniDisplay, {
+  HypercertMiniDisplayProps,
+} from "@/components/hypercert-mini-display";
 import {
   GetAllHypercertsParams,
   getAllHypercerts,
   isClaimsOrderBy,
 } from "@/hypercerts/getAllHypercerts";
-import HypercertMiniDisplay, {
-  HypercertMiniDisplayProps,
-} from "@/components/hypercert-mini-display";
 
+import Loading from "@/app/explore/loading";
 import ChainFilterSelect from "@/components/explore/chain-filter-select";
-import { HYPERCERTS_PER_PAGE } from "@/configs/ui";
-import Loading from "./loading";
 import OrderBySelect from "@/components/explore/order-by-select";
 import Pagination from "@/components/explore/pagination";
 import SearchBar from "@/components/explore/search-bar";
+import { HYPERCERTS_PER_PAGE } from "@/configs/ui";
+import { Metadata } from "next";
 import { Suspense } from "react";
+
+export const metadata: Metadata = {
+  title: "Explore",
+  description:
+    "The best place to discover and contribute to hypercerts and hyperboards.",
+};
 
 async function ExplorePageInner({
   searchParams,
