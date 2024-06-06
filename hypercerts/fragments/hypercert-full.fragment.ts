@@ -1,3 +1,4 @@
+import { ResultOf } from "gql.tada";
 import { gqlHypercerts } from "../../graphql/hypercerts";
 
 export const HypercertFullFragment = gqlHypercerts(`
@@ -36,3 +37,5 @@ export const HypercertFullFragment = gqlHypercerts(`
     token_id
   }
 `);
+
+export type HypercertFull = ResultOf<typeof HypercertFullFragment>;

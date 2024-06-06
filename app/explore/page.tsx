@@ -39,7 +39,7 @@ async function ExplorePageInner({
   const hypercerts = await getAllHypercerts(params);
 
   return (
-    <>
+    
       <main className="flex flex-col p-8 md:p-24 pb-24 space-y-4">
         <section>
           <h1 className="font-serif text-3xl lg:text-5xl tracking-tight">
@@ -76,9 +76,8 @@ async function ExplorePageInner({
             );
           })}
         </div>
-        <Pagination searchParams={searchParams} />
-      </main>
-    </>
+      <Pagination searchParams={searchParams} />
+    </main>
   );
 }
 
