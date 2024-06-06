@@ -1,5 +1,5 @@
-import WorkScope from "../../../components/hypercert/Scope";
-import WorkTimeFrame from "../../../components/hypercert/TimeFrame";
+import WorkScope from "../../../components/hypercert/scope";
+import WorkTimeFrame from "../../../components/hypercert/time-frame";
 import { getHypercert } from "../../../hypercerts/getHypercert";
 
 export default async function HypercertPage({
