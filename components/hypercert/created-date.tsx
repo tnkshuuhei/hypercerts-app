@@ -1,5 +1,5 @@
 import FormattedDate from "../formatted-date";
-import { HypercertFull } from "../../hypercerts/fragments/hypercert-full.fragment";
+import { type HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
 
 export default function CreatedDate({
   hypercert,
@@ -9,7 +9,7 @@ export default function CreatedDate({
   return (
     <div className="flex flex-col w-full">
       <span>Created on</span>
-      <FormattedDate seconds={hypercert.creation_block_timestamp} />
+      <FormattedDate seconds={hypercert.block_number} />
     </div>
   );
 }
