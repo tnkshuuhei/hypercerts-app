@@ -4,7 +4,7 @@ import PaginationSkeleton from "./pagination-skeleton";
 export default function HypercertsListSkeleton() {
   return (
     <div className="flex flex-col gap-5">
-      <div className="flex justify-center md:justify-start flex-wrap gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {Array.from({ length: HYPERCERTS_PER_PAGE }, (_, i) => (
           <div
             key={i}
