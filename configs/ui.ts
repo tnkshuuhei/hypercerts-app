@@ -1,2 +1,2 @@
 export const HYPERCERTS_PER_PAGE = 12;
-export const ATTESTORS_PER_PAGE = 10;
+export const ATTESTORS_PER_PAGE = 3;

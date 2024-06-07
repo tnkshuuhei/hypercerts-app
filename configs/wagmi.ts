@@ -1,7 +1,15 @@
+import {
+  base,
+  baseSepolia,
+  celo,
+  mainnet,
+  optimism,
+  sepolia,
+} from "viem/chains";
 import { cookieStorage, createConfig, createStorage, http } from "wagmi";
-import { walletConnect } from "wagmi/connectors";
-import { base, baseSepolia, celo, optimism, sepolia } from "viem/chains";
+
 import { siteConfig } from "./site";
+import { walletConnect } from "wagmi/connectors";
 
 // Get projectId at https://cloud.walletconnect.com
 export const projectId = process.env.NEXT_PUBLIC_WC_PROJECT_ID;
@@ -18,7 +26,7 @@ const metadata = {
 // Create wagmiConfig
 export const config = createConfig({
   // chains: [sepolia, celo, base, baseSepolia, optimism],
-  chains: [sepolia],
+  chains: [mainnet, sepolia],
   connectors: [walletConnect({ projectId })],
   pollingInterval: 2_000,
   ssr: true,
@@ -26,6 +34,7 @@ export const config = createConfig({
     storage: cookieStorage,
   }),
   transports: {
+    [mainnet.id]: http(),
     [sepolia.id]: http(),
     // [celo.id]: http(),
     // [base.id]: http(),
