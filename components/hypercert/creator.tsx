@@ -1,16 +1,23 @@
-import { FragmentOf, readFragment } from "gql.tada";
-
+import FormattedDate from "@/components/formatted-date";
+import { type HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
 import EthAddress from "../eth-address";
-import { HypercertFull } from "../../hypercerts/fragments/hypercert-full.fragment";
 
 export default function Creator({ hypercert }: { hypercert: HypercertFull }) {
   if (!hypercert) return null;
   return (
-    <div className="flex flex-col items-start w-full">
-      <span>Creator</span>
-      <div>
-        <EthAddress address={hypercert.owner_address} />
-      </div>
+    <div className="flex items-center gap-2 text-sm text-slate-500 font-medium">
+      {hypercert.owner_address && (
+        <div className="flex space-x-1 items-center">
+          <span>by</span>
+          <EthAddress address={hypercert.owner_address} />
+        </div>
+      )}
+      {(hypercert?.block_number as number) && (
+        <div className="flex space-x-1 items-center">
+          <span>•</span>
+          <FormattedDate seconds={Number(hypercert.block_number)} />
+        </div>
+      )}
     </div>
   );
 }

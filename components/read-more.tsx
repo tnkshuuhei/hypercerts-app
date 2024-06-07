@@ -28,11 +28,13 @@ export default function ReadMore({
   const cutoffText = text.substring(0, length) + "...";
 
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex flex-col">
       {!isOpen && cutoffText}
       <Collapsible onOpenChange={setIsOpen}>
-        <CollapsibleContent>{text}</CollapsibleContent>
-        <CollapsibleTrigger>Read more</CollapsibleTrigger>
+        <CollapsibleContent className="text-pretty">{text}</CollapsibleContent>
+        <CollapsibleTrigger className="text-blue-600 hover:underline text-xs lg:text-sm">
+          {isOpen ? "Read less" : "Read more"}
+        </CollapsibleTrigger>
       </Collapsible>
     </div>
   );

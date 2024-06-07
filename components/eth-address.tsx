@@ -3,6 +3,7 @@
 import { CopyButton } from "./copy-button";
 import { useEnsName } from "wagmi";
 import { useState } from "react";
+import { truncateEthereumAddress } from "@/lib/utils";
 
 export default function EthAddress({
   address,
@@ -11,7 +12,6 @@ export default function EthAddress({
   address?: string | undefined | null;
   showEnsName?: boolean;
 }) {
-  const [hover, setHover] = useState(false);
   const { data: ensName } = useEnsName({
     address: address as `0x${string}` | undefined,
     chainId: 1,
@@ -24,27 +24,16 @@ export default function EthAddress({
   const copyAddress = (event: React.MouseEvent<HTMLDivElement>) => {
     event.stopPropagation();
     void navigator.clipboard.writeText(address);
-    // toast({
-    //   title: "Copied.",
-    //   status: "info",
-    //   duration: 1000,
-    //   position: "top",
-    // });
   };
 
   return (
-    <div
-      className="flex items-center gap-2 content-center cursor-pointer"
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-    >
-      {/* <JazziconImage address={address} /> */}
+    <div className="flex items-center gap-2 content-center cursor-pointer px-1 py-0.5 bg-slate-100 rounded-md w-max text-sm">
       <div onClick={copyAddress}>
         {showEnsName && ensName
           ? ensName
-          : address.slice(0, 6) + "..." + address.slice(-4)}
+          : truncateEthereumAddress(address as `0x${string}`)}
       </div>
-      {hover && <CopyButton textToCopy={address} className="w-4 h-4" />}
+      <CopyButton textToCopy={address} className="w-4 h-4 bg-transparent" />
     </div>
   );
 }

@@ -12,7 +12,7 @@ export const HypercertFullFragment = gqlHypercerts(`
       work_timeframe_to
       contributors
     }
-    creation_block_timestamp
+		block_number
     hypercert_id
     contract {
       chain_id

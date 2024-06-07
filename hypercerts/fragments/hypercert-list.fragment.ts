@@ -8,7 +8,7 @@ export const HypercertListFragment = gqlHypercerts(`
     attestations {
       count
     }
-    creation_block_timestamp
+		block_number
     hypercert_id
 		contract {
         chain_id

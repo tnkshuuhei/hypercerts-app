@@ -1,14 +1,16 @@
 "use client";
 
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "../ui/collapsible";
-
-import EthAddress from "../eth-address";
-import { HypercertFull } from "../../hypercerts/fragments/hypercert-full.fragment";
-import { isAddress } from "viem";
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import { type HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
+import { truncateEthereumAddress } from "@/lib/utils";
+import { UserCircle2 } from "lucide-react";
 import { useState } from "react";
 
 const MAX_FRACTIONS_DISPLAYED = 5;
@@ -22,7 +24,8 @@ function Fraction({
 }) {
   return (
     <div className="flex flex-col w-full">
-      {ownerAddress} owns {units as string} units
+      {truncateEthereumAddress(ownerAddress as `0x${string}`)} &mdash;{" "}
+      {units as string} units
     </div>
   );
 }
@@ -30,55 +33,56 @@ function Fraction({
 export default function Fractions({ hypercert }: { hypercert: HypercertFull }) {
   const [isOpen, setIsOpen] = useState(false);
 
-  if (!hypercert || !hypercert.fractions?.data) return null;
+  if (
+    !hypercert ||
+    !hypercert.fractions?.data ||
+    hypercert.fractions.data.length === 0
+  )
+    return null;
 
-  console.log(hypercert.fractions.data);
-
-  if (hypercert.fractions.data.length <= MAX_FRACTIONS_DISPLAYED) {
-    return (
-      <div className="flex flex-col w-full">
-        <span>Ownership</span>
-        <div>
-          {hypercert.fractions.data.map((fraction) => (
-            <Fraction
-              ownerAddress={fraction.owner_address}
-              units={fraction.units}
-              key={fraction.owner_address}
-            />
-          ))}
-        </div>
-      </div>
-    );
-  }
+  // if (hypercert.fractions.data.length <= MAX_FRACTIONS_DISPLAYED) {
+  //   return (
+  //     <div className="flex flex-col w-full">
+  //       <span>Ownership</span>
+  //       <div>
+  //         {hypercert.fractions.data.map((fraction) => (
+  //           <Fraction
+  //             ownerAddress={fraction.owner_address}
+  //             units={fraction.units}
+  //             key={fraction.owner_address}
+  //           />
+  //         ))}
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
-    <div className="flex flex-col w-full">
-      <span>Ownership</span>
-      {!isOpen && (
-        <div>
-          {hypercert.fractions.data
-            .slice(0, MAX_FRACTIONS_DISPLAYED)
-            .map((fraction) => (
-              <Fraction
-                ownerAddress={fraction.owner_address}
-                units={fraction.units}
+    <section className="flex flex-col gap-y-2 w-full max-w-[500px]">
+      <h5 className="uppercase text-sm text-gray-500 font-medium tracking-wider">
+        Owners
+      </h5>
+      <Command className="rounded-lg border-[1.5px] border-slate-200">
+        <CommandInput placeholder="Find fraction owner..." />
+        <CommandList>
+          <CommandEmpty>No results found.</CommandEmpty>
+          <CommandGroup>
+            {hypercert.fractions.data.map((fraction) => (
+              <CommandItem
                 key={fraction.owner_address}
-              />
+                title={fraction.owner_address || ""}
+              >
+                <UserCircle2 className="mr-2 h-4 w-4" />
+                <span className="hidden">{fraction.owner_address}</span>
+                <Fraction
+                  ownerAddress={fraction.owner_address}
+                  units={fraction.units}
+                />
+              </CommandItem>
             ))}
-        </div>
-      )}
-      <Collapsible onOpenChange={setIsOpen}>
-        <CollapsibleContent>
-          {hypercert.fractions.data.map((fraction) => (
-            <Fraction
-              ownerAddress={fraction.owner_address}
-              units={fraction.units}
-              key={fraction.owner_address}
-            />
-          ))}
-        </CollapsibleContent>
-        <CollapsibleTrigger>Read more</CollapsibleTrigger>
-      </Collapsible>
-    </div>
+          </CommandGroup>
+        </CommandList>
+      </Command>
+    </section>
   );
 }
