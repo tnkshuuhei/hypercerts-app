@@ -18,10 +18,10 @@ export default function PaginationButton({
         {arrow === "left" && (
           <ChevronLeft style={{ width: "10px", height: "10px" }} />
         )}
+        {children}
         {arrow === "right" && (
           <ChevronRight style={{ width: "10px", height: "10px" }} />
         )}
-        {children}
       </Button>
     </Link>
   );
