@@ -60,7 +60,7 @@ async function ExploreListInner({
             Showing search results for: <b>{search}</b>
           </div>
         )}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="flex flex-col md:flex-row flex-wrap gap-5">
           {hypercerts?.data?.map((hypercert) => {
             const props: HypercertMiniDisplayProps = {
               hypercertId: hypercert.hypercert_id as string,

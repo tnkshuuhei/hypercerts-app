@@ -34,7 +34,7 @@ export default async function ExplorePageInner({
           <ExploreOrderBySelect />
         </div>
       </section>
-      <div className="flex justify-center md:justify-start flex-wrap gap-5">
+      <div className="max-w-screen-xl">
         <ExploreList {...{ searchParams }} />
       </div>
     </main>
