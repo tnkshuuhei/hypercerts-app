@@ -1,8 +1,8 @@
-import ChainFilterSelect from "@/components/explore/chain-filter-select";
-import OrderBySelect from "@/components/explore/order-by-select";
-import SearchBar from "@/components/explore/search-bar";
+import ExploreChainFilterSelect from "../../components/explore/explore-chain-filter-select";
+import ExploreList from "../../components/explore/explore-list";
+import ExploreOrderBySelect from "../../components/explore/explore-order-by-select";
+import ExploreSearchBar from "../../components/explore/explore-search-bar";
 import { Metadata } from "next";
-import HypercertsList from "@/components/explore/hypercerts-list";
 
 export const metadata: Metadata = {
   title: "Explore",
@@ -28,14 +28,13 @@ export default async function ExplorePageInner({
         </p>
       </section>
       <section className="flex flex-col md:flex-row gap-4">
-        <SearchBar />
-        <ChainFilterSelect />
-        <OrderBySelect />
+        <ExploreSearchBar />
+        <ExploreChainFilterSelect />
+        <ExploreOrderBySelect />
       </section>
       <div className="flex justify-center md:justify-start flex-wrap gap-5">
-        <HypercertsList {...{ searchParams }} />
+        <ExploreList {...{ searchParams }} />
       </div>
     </main>
   );
 }
-

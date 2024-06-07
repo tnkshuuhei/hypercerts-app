@@ -9,7 +9,7 @@ import {
 } from "../ui/select";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-export default function OrderBySelect() {
+export default function ExploreOrderBySelect() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const router = useRouter();

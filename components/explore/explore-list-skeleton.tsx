@@ -1,7 +1,7 @@
 import { HYPERCERTS_PER_PAGE } from "../../configs/ui";
-import PaginationSkeleton from "./pagination-skeleton";
+import PaginationSkeleton from "../pagination-skeleton";
 
-export default function HypercertsListSkeleton() {
+export default function ExploreListSkeleton() {
   return (
     <div className="flex flex-col gap-5">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">

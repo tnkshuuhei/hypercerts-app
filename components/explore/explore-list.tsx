@@ -7,10 +7,9 @@ import HypercertMiniDisplay, {
   HypercertMiniDisplayProps,
 } from "@/components/hypercert-mini-display";
 
+import ExploreListSkeleton from "./explore-list-skeleton";
+import ExplorePagination from "./explore-pagination";
 import { HYPERCERTS_PER_PAGE } from "@/configs/ui";
-import HypercertsListSkeleton from "./hypercerts-list-skeleton";
-import Pagination from "@/components/explore/pagination";
-import PaginationSkeleton from "./pagination-skeleton";
 import { Suspense } from "react";
 
 function HypercertsListNoResults() {
@@ -21,7 +20,7 @@ function HypercertsListLoadError() {
   return "Unable to load hypercerts";
 }
 
-async function HypercertsListInner({
+async function ExploreListInner({
   searchParams,
 }: {
   searchParams: Record<string, string>;
@@ -76,7 +75,7 @@ async function HypercertsListInner({
           })}
         </div>
       </div>
-      <Pagination
+      <ExplorePagination
         searchParams={searchParams}
         hypercertsCount={hypercerts.count}
       />
@@ -84,15 +83,15 @@ async function HypercertsListInner({
   );
 }
 
-export default async function HypercertsList({
+export default async function ExploreList({
   searchParams,
 }: {
   searchParams: Record<string, string>;
 }) {
   const suspenseKey = new URLSearchParams(searchParams).toString();
   return (
-    <Suspense fallback={<HypercertsListSkeleton />} key={suspenseKey}>
-      <HypercertsListInner {...{ searchParams }} />
+    <Suspense fallback={<ExploreListSkeleton />} key={suspenseKey}>
+      <ExploreListInner {...{ searchParams }} />
     </Suspense>
   );
 }
