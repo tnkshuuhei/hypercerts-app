@@ -29,8 +29,10 @@ export default async function ExplorePageInner({
       </section>
       <section className="flex flex-col md:flex-row gap-4">
         <ExploreSearchBar />
-        <ExploreChainFilterSelect />
-        <ExploreOrderBySelect />
+        <div className="flex gap-2">
+          <ExploreChainFilterSelect />
+          <ExploreOrderBySelect />
+        </div>
       </section>
       <div className="flex justify-center md:justify-start flex-wrap gap-5">
         <ExploreList {...{ searchParams }} />
