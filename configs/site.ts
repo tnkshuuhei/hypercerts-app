@@ -1,4 +1,4 @@
-import { Compass, Book, LucideIcon, PlusCircle } from "lucide-react";
+import { Book, Compass, LucideIcon, PlusCircle } from "lucide-react";
 
 interface SiteConfig {
   name: string;
@@ -13,6 +13,7 @@ interface SiteConfig {
     createHypercert: string;
     createHyperboard: string;
     explore: string;
+    evaluators: string;
   };
 }
 
@@ -30,5 +31,6 @@ export const siteConfig: SiteConfig = {
     createHypercert: "/create/hypercert",
     createHyperboard: "/create/hyperboard",
     explore: "/explore",
+    evaluators: "/evaluators",
   },
 };

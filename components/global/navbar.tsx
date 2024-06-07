@@ -1,16 +1,18 @@
 "use client";
-import { buttonVariants } from "@/components/ui/button";
+
+import { ArrowUpRight, ChevronDown } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { siteConfig } from "@/configs/site";
-import { ArrowUpRight, ChevronDown } from "lucide-react";
+
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { WalletProfile } from "@/components/wallet-profile";
+import { buttonVariants } from "@/components/ui/button";
+import { siteConfig } from "@/configs/site";
+import { usePathname } from "next/navigation";
 
 const Navbar = () => {
   const currentPath = usePathname();
@@ -34,6 +36,17 @@ const Navbar = () => {
             }`}
           >
             <span className="hover:underline">Explore</span>
+          </Link>
+          <Link
+            key={siteConfig.links.evaluators}
+            href={siteConfig.links.evaluators}
+            className={`${buttonVariants({ variant: "link" })} text-lg ${
+              currentPath === siteConfig.links.evaluators
+                ? "opacity-1 font-semibold hover:opacity-100"
+                : "opacity-70 hover:opacity-100"
+            }`}
+          >
+            <span className="hover:underline">Evaluators</span>
           </Link>
           <DropdownMenu>
             <DropdownMenuTrigger
