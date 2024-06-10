@@ -5,6 +5,7 @@ import HypercertCard from "@/components/hypercert-card";
 import { Form } from "@/components/ui/form";
 import { mintSteps, useMintClaim } from "@/hooks/use-mint-claim";
 import useProcessDialog, { StepData } from "@/hooks/useProcessDialog";
+import { formatDate } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   HypercertMetadata,
@@ -18,7 +19,6 @@ import { useForm } from "react-hook-form";
 import { TransactionReceipt } from "viem";
 import { z } from "zod";
 import FormSteps from "./form-steps";
-import { formatDate } from "@/lib/utils";
 
 const DEFAULT_NUM_FRACTIONS: number = 10000;
 const DEFAULT_HYPERCERT_VERSION: string = "0.0.1";
@@ -81,7 +81,7 @@ const formDefaultValues: HypercertFormValues = {
   logo: "https://www.bungie.net/common/destiny2_content/icons/cb01f3cbfd11000b1d19537e73922f55.jpg",
   link: "https://destinyemblemcollector.com/emblem?id=2069797998",
   cardImage: "",
-  tags: ["ghosts,deep,legend"],
+  tags: ["ghosts,deep,legend,skeleton,skeleton-king,grave,helion,skald"],
   projectDates: {
     from: new Date(),
     to: new Date(),
@@ -186,6 +186,7 @@ export default function NewHypercertForm() {
             description={form.getValues().description || undefined}
             banner={form.getValues().banner || undefined}
             logo={form.getValues().logo || undefined}
+            scopes={form.getValues().tags}
             fromDateDisplay={formatDate(
               form.getValues().projectDates?.from?.toISOString(),
               language
@@ -194,7 +195,6 @@ export default function NewHypercertForm() {
               form.getValues().projectDates?.to?.toISOString(),
               language
             )}
-            displayOnly
           />
         </div>
       </section>
@@ -203,7 +203,7 @@ export default function NewHypercertForm() {
           steps={dialogSteps}
           currentStep={mintStep}
           title="Mint your hypercert"
-          triggerLabel="Mint hypercert"
+          triggerLabel="See progress"
           extraContent={
             txReceipt && (
               <Link
