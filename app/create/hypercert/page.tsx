@@ -18,6 +18,7 @@ import { useForm } from "react-hook-form";
 import { TransactionReceipt } from "viem";
 import { z } from "zod";
 import FormSteps from "./form-steps";
+import { formatDate } from "@/lib/utils";
 
 const DEFAULT_NUM_FRACTIONS: number = 10000;
 const DEFAULT_HYPERCERT_VERSION: string = "0.0.1";
@@ -95,6 +96,7 @@ const formDefaultValues: HypercertFormValues = {
 
 export default function NewHypercertForm() {
   const [currentStep, setCurrentStep] = useState(1);
+  const [language, setLanguage] = useState("en-US");
   const { dialogSteps, setStep } = useProcessDialog(mintSteps);
   const form = useForm<HypercertFormValues>({
     resolver: zodResolver(formSchema),
@@ -114,6 +116,10 @@ export default function NewHypercertForm() {
   } = useMintClaim({
     onComplete: onMintComplete,
   });
+
+  useEffect(() => {
+    setLanguage(window.navigator.language);
+  }, []);
 
   useEffect(() => {
     setStep(mintStep as StepData["id"]);
@@ -180,6 +186,14 @@ export default function NewHypercertForm() {
             description={form.getValues().description || undefined}
             banner={form.getValues().banner || undefined}
             logo={form.getValues().logo || undefined}
+            fromDateDisplay={formatDate(
+              form.getValues().projectDates?.from?.toISOString(),
+              language
+            )}
+            toDateDisplay={formatDate(
+              form.getValues().projectDates?.to?.toISOString(),
+              language
+            )}
             displayOnly
           />
         </div>

@@ -18,7 +18,8 @@ export interface HypercertCardProps {
   description?: string;
   banner?: string;
   logo?: string;
-  dateRange?: string;
+  fromDateDisplay?: string | null;
+  toDateDisplay?: string | null;
   displayOnly?: boolean;
   hypercertId?: string;
 }
@@ -34,8 +35,8 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
       name: title,
       description,
       banner,
-      dateRange,
-      logo,
+      fromDateDisplay,
+      toDateDisplay,
       hypercertId,
       displayOnly = false,
     }: HypercertCardProps = defaultValues,
@@ -44,17 +45,24 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
     title = title ?? defaultValues.name;
     description = description ?? defaultValues.description;
 
+    const formattedDateRange =
+      fromDateDisplay && toDateDisplay
+        ? fromDateDisplay === toDateDisplay
+          ? fromDateDisplay
+          : `${fromDateDisplay} - ${toDateDisplay}`
+        : "";
+
     const CardContent = () => (
       <article
         ref={ref}
-        className="relative w-[275px] h-[170px] rounded-xl border-[1.5px] border-slate-500 overflow-clip bg-black"
+        className="relative w-[275px] h-[250px] rounded-xl border-[1.5px] border-slate-500 overflow-clip bg-black"
       >
-        <header className="relative h-[80px] w-full flex items-center justify-center rounded-b-xl overflow-clip">
+        <header className="relative h-[150px] w-full flex items-center justify-center rounded-b-xl overflow-clip">
           {banner ? (
             <Image
               src={banner}
               alt={`${title} banner`}
-              className="object-cover"
+              className="object-cover object-center"
               fill
               unoptimized
             />
@@ -63,8 +71,17 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
               <span className="text-slate-500 text-lg">Your banner here</span>
             </div>
           )}
+          <div className="absolute inset-0 mix-blend-luminosity w-full h-full">
+            <Image
+              src={"/hc-guilloche.svg"}
+              alt="Guilloche"
+              className="object-cover opacity-25"
+              fill
+              unoptimized
+            />
+          </div>
         </header>
-        <section className="absolute top-16 left-3 border-white border-4 rounded-full overflow-hidden bg-slate-200">
+        {/* <section className="absolute top-16 left-3 border-white border-2 rounded-full overflow-hidden bg-slate-200">
           <div className="relative w-7 h-7 flex items-center justify-center border border-slate-300 rounded-full overflow-hidden">
             {logo ? (
               <Image src={logo} alt={`${title} logo`} fill unoptimized />
@@ -74,15 +91,17 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
               </div>
             )}
           </div>
-        </section>
-        <section className="pt-6 px-3 pb-3 rounded-t-xl h-full bg-white border-t-[1.5px] border-black space-y-2">
+        </section> */}
+        <section className="p-3 rounded-t-xl h-full bg-white border-t-[1.5px] border-black space-y-2">
           <h5
-            className="text-base font-semibold text-slate-800 line-clamp-1 text-ellipsis tracking-tight"
+            className="text-base font-semibold text-slate-800 line-clamp-2 text-ellipsis tracking-tight leading-tight"
             title={title}
           >
             {title}
           </h5>
-          <p className="text-xs text-slate-600">{dateRange}</p>
+          <div className="flex items-center">
+            <span className="text-sm text-slate-500">{formattedDateRange}</span>
+          </div>
         </section>
       </article>
     );
