@@ -150,6 +150,12 @@ export default function NewHypercertForm() {
       impactTimeframeEnd: values.projectDates.to.getTime() / 1000,
       contributors: values.contributors,
     });
+
+    if (!formattedMetadata.valid) {
+      console.log("Invalid metadata", { errors: formattedMetadata.errors });
+      return;
+    }
+
     console.log({ formattedMetadata });
 
     await mintClaim(
