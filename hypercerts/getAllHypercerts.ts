@@ -100,7 +100,7 @@ function createFilter({
   if (chainId) {
     where.contract = {
       chain_id: {
-        eq: chainId,
+        eq: chainId.toString(),
       },
     };
   }
