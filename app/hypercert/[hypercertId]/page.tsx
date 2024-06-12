@@ -14,6 +14,7 @@ import { Separator } from "@/components/ui/separator";
 import WorkScope from "@/components/hypercert/scope";
 import WorkTimeFrame from "@/components/hypercert/time-frame";
 import { getHypercert } from "@/hypercerts/getHypercert";
+import EvaluateButton from "@/components/hypercert/evaluate-button";
 
 type Props = {
   params: { hypercertId: string };
@@ -96,6 +97,13 @@ async function HypercertPageInner({
           <WorkScope hypercert={hypercert} />
         </Fragment>
       )}
+      <Separator />
+      <div className="flex justify-between">
+        <h5 className="uppercase text-sm text-gray-500 font-medium tracking-wider">
+          Evaluations
+        </h5>
+        <EvaluateButton />
+      </div>
     </section>
   );
 }
