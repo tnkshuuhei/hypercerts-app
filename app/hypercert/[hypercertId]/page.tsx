@@ -4,6 +4,8 @@ import { Metadata, ResolvingMetadata } from "next";
 import { ArrowLeftIcon } from "lucide-react";
 import Contributors from "@/components/hypercert/contributors";
 import Creator from "@/components/hypercert/creator";
+import EvaluateButton from "@/components/hypercert/evaluate-button";
+import EvaluationsList from "@/components/hypercert/evaluations-list";
 import ExternalUrl from "@/components/hypercert/external-url";
 import Fractions from "@/components/hypercert/fractions";
 import Image from "next/image";
@@ -14,7 +16,6 @@ import { Separator } from "@/components/ui/separator";
 import WorkScope from "@/components/hypercert/scope";
 import WorkTimeFrame from "@/components/hypercert/time-frame";
 import { getHypercert } from "@/hypercerts/getHypercert";
-import EvaluateButton from "@/components/hypercert/evaluate-button";
 
 type Props = {
   params: { hypercertId: string };
@@ -23,7 +24,7 @@ type Props = {
 
 export async function generateMetadata(
   { params, searchParams }: Props,
-  parent: ResolvingMetadata,
+  parent: ResolvingMetadata
 ): Promise<Metadata> {
   const { hypercertId } = params;
 
@@ -104,6 +105,7 @@ async function HypercertPageInner({
         </h5>
         <EvaluateButton />
       </div>
+      <EvaluationsList hypercertId={hypercertId} />
     </section>
   );
 }
