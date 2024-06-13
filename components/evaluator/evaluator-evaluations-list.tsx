@@ -32,21 +32,6 @@ export default async function EvaluatorEvaluationsList({
 }: {
   address: string;
 }) {
-  // const attestations = await getEvaluatorAttestations(address);
-
-  // if (isPending) {
-  //   return <EvaluatorEvaluationsListSkeleton />;
-  // }
-
-  // if (error) {
-  //   console.error(error);
-  //   return <div>Error loading evaluations</div>;
-  // }
-
-  // if (!data?.attestations.length) {
-  //   return <div>No evaluations found.</div>;
-  // }
-
   return (
     <Suspense fallback={<EvaluatorEvaluationsListSkeleton />} key={address}>
       <EvaluatorEvaluationsListInner {...{ address }} />

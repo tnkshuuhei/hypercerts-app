@@ -1,7 +1,10 @@
+import Comments from "./evaluations-list-item/comments";
 import { EvaluationData } from "../../eas/types/evaluation-data.type";
+import Evaluations from "./evaluations-list-item/evaluations";
 import FormattedDate from "../formatted-date";
+import HypercertRow from "./evaluations-list-item/hypercert-row";
 import Link from "next/link";
-import { getDecodedValue } from "../../eas/getDecodedValue";
+import Tags from "./evaluations-list-item/tags";
 
 export default function EvaluatorEvaluationsListItem({
   blockTimestamp,
@@ -10,35 +13,19 @@ export default function EvaluatorEvaluationsListItem({
   blockTimestamp: string | null | undefined;
   data: EvaluationData;
 }) {
-  console.log(data);
-
   const hypercertId = `${data.chain_id}-${data.contract_address}-${data.token_id}`;
   return (
-    // <Flex
-    //   direction="column"
-    //   _hover={{ backgroundColor: "rgba(0,0,0,0.1)" }}
-    //   h="100%"
-    //   onClick={() => router.push(`/claim/${hypercertId}`)}
-    //   cursor="pointer"
-    //   {...props}
-    // >
-    //   <Link href={`/claim/${hypercertId}`}>
-    //     <Flex direction="column" p={5} gap={4} h="100%">
-    //       <FormattedDate seconds={created} />
-    //       <ClaimRow claimId={hypercertId} />
-    //       <Evaluations
-    //         basic={evaluateBasic}
-    //         work={evaluateWork}
-    //         properties={evaluateProperties}
-    //         contributors={evaluateContributors}
-    //       />
-    //       <Tags tags={tags} />
-    //       <Comments comments={comments} />
-    //     </Flex>
-    //   </Link>
-    // </Flex>
     <Link href={`/hypercert/${hypercertId}`}>
       <FormattedDate seconds={blockTimestamp} />
+      <HypercertRow hypercertId={hypercertId} />
+      <Evaluations
+        basic={data.evaluate_basic}
+        work={data.evaluate_work}
+        properties={data.evaluate_properties}
+        contributors={data.evaluate_contributors}
+      />
+      <Tags tags={data.tags} />
+      <Comments comments={data.comments} />
     </Link>
   );
 }
