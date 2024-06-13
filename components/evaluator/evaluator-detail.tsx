@@ -1,5 +1,6 @@
 import EnsName from "../ens-name";
 import EthAddress from "../eth-address";
+import EvaluatorEvaluationsList from "./evaluator-evaluations-list";
 import OrgItems from "./org-items";
 import { UserIcon } from "../user-icon";
 import { getTrustedAttestor } from "../../github/getTrustedAttestor";
@@ -34,7 +35,7 @@ export default async function EvaluatorDetails({
       <h5 className="uppercase text-sm text-gray-500 font-medium tracking-wider">
         Evaluations
       </h5>
-      {/* <EvaluatorEvaluationsList address={address} /> */}
+      <EvaluatorEvaluationsList address={attestor.eth_address} />
     </div>
   );
 }
