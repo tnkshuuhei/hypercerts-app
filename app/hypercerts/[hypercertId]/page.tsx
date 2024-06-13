@@ -22,7 +22,7 @@ type Props = {
 
 export async function generateMetadata(
   { params, searchParams }: Props,
-  parent: ResolvingMetadata,
+  parent: ResolvingMetadata
 ): Promise<Metadata> {
   const { hypercertId } = params;
 
@@ -34,7 +34,7 @@ export async function generateMetadata(
     title: hypercert?.metadata?.name || "Untitled Hypercert",
     description: hypercert?.metadata?.description || "",
     openGraph: {
-      images: [`/hypercert/${hypercertId}/image`, ...previousImages],
+      images: [`/hypercerts/${hypercertId}/image`, ...previousImages],
     },
   };
 }
@@ -57,7 +57,7 @@ async function HypercertPageInner({
         <div className="h-[300px] lg:h-[350px] min-w-[300px] lg:min-w-[500px] max-w-[500px]">
           <div className="relative w-full h-full bg-black border border-slate-800 rounded-lg overflow-hidden ">
             <Image
-              src={`/hypercert/${hypercertId}/image`}
+              src={`/hypercerts/${hypercertId}/image`}
               alt={hypercert?.metadata?.name || ""}
               fill
               className="object-contain object-top p-2"

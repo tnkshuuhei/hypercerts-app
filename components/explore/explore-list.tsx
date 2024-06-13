@@ -5,7 +5,7 @@ import {
 } from "@/hypercerts/getAllHypercerts";
 import HypercertMiniDisplay, {
   HypercertMiniDisplayProps,
-} from "@/components/hypercert-mini-display";
+} from "@/components/hypercert/hypercert-mini-display";
 
 import ExploreListSkeleton from "./explore-list-skeleton";
 import ExplorePagination from "./explore-pagination";
@@ -65,13 +65,10 @@ async function ExploreListInner({
             const props: HypercertMiniDisplayProps = {
               hypercertId: hypercert.hypercert_id as string,
               name: hypercert.metadata?.name as string,
-              chainId: hypercert.contract?.chain_id as number,
+              chainId: Number(hypercert.contract?.chain_id),
             };
             return (
-              <HypercertMiniDisplay
-                {...props}
-                key={hypercert.hypercert_id as string}
-              />
+              <HypercertMiniDisplay {...props} key={hypercert.hypercert_id} />
             );
           })}
         </div>
