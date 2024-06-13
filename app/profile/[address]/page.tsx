@@ -1,21 +1,12 @@
 "use client";
 
-import { WalletProfile } from "@/components/wallet-profile";
+import ConnectDialog from "@/components/connect-dialog";
 import { useHypercertClient } from "@/hooks/use-hypercert-client";
 import { truncateEthereumAddress } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { usePathname } from "next/navigation";
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { useAccount } from "wagmi";
-
-const NotAccountProfile = () => {
-  return (
-    <div className="flex flex-col items-center justify-center h-40 gap-3">
-      <p>Connect your wallet to view your profile</p>
-      <WalletProfile />
-    </div>
-  );
-};
 
 const EmptySection = () => {
   return (
@@ -36,6 +27,7 @@ const InfoSection = ({ children }: { children: ReactNode }) => {
 const Profile = () => {
   const { address } = useAccount();
   const { client: hypercertClient } = useHypercertClient();
+  const [isConnectOpen, setIsConnectOpen] = useState(false);
 
   const accountFromPath = usePathname().split("/")[2];
   const isAccountProfile =
@@ -82,10 +74,14 @@ const Profile = () => {
   if (!isAccountProfile) {
     return (
       <InfoSection>
-        <NotAccountProfile />
+        <h5 className="text-lg font-medium">
+          Connect your wallet to view your profile
+        </h5>
+        <ConnectDialog isOpen={isConnectOpen} setIsOpen={setIsConnectOpen} />
       </InfoSection>
     );
   }
+
   if (isHypercertsLoading) {
     return (
       <InfoSection>
