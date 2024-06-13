@@ -36,8 +36,6 @@ export async function getHypercertAttestations(hypercertId: string) {
   const contractAddress = idParts[1];
   const tokenId = idParts[2];
 
-  console.log(query, chainId, contractAddress, tokenId);
-
   const res = await request(HYPERCERTS_API_URL, query, {
     chainId: chainId,
     contractAddress: contractAddress,
