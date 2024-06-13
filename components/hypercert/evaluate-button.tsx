@@ -18,7 +18,7 @@ export default function EvaluateButton() {
 
   useEffect(() => {
     if (address) {
-      fetch(`/evaluators/${address}`)
+      fetch(`/api/evaluators/${address}`)
         .then((res) => res.json())
         .then((data) => {
           setEvaluator(data);

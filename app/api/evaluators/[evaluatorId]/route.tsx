@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { getTrustedAttestor } from "../../../github/getTrustedAttestor";
+import { getTrustedAttestor } from "../../../../github/getTrustedAttestor";
 
 export async function GET(
   request: NextRequest,

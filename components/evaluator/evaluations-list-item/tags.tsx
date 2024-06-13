@@ -1,3 +1,4 @@
+import { Badge } from "../../ui/badge";
 import React from "react";
 
 export default function Tags({
@@ -12,7 +13,9 @@ export default function Tags({
     <div className="flex flex-col items-start w-full" {...props}>
       <div className="flex items-start w-full gap-1" {...props}>
         {tags.map((tag, index) => (
-          <div key={index}>{tag}</div>
+          <Badge variant="secondary" key={index}>
+            {tag}
+          </Badge>
         ))}
       </div>
     </div>
