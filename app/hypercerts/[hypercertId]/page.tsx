@@ -103,9 +103,9 @@ async function HypercertPageInner({
         <h5 className="uppercase text-sm text-gray-500 font-medium tracking-wider">
           Evaluations
         </h5>
-        <EvaluateButton />
+        <EvaluateButton hypercert={hypercert} />
       </div>
-      <EvaluationsList hypercertId={hypercertId} />
+      <EvaluationsList hypercert={hypercert} />
     </section>
   );
 }
