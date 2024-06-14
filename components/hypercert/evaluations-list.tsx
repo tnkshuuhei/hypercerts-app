@@ -1,17 +1,20 @@
-import { Suspense } from "react";
-import { getHypercertAttestations } from "../../attestations/getHypercertAttestations";
+import { HypercertFull } from "../../hypercerts/fragments/hypercert-full.fragment";
 
-async function EvaluationsListInner({ hypercertId }: { hypercertId: string }) {
-  const attetstations = await getHypercertAttestations(hypercertId);
+export default async function EvaluationsList({
+  hypercert,
+}: {
+  hypercert: HypercertFull;
+}) {
+  const attestations = hypercert.attestations?.data;
 
-  if (!attetstations) {
+  if (!attestations) {
     return <div>No attestations found</div>;
   }
 
   return (
     <div className="flex flex-col gap-2">
-      {attetstations.data.map((attestation) => (
-        <div key={attestation.id}>
+      {attestations.map((attestation) => (
+        <div key={attestation.uid}>
           <div className="flex items-center gap-2">
             <div className="flex-grow">
               <p className="text-sm text-gray-700 font-medium">
@@ -27,17 +30,5 @@ async function EvaluationsListInner({ hypercertId }: { hypercertId: string }) {
         </div>
       ))}
     </div>
-  );
-}
-
-export default function EvaluationsList({
-  hypercertId,
-}: {
-  hypercertId: string;
-}) {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <EvaluationsListInner hypercertId={hypercertId} />
-    </Suspense>
   );
 }
