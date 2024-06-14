@@ -1,4 +1,4 @@
-import { Ban, Check, CheckSquare, MinusSquare } from "lucide-react";
+import { Ban, Check } from "lucide-react";
 
 import { Button } from "../ui/button";
 import { EvaluationStates } from "../../eas/types/evaluation-states.type";
