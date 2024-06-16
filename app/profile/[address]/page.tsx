@@ -87,7 +87,7 @@ const Profile = () => {
   return (
     <Fragment>
       <section className="flex space-x-2 items-center">
-        <h1 className="font-serif text-4xl lg:text-5xl tracking-tight">
+        <h1 className="font-serif text-3xl lg:text-4xl tracking-tight">
           Profile
         </h1>
         <div className="flex items-center gap-1 px-2 py-1 bg-slate-100 w-max rounded-lg h-max">

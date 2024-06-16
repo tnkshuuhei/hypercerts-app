@@ -58,10 +58,13 @@ const ProfileMainTabButton = ({
   return (
     <Button
       variant={"outline"}
+      size={"lg"}
       className={`space-x-1 border-[1.5px] ${buttonActiveClasses}`}
       onClick={() => setActiveTab(tabKey)}
     >
-      <h2 className={`font-serif text-2xl ${textActiveClasses}`}>{tabLabel}</h2>
+      <h2 className={`font-serif text-xl lg:text-3xl ${textActiveClasses}`}>
+        {tabLabel}
+      </h2>
     </Button>
   );
 };
@@ -109,7 +112,7 @@ const HypercertsTabContent = ({
     return <EmptySection />;
   }
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-2 justify-center lg:justify-start">
       {hypercerts.map((hypercert, index) => {
         const props = {
           hypercertId: hypercert.hypercert_id,
@@ -164,7 +167,7 @@ const ProfileTabSection = ({
   const activeTabPrefix = activeTab.split(":")[0];
   return (
     <section className="w-full space-y-2">
-      <section className="space-x-1">
+      <section className="space-x-1 w-full">
         {profileTabs.map((tab) => (
           <>
             <ProfileMainTabButton
