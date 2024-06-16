@@ -1,15 +1,14 @@
 "use client";
 
+import getHypercertsByCreatorQuery from "@/app/profile/[address]/queries";
 import { InfoSection } from "@/app/profile/[address]/sections";
 import {
-  ProfileTabButton,
   ProfileTabContent,
-  profileTabs,
+  ProfileTabSection,
   type ProfileTabKey,
 } from "@/app/profile/[address]/tabs";
 import ConnectDialog from "@/components/connect-dialog";
 import { Separator } from "@/components/ui/separator";
-import { useHypercertClient } from "@/hooks/use-hypercert-client";
 import { truncateEthereumAddress } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { usePathname } from "next/navigation";
@@ -18,52 +17,24 @@ import { useAccount } from "wagmi";
 
 const Profile = () => {
   const { address } = useAccount();
-  const { client: hypercertClient } = useHypercertClient();
   const [isConnectOpen, setIsConnectOpen] = useState(false);
 
-  const [activeTab, setActiveTab] = useState<ProfileTabKey>("hypercerts");
+  const [activeTab, setActiveTab] =
+    useState<ProfileTabKey>("hypercerts:created");
 
   const accountFromRoutePath = usePathname().split("/")[2];
   const isAccountProfile =
     address && accountFromRoutePath && address === accountFromRoutePath;
 
-  // const getBatchHypercertMetadata = async (hypercertURIs: string[]) =>
-  //   await Promise.allSettled(
-  //     hypercertURIs.map(async (hypercertURI) => {
-  //       return await hypercertClient.indexer.metadataByUri({
-  //         uri: hypercertURI,
-  //       });
-  //     })
-  //   );
-
   const {
-    data: hypercertsByOwnerResponse,
-    isLoading: isHypercertsByOwnerLoading,
-    error: hypercertsByOwnerError,
+    data: hypercertsByCreatorResponse,
+    isLoading: isHypercertsByCreatorLoading,
+    error: hypercertsByCreatorError,
   } = useQuery({
-    queryKey: ["hypercerts", address],
-    queryFn: async () =>
-      await hypercertClient.indexer.hypercertsByOwner({
-        owner: address,
-        first: 10,
-      }),
-    enabled: !!address && !!activeTab && activeTab === "hypercerts",
+    queryKey: ["hypercerts", address, "created"],
+    queryFn: () => getHypercertsByCreatorQuery(address as string),
+    enabled: !!address && activeTab === "hypercerts:created",
   });
-
-  // const {
-  //   data: hypercertMetadataResponse,
-  //   isLoading: isHypercertMetadataLoading,
-  //   error: hypercertMetadataError,
-  // } = useQuery({
-  //   queryKey: ["hypercerts", address, "owned"],
-  //   queryFn: async () =>
-  //     await getBatchHypercertMetadata(
-  //       hypercertsResponse?.hypercerts?.data?.map(
-  //         (hypercert) => hypercert.uri
-  //       ) as string[]
-  //     ),
-  //   enabled: !!address && !!hypercertsResponse?.hypercerts?.data?.length,
-  // });
 
   if (!isAccountProfile) {
     return (
@@ -76,7 +47,7 @@ const Profile = () => {
     );
   }
 
-  if (isHypercertsByOwnerLoading) {
+  if (isHypercertsByCreatorLoading) {
     return (
       <InfoSection>
         <div>Loading...</div>
@@ -84,9 +55,7 @@ const Profile = () => {
     );
   }
 
-  console.log({ hypercertsByOwnerResponse });
-
-  if (hypercertsByOwnerError) {
+  if (hypercertsByCreatorError) {
     return (
       <InfoSection>
         <div>Error loading hypercerts...</div>
@@ -94,40 +63,26 @@ const Profile = () => {
     );
   }
 
-  if (!hypercertsByOwnerResponse) {
+  if (!hypercertsByCreatorResponse) {
     return <InfoSection>No hypercerts found...</InfoSection>;
   }
 
-  // if (isHypercertMetadataLoading) {
-  //   return (
-  //     <InfoSection>
-  //       <div>Getting hypercert metadata...</div>
-  //     </InfoSection>
-  //   );
-  // }
+  const createdHypercerts = hypercertsByCreatorResponse.hypercerts.data || [];
 
-  // if (hypercertMetadataError || !hypercertMetadataResponse) {
-  //   return (
-  //     <InfoSection>
-  //       <div>Sorry, we couldn&apos;t load your hypercerts</div>
-  //     </InfoSection>
-  //   );
-  // }
-
-  // if (!hypercertMetadataResponse) {
-  //   if (!hypercertsResponse?.hypercerts?.data?.length) {
-  //     return <InfoSection>No hypercerts found</InfoSection>;
-  //   }
-  //   return <InfoSection>Loading hypercerts...</InfoSection>;
-  // }
-
-  // const ownedHypercerts = hypercertMetadataResponse.map((response) => {
-  //   if (response.status === "fulfilled" && response.value) {
-  //     return response.value.metadata.data;
-  //   }
-  // });
-
-  // console.log({ ownedHypercerts });
+  const tabData: Record<ProfileTabKey, { data: any[] }> = {
+    "hypercerts:created": {
+      data: createdHypercerts,
+    },
+    "hypercerts:owned": {
+      data: [],
+    },
+    "hyperboards:created": {
+      data: [],
+    },
+    "hyperboards:owned": {
+      data: [],
+    },
+  };
 
   return (
     <Fragment>
@@ -146,16 +101,13 @@ const Profile = () => {
       </section>
       <Separator className="my-4" />
       <section className="flex space-x-2">
-        {profileTabs.map((tab) => (
-          <ProfileTabButton
-            {...tab}
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            key={tab.tabKey}
-          />
-        ))}
+        <ProfileTabSection
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          data={tabData}
+        />
       </section>
-      <ProfileTabContent activeTab={activeTab} data={[]} />
+      <ProfileTabContent activeTab={activeTab} data={tabData[activeTab].data} />
     </Fragment>
   );
 };
