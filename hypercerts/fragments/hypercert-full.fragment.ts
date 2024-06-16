@@ -17,7 +17,7 @@ export const HypercertFullFragment = graphql(`
       chain_id
       contract_address
     }
-    owner_address
+    creator_address
     units
     attestations {
       data {
