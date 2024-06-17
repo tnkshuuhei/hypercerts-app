@@ -13,6 +13,7 @@ import { Drawer } from "vaul";
 import { EvaluateDrawer } from "./evaluate-drawer";
 import { HypercertFull } from "../../hypercerts/fragments/hypercert-full.fragment";
 import { TrustedAttestor } from "../../github/types/trusted-attestor.type";
+import { isChainIdSupported } from "../../lib/isChainIdSupported";
 import { useAccount } from "wagmi";
 
 export default function EvaluateButton({
@@ -22,6 +23,7 @@ export default function EvaluateButton({
 }) {
   const { address } = useAccount();
   const [evaluator, setEvaluator] = useState<TrustedAttestor>();
+  const { chainId } = useAccount();
 
   useEffect(() => {
     if (address) {
@@ -33,7 +35,7 @@ export default function EvaluateButton({
     }
   }, [address]);
 
-  const enabled = address && evaluator;
+  const enabled = address && evaluator && isChainIdSupported(chainId);
 
   if (enabled) {
     return (
@@ -66,8 +68,9 @@ export default function EvaluateButton({
           </div>
         </TooltipTrigger>
         <TooltipContent>
-          Evaluation is only available to the group of trusted evaluators at
-          this time.
+          {!isChainIdSupported(chainId)
+            ? "Evaulations are only available on supported chains."
+            : "Evaluation is only available to the group of trusted evaluators at this time."}
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
