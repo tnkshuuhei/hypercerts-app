@@ -2,6 +2,7 @@ import { HypercertsByCreatorQueryResponse } from "@/app/profile/[address]/querie
 import { EmptySection } from "@/app/profile/[address]/sections";
 import HypercertMiniDisplay from "@/components/hypercert/hypercert-mini-display";
 import { Button } from "@/components/ui/button";
+import Script from "next/script";
 import { Dispatch, ReactNode, SetStateAction } from "react";
 
 type ProfileTabKey =
@@ -135,8 +136,45 @@ const HyperboardsTabContent = ({
   if (!hyperboards || hyperboards.length === 0) {
     return <EmptySection />;
   }
-  return <div>Hyperboards</div>; // TODO: display actual data content
+
+  return (
+    <div>
+      <Script
+        src="https://hyperboards-git-feature-hyperboard-widget-hypercerts-foundation.vercel.app/widget/hyperboard-widget.js"
+        type="module"
+      />
+      <div className="flex flex-col gap-4">
+        {hyperboards.map((hyperboard) => (
+          <div
+            key={hyperboard}
+            className="hyperboard-widget"
+            data-hyperboard-id={hyperboard}
+          ></div>
+        ))}
+      </div>
+    </div>
+  );
 };
+
+
+// const ProfileTabContent = ({
+//   activeTab,
+//   data,
+// }: {
+//   activeTab: "hypercerts" | "hyperboards";
+//   data: { hyperboardIds: string[]; ownedHypercerts: HypercertMetadata[] };
+// }) => {
+//   const tabContent: { [key in ProfileTabKey]: ReactNode } = {
+//     hypercerts: <HypercertsTabContent ownedHypercerts={data.ownedHypercerts} />,
+//     hyperboards: (
+//       <HyperboardsTabContent ownedHyperboards={data.hyperboardIds} />
+//     ),
+//   };
+
+//   return <section className="py-2">{tabContent[activeTab]}</section>;
+// };
+
+
 
 const ProfileTabContent = ({
   activeTab,

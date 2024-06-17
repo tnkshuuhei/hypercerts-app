@@ -14,6 +14,7 @@ import { useQuery } from "@tanstack/react-query";
 import { usePathname } from "next/navigation";
 import { Fragment, useState } from "react";
 import { useAccount } from "wagmi";
+import { supabaseData } from "@/lib/supabase";
 
 const Profile = () => {
   const { address } = useAccount();
@@ -36,6 +37,20 @@ const Profile = () => {
     enabled: !!address && activeTab === "hypercerts:created",
   });
 
+	  const {
+    data: hyperboardsByOwnerResponse,
+    isLoading: isHyperboardsByOwnerLoading,
+    error: hyperboardsByOwnerError,
+  } = useQuery({
+    queryKey: ["hyperboards", address],
+    queryFn: async () => {
+      return await supabaseData
+        .from("hyperboards")
+        .select("id")
+        .eq("admin_id", address!.toLowerCase());
+    },
+    enabled: !!address,
+  });
   if (!isAccountProfile) {
     return (
       <InfoSection>

@@ -16,6 +16,8 @@ import { Separator } from "@/components/ui/separator";
 import WorkScope from "@/components/hypercert/scope";
 import WorkTimeFrame from "@/components/hypercert/time-frame";
 import { getHypercert } from "@/hypercerts/getHypercert";
+import { ListForSaleButton } from "@/components/marketplace/list-for-sale-button";
+import OrdersList from "@/components/marketplace/orders-list";
 
 type Props = {
   params: { hypercertId: string };
@@ -24,7 +26,7 @@ type Props = {
 
 export async function generateMetadata(
   { params, searchParams }: Props,
-  parent: ResolvingMetadata
+  parent: ResolvingMetadata,
 ): Promise<Metadata> {
   const { hypercertId } = params;
 
@@ -106,6 +108,15 @@ async function HypercertPageInner({
         <EvaluateButton hypercert={hypercert} />
       </div>
       <EvaluationsList hypercert={hypercert} />
+      <Separator />
+      <div className="flex justify-between">
+        <h5 className="uppercase text-sm text-gray-500 font-medium tracking-wider">
+          Marketplace
+        </h5>
+
+        <ListForSaleButton hypercertId={hypercertId} />
+      </div>
+      <OrdersList hypercertId={hypercertId} />
     </section>
   );
 }
@@ -113,7 +124,9 @@ async function HypercertPageInner({
 export default async function HypercertPage({
   params,
 }: {
-  params: { hypercertId: string };
+  params: {
+    hypercertId: string;
+  };
 }) {
   return (
     <main className="flex flex-col p-8 md:px-24 md:pt-14 pb-24 space-y-4">
