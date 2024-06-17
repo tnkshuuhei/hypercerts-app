@@ -20,6 +20,7 @@ export const HypercertFullFragment = graphql(`
     owner_address
     units
     attestations {
+      count
       data {
         data
         uid
