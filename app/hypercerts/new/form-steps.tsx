@@ -1,10 +1,4 @@
-import { HypercertFormValues } from "@/app/hypercerts/new/page";
-import ConnectDialog from "@/components/connect-dialog";
-import HypercertCard from "@/components/hypercert/hypercert-card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { Checkbox } from "@/components/ui/checkbox";
+import { ArrowLeftIcon, ArrowRightIcon, CalendarIcon } from "lucide-react";
 import {
   FormControl,
   FormDescription,
@@ -13,21 +7,29 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { useCallback, useEffect, useRef, useState } from "react";
+
+import AllowlistDialog from "../../../components/allowlist/allowlist-dialog";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Checkbox } from "@/components/ui/checkbox";
+import ConnectDialog from "@/components/connect-dialog";
+import HypercertCard from "@/components/hypercert/hypercert-card";
+import { HypercertFormValues } from "@/app/hypercerts/new/page";
+import { Input } from "@/components/ui/input";
+import Link from "next/link";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
+import { UseFormReturn } from "react-hook-form";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { toPng } from "html-to-image";
-import { ArrowLeftIcon, ArrowRightIcon, CalendarIcon } from "lucide-react";
-import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { UseFormReturn } from "react-hook-form";
 import { useAccount } from "wagmi";
 
 interface FormStepsProps {
@@ -303,6 +305,8 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
               >
                 allowlist-creator.vercel.app
               </Link>
+              ...
+              <AllowlistDialog />
             </div>
             <FormMessage />
           </FormItem>

@@ -1,3 +1,4 @@
+export const HYPERCERTS_API_URL_REST = "https://staging-api.hypercerts.org/v1";
 export const HYPERCERTS_API_URL =
   "https://staging-api.hypercerts.org/v1/graphql";
 export const HYPERCERTS_DEFAULT_CONTRACT =
