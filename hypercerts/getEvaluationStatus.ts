@@ -21,14 +21,21 @@ function countEvaluationValue(data: EvaluationData, value: number): number {
   return count;
 }
 
+export type HypercertAttestations = {
+  data: {
+      data: unknown;
+  }[] | null;
+  count: number | null;
+} | null;
+
 export function getEvaluationStatus(
-  hypercert: HypercertListFragment
+  hypercertAttestations: HypercertAttestations,
 ): EvaluationStatus {
-  if (!hypercert.attestations || hypercert.attestations.count === 0) {
+  if (!hypercertAttestations || hypercertAttestations.count === 0) {
     return "not-evaluated";
   }
 
-  const attestations = hypercert.attestations.data;
+  const attestations = hypercertAttestations.data;
 
   if (!attestations || attestations.length === 0) {
     return "not-evaluated";

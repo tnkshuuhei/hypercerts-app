@@ -62,7 +62,10 @@ async function ExploreListInner({
       <div className="flex flex-row flex-wrap gap-5 justify-center md:justify-start">
         {hypercerts?.data?.map((hypercert) => {
           const props: HypercertMiniDisplayProps = {
-            hypercert,
+            hypercertId: hypercert.hypercert_id as string,
+            name: hypercert.metadata?.name as string,
+            chainId: Number(hypercert.contract?.chain_id),
+            attestations: hypercert.attestations,
           };
           return (
             <HypercertMiniDisplay {...props} key={hypercert.hypercert_id} />

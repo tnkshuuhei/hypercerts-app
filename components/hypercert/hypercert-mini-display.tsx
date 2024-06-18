@@ -13,29 +13,36 @@ import { SUPPORTED_CHAINS } from "@/lib/constants";
 import { ShieldCheck } from "lucide-react";
 import { getEvaluationStatus } from "../../hypercerts/getEvaluationStatus";
 
-export interface HypercertMiniDisplayProps {
-  hypercert: HypercertListFragment;
+export type HypercertMiniDisplayProps = {
+  hypercertId: string;
+  name: string;
+  chainId: number;
+  attestations: {
+    data: {
+        data: unknown;
+    }[] | null;
+    count: number | null;
+} | null;
   hasTrustedEvaluator?: boolean;
   percentAvailable?: number;
   lowestPrice?: string;
 }
 
 const HypercertMiniDisplay = ({
-  hypercert,
   hasTrustedEvaluator,
   percentAvailable,
   lowestPrice,
+  hypercertId,
+  name,
+  chainId,
+  attestations
 }: HypercertMiniDisplayProps) => {
   const cardChain = (chainId: number) => {
     return SUPPORTED_CHAINS.get(chainId);
   };
 
-  const hypercertId = hypercert.hypercert_id as string;
-  const name = hypercert.metadata?.name as string;
-  const chainId = Number(hypercert.contract?.chain_id);
-  const attestations = hypercert.attestations?.data;
 
-  const evaluationStatus = getEvaluationStatus(hypercert);
+  const evaluationStatus = getEvaluationStatus(attestations);
 
   return (
     <Link href={`/hypercerts/${hypercertId}`}>
