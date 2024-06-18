@@ -11,13 +11,14 @@ import ExploreListSkeleton from "./explore-list-skeleton";
 import ExplorePagination from "./explore-pagination";
 import { HYPERCERTS_PER_PAGE } from "@/configs/ui";
 import { Suspense } from "react";
+import { InfoSection } from "@/app/profile/[address]/sections";
 
 function HypercertsListNoResults() {
   return "No results found";
 }
 
 function HypercertsListLoadError() {
-  return "Unable to load hypercerts";
+  return <InfoSection>We couldn&apos;t find any hypercerts...</InfoSection>;
 }
 
 async function ExploreListInner({
@@ -26,15 +27,15 @@ async function ExploreListInner({
   searchParams: Record<string, string>;
 }) {
   const currentPage = Number(searchParams?.p) || 1;
-  const chainId = Number(searchParams?.chain);
+  const chain = Number(searchParams?.chain);
   const search = searchParams?.search;
   const orderBy = searchParams?.orderBy;
   const params: GetAllHypercertsParams = {
     first: HYPERCERTS_PER_PAGE,
     offset: HYPERCERTS_PER_PAGE * (currentPage - 1),
   };
-  if (chainId) {
-    params.chainId = chainId;
+  if (chain) {
+    params.chainId = chain;
   }
   if (search) {
     params.search = search;
