@@ -47,7 +47,9 @@ export default function WorkTimeFrame({
       <h5 className="uppercase text-sm text-gray-500 font-medium tracking-wider">
         TIMEFRAME
       </h5>
-      <p className="text-base text-gray-800 font-medium">{workTimeFrame}</p>
+      <p className="text-base text-gray-800 font-medium">
+        {workTimeFrame ?? "--"}
+      </p>
     </div>
   );
 }
