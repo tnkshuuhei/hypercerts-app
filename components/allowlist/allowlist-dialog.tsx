@@ -85,7 +85,8 @@ export default function AllowlistDialog() {
 
   const submitList = async () => {
     console.log("Submitting allow list");
-    const totalUnits = parseEther("1");
+    // const totalUnits = parseEther("1");
+    const totalUnits = BigInt(100);
     try {
       const parsedAllowList = allowList.map((entry) => {
         if (
