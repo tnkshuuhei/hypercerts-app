@@ -5,11 +5,7 @@ import { Button } from "@/components/ui/button";
 import Script from "next/script";
 import { Dispatch, ReactNode, SetStateAction } from "react";
 
-type ProfileTabKey =
-  | "hypercerts:created"
-  | "hypercerts:owned"
-  | "hyperboards:created"
-  | "hyperboards:owned";
+type ProfileTabKey = "hypercerts:created" | "hyperboards:owned";
 
 type Tab = {
   tabLabel: string;
@@ -29,18 +25,12 @@ const profileTabs: ProfileTabDetails[] = [
   {
     tabLabel: "Hypercerts",
     tabKey: "hypercerts:created",
-    subTabs: [
-      { tabLabel: "Created by me", tabKey: "hypercerts:created" },
-      { tabLabel: "My contributions", tabKey: "hypercerts:owned" },
-    ],
+    subTabs: [{ tabLabel: "Created by me", tabKey: "hypercerts:created" }],
   },
   {
     tabLabel: "Hyperboards",
-    tabKey: "hyperboards:created",
-    subTabs: [
-      { tabLabel: "Created by me", tabKey: "hyperboards:created" },
-      { tabLabel: "My contributions", tabKey: "hyperboards:owned" },
-    ],
+    tabKey: "hyperboards:owned",
+    subTabs: [{ tabLabel: "My contributions", tabKey: "hyperboards:owned" }],
   },
 ];
 
@@ -156,7 +146,6 @@ const HyperboardsTabContent = ({
   );
 };
 
-
 // const ProfileTabContent = ({
 //   activeTab,
 //   data,
@@ -174,8 +163,6 @@ const HyperboardsTabContent = ({
 //   return <section className="py-2">{tabContent[activeTab]}</section>;
 // };
 
-
-
 const ProfileTabContent = ({
   activeTab,
   data,
@@ -185,8 +172,6 @@ const ProfileTabContent = ({
 }) => {
   const tabContent: { [key in ProfileTabKey]: ReactNode } = {
     "hypercerts:created": <HypercertsTabContent hypercerts={data} />,
-    "hypercerts:owned": <HypercertsTabContent hypercerts={data} />,
-    "hyperboards:created": <HyperboardsTabContent hyperboards={data} />,
     "hyperboards:owned": <HyperboardsTabContent hyperboards={data} />,
   };
 

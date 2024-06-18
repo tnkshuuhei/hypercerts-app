@@ -37,7 +37,7 @@ const Profile = () => {
     enabled: !!address && activeTab === "hypercerts:created",
   });
 
-	  const {
+  const {
     data: hyperboardsByOwnerResponse,
     isLoading: isHyperboardsByOwnerLoading,
     error: hyperboardsByOwnerError,
@@ -51,6 +51,7 @@ const Profile = () => {
     },
     enabled: !!address,
   });
+
   if (!isAccountProfile) {
     return (
       <InfoSection>
@@ -86,16 +87,10 @@ const Profile = () => {
 
   const tabData: Record<ProfileTabKey, { data: any[] }> = {
     "hypercerts:created": {
-      data: createdHypercerts,
-    },
-    "hypercerts:owned": {
-      data: [],
-    },
-    "hyperboards:created": {
-      data: [],
+      data: createdHypercerts || [],
     },
     "hyperboards:owned": {
-      data: [],
+      data: hyperboardsByOwnerResponse?.data || [],
     },
   };
 
