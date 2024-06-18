@@ -1,4 +1,4 @@
-import { graphql } from "@/lib/graphql";
+import { ResultOf, graphql } from "@/lib/graphql";
 
 export const HypercertListFragment = graphql(`
   fragment HypercertListFragment on Hypercert {
@@ -7,6 +7,9 @@ export const HypercertListFragment = graphql(`
     }
     attestations {
       count
+      data {
+        data
+      }
     }
     block_number
     hypercert_id
@@ -15,3 +18,4 @@ export const HypercertListFragment = graphql(`
     }
   }
 `);
+export type HypercertListFragment = ResultOf<typeof HypercertListFragment>;

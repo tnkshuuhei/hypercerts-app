@@ -16,6 +16,12 @@ export type HypercertsByCreatorQueryResponse = {
       contract: {
         chain_id: number;
       };
+      attestations: {
+        data: {
+            data: unknown;
+        }[] | null;
+        count: number | null;
+      } | null;
     }[];
   };
 };
@@ -40,6 +46,12 @@ const hypercertsByCreatorQuery = graphql(
           units
           uri
           creator_address
+          attestations {
+            count
+            data {
+              data
+            }
+          }
         }
       }
     }

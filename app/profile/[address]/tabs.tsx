@@ -100,12 +100,11 @@ const HypercertsTabContent = ({
     <div className="flex flex-wrap gap-5 justify-center lg:justify-start pt-3">
       {hypercerts.map((hypercert, index) => {
         const props = {
-          hypercertId: hypercert.hypercert_id,
-          name: hypercert.metadata.name,
-          units: hypercert.units,
-          uri: hypercert.uri,
-          chainId: hypercert.contract.chain_id,
-        };
+          hypercertId: hypercert.hypercert_id as string,
+          name: hypercert.metadata?.name as string,
+          chainId: Number(hypercert.contract?.chain_id),
+          attestations: hypercert.attestations,
+      };
         return <HypercertMiniDisplay key={index} {...props} />; // TODO: show hypercert mini displays
       })}
     </div>

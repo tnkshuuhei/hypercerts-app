@@ -66,6 +66,7 @@ async function ExploreListInner({
             hypercertId: hypercert.hypercert_id as string,
             name: hypercert.metadata?.name as string,
             chainId: Number(hypercert.contract?.chain_id),
+            attestations: hypercert.attestations,
           };
           return (
             <HypercertMiniDisplay {...props} key={hypercert.hypercert_id} />

@@ -16,13 +16,14 @@ const query = graphql(
       }
     }
   `,
-  [HypercertFullFragment],
+  [HypercertFullFragment]
 );
 
 export async function getHypercert(hypercertId: string) {
   const res = await request(HYPERCERTS_API_URL, query, {
     hypercert_id: hypercertId,
   });
+
   const hypercertFullFragment = res.hypercerts?.data?.[0];
   if (!hypercertFullFragment) {
     return undefined;

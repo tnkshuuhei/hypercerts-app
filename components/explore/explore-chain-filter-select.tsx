@@ -1,14 +1,22 @@
 "use client";
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-import { ComboSelect } from "@/components/combobox";
 import { SUPPORTED_CHAINS } from "@/lib/constants";
 
 export default function ChainFilterSelect() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const router = useRouter();
+
+  const selectedValue = searchParams.get("chain") || "all";
 
   const selectFilter = (value: string) => {
     const urlSearchParams = new URLSearchParams(searchParams);
@@ -20,20 +28,23 @@ export default function ChainFilterSelect() {
     router.push(`${pathname}?${urlSearchParams.toString()}`);
   };
 
-  const chainFilterOptions = [
-    { value: "all", label: "All" },
-    ...Array.from(SUPPORTED_CHAINS.entries()).map(([chainId, chainName]) => ({
-      value: chainId.toString(),
-      label: chainName,
-    })),
-  ];
-
   return (
-    <ComboSelect
-      options={chainFilterOptions}
-      groupLabel="chain"
-      groupLabelPlural="chains"
+    <Select
+      defaultValue="timestamp_desc"
       onValueChange={selectFilter}
-    />
+      value={selectedValue}
+    >
+      <SelectTrigger className="w-max">
+        <SelectValue placeholder="All chains" />
+      </SelectTrigger>
+      <SelectContent className="w-max">
+        <SelectItem value="all">All chains</SelectItem>
+        {Array.from(SUPPORTED_CHAINS.entries()).map(([chainId, chainName]) => (
+          <SelectItem key={chainId} value={chainId.toString()}>
+            {chainName}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 }
