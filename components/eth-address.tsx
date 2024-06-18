@@ -2,7 +2,6 @@
 
 import { CopyButton } from "./copy-button";
 import { useEnsName } from "wagmi";
-import { useState } from "react";
 import { truncateEthereumAddress } from "@/lib/utils";
 
 export default function EthAddress({
@@ -33,7 +32,10 @@ export default function EthAddress({
           ? ensName
           : truncateEthereumAddress(address as `0x${string}`)}
       </div>
-      <CopyButton textToCopy={address} className="w-4 h-4 bg-transparent" />
+      <CopyButton
+        textToCopy={address}
+        className="w-4 h-4 bg-transparent focus:opacity-70 focus:scale-90"
+      />
     </div>
   );
 }

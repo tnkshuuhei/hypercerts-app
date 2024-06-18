@@ -32,7 +32,6 @@ export const HypercertFullFragment = graphql(`
       data {
         units
         owner_address
-        hypercert_id
       }
     }
     token_id

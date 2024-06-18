@@ -50,7 +50,7 @@ const query = graphql(
       }
     }
   `,
-  [HypercertListFragment]
+  [HypercertListFragment],
 );
 
 type VariableTypes = VariablesOf<typeof query>;
@@ -63,7 +63,7 @@ function createOrderBy({
   if (orderBy) {
     const orderByAttribute = orderBy.split("_")[0];
     const orderByDirection = orderBy.split("_")[1];
-    if (orderByAttribute === "timestamp") {
+    if (orderByAttribute === "block_number") {
       return {
         by: {
           block_number: orderByDirection === "asc" ? "ascending" : "descending",

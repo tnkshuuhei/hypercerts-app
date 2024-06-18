@@ -6,7 +6,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
+} from "@/components/ui/select";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 export default function ExploreOrderBySelect() {
@@ -14,7 +14,7 @@ export default function ExploreOrderBySelect() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const selectedValue = searchParams.get("orderBy") || "timestamp_desc";
+  const selectedValue = searchParams.get("orderBy") || "block_number_desc";
 
   const orderBy = (value: string) => {
     const urlSearchParams = new URLSearchParams(searchParams);
@@ -24,7 +24,7 @@ export default function ExploreOrderBySelect() {
 
   return (
     <Select
-      defaultValue="timestamp_desc"
+      defaultValue="block_number_desc"
       onValueChange={orderBy}
       value={selectedValue}
     >
@@ -32,8 +32,10 @@ export default function ExploreOrderBySelect() {
         <SelectValue placeholder="Sort by" />
       </SelectTrigger>
       <SelectContent className="w-max">
-        <SelectItem value="timestamp_desc">Newest first</SelectItem>
-        <SelectItem value="timestamp_asc">Oldest first</SelectItem>
+        <SelectItem value="block_number_desc">Newest first</SelectItem>
+        <SelectItem value="block_number_asc">Oldest first</SelectItem>
+        <SelectItem value="name_asc">Name: A-Z</SelectItem>
+        <SelectItem value="name_desc">Name: Z-A</SelectItem>
         <SelectItem value="attestations_desc">
           Most evaluations first
         </SelectItem>
