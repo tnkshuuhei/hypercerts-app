@@ -12,6 +12,7 @@ import EvaluateToggle from "./evaluate-toggle";
 import { HypercertFull } from "../../hypercerts/fragments/hypercert-full.fragment";
 import Tags from "@yaireo/tagify/dist/react.tagify";
 import { Textarea } from "../ui/textarea";
+import { clearCacheAfterEvaluation } from "../../app/actions/clearCacheAfterEvaluation";
 import { cn } from "../../lib/utils";
 import { createAttestation } from "../../eas/createAttestation";
 import { errorHasMessage } from "../../lib/errorHasMessage";
@@ -133,6 +134,8 @@ export function EvaluateDrawer({ hypercert }: { hypercert: HypercertFull }) {
   }
 
   if (uid) {
+    clearCacheAfterEvaluation(hypercert.hypercert_id);
+
     const easConfig = getEasConfig(chainId);
     const url = `${easConfig?.explorerUrl}/attestation/view/${uid}`;
     return (

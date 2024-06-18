@@ -34,8 +34,6 @@ export default function ExploreOrderBySelect() {
       <SelectContent className="w-max">
         <SelectItem value="timestamp_desc">Newest first</SelectItem>
         <SelectItem value="timestamp_asc">Oldest first</SelectItem>
-        <SelectItem value="name_asc">Name: A-Z</SelectItem>
-        <SelectItem value="name_desc">Name: Z-A</SelectItem>
         <SelectItem value="attestations_desc">
           Most evaluations first
         </SelectItem>

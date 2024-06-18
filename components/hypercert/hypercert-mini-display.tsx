@@ -5,32 +5,37 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
+import { HypercertListFragment } from "../../hypercerts/fragments/hypercert-list.fragment";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import { SUPPORTED_CHAINS } from "@/lib/constants";
 import { ShieldCheck } from "lucide-react";
+import { getEvaluationStatus } from "../../hypercerts/getEvaluationStatus";
 
 export interface HypercertMiniDisplayProps {
-  hypercertId: string;
-  name: string;
+  hypercert: HypercertListFragment;
   hasTrustedEvaluator?: boolean;
   percentAvailable?: number;
   lowestPrice?: string;
-  chainId: number;
 }
 
 const HypercertMiniDisplay = ({
-  hypercertId,
-  name,
+  hypercert,
   hasTrustedEvaluator,
   percentAvailable,
   lowestPrice,
-  chainId,
 }: HypercertMiniDisplayProps) => {
   const cardChain = (chainId: number) => {
     return SUPPORTED_CHAINS.get(chainId);
   };
+
+  const hypercertId = hypercert.hypercert_id as string;
+  const name = hypercert.metadata?.name as string;
+  const chainId = Number(hypercert.contract?.chain_id);
+  const attestations = hypercert.attestations?.data;
+
+  const evaluationStatus = getEvaluationStatus(hypercert);
 
   return (
     <Link href={`/hypercerts/${hypercertId}`}>
@@ -49,7 +54,7 @@ const HypercertMiniDisplay = ({
         </div>
         <div className="absolute top-4 right-4">
           <p className="text-[10px] px-2 py-0.5 rounded-full bg-black/60 text-white tracking-wide">
-            {cardChain(chainId)}
+            {cardChain(chainId)} - {evaluationStatus}
           </p>
         </div>
         <section className="p-3 bg-white text-primary overflow-hidden rounded-lg border-[1.5px] border-slate-500 space-y-3">
