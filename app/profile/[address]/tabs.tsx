@@ -42,20 +42,14 @@ const ProfileMainTabButton = ({
 }: ProfileTabProps) => {
   const isActive = activeTab.split(":")[0] === tabKey.split(":")[0];
 
-  const textActiveClasses = isActive ? "text-primary" : "text-slate-400";
-
-  const buttonActiveClasses = isActive ? "border-primary" : "border-slate-300";
-
   return (
     <Button
-      variant={"outline"}
-      size={"lg"}
-      className={`space-x-1 border-[1.5px] ${buttonActiveClasses}`}
+      variant={isActive ? "default" : "outline"}
+      size={"default"}
+      className={`space-x-1 border-[1.5px]`}
       onClick={() => setActiveTab(tabKey)}
     >
-      <h2 className={`font-serif text-xl lg:text-3xl ${textActiveClasses}`}>
-        {tabLabel}
-      </h2>
+      <h3 className={`text-lg`}>{tabLabel}</h3>
     </Button>
   );
 };
@@ -103,7 +97,7 @@ const HypercertsTabContent = ({
     return <EmptySection />;
   }
   return (
-    <div className="flex flex-wrap gap-2 justify-center lg:justify-start">
+    <div className="flex flex-wrap gap-5 justify-center lg:justify-start pt-3">
       {hypercerts.map((hypercert, index) => {
         const props = {
           hypercertId: hypercert.hypercert_id,
@@ -146,23 +140,6 @@ const HyperboardsTabContent = ({
   );
 };
 
-// const ProfileTabContent = ({
-//   activeTab,
-//   data,
-// }: {
-//   activeTab: "hypercerts" | "hyperboards";
-//   data: { hyperboardIds: string[]; ownedHypercerts: HypercertMetadata[] };
-// }) => {
-//   const tabContent: { [key in ProfileTabKey]: ReactNode } = {
-//     hypercerts: <HypercertsTabContent ownedHypercerts={data.ownedHypercerts} />,
-//     hyperboards: (
-//       <HyperboardsTabContent ownedHyperboards={data.hyperboardIds} />
-//     ),
-//   };
-
-//   return <section className="py-2">{tabContent[activeTab]}</section>;
-// };
-
 const ProfileTabContent = ({
   activeTab,
   data,
@@ -190,7 +167,7 @@ const ProfileTabSection = ({
   const activeTabPrefix = activeTab.split(":")[0];
   return (
     <section className="w-full space-y-2">
-      <section className="space-x-1 w-full">
+      <section className="space-x-1 w-full flex">
         {profileTabs.map((tab) => (
           <>
             <ProfileMainTabButton

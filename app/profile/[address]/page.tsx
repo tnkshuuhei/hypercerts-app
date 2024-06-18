@@ -7,26 +7,18 @@ import {
   ProfileTabSection,
   type ProfileTabKey,
 } from "@/app/profile/[address]/tabs";
-import ConnectDialog from "@/components/connect-dialog";
+import EthAddress from "@/components/eth-address";
 import { Separator } from "@/components/ui/separator";
 import { supabaseData } from "@/lib/supabase";
-import { truncateEthereumAddress } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { usePathname } from "next/navigation";
 import { Fragment, useState } from "react";
-import { useAccount } from "wagmi";
 
 const Profile = () => {
-  const { address } = useAccount();
-  const [isConnectOpen, setIsConnectOpen] = useState(false);
-
   const [activeTab, setActiveTab] =
     useState<ProfileTabKey>("hypercerts:created");
 
-  const accountFromRoutePath = usePathname().split("/")[2];
-  const isAccountProfile =
-    address && accountFromRoutePath && address === accountFromRoutePath;
-
+  const address = usePathname().split("/")[2];
   const {
     data: hypercertsByCreatorResponse,
     isLoading: isHypercertsByCreatorLoading,
@@ -52,17 +44,6 @@ const Profile = () => {
     enabled: !!address,
   });
 
-  if (!isAccountProfile) {
-    return (
-      <InfoSection>
-        <h5 className="text-lg font-medium">
-          Connect your wallet to view your profile
-        </h5>
-        <ConnectDialog isOpen={isConnectOpen} setIsOpen={setIsConnectOpen} />
-      </InfoSection>
-    );
-  }
-
   if (isHypercertsByCreatorLoading) {
     return (
       <InfoSection>
@@ -83,6 +64,14 @@ const Profile = () => {
     return <InfoSection>No hypercerts found...</InfoSection>;
   }
 
+  if (isHyperboardsByOwnerLoading) {
+    return <InfoSection>Loading hyperboards...</InfoSection>;
+  }
+
+  if (!hyperboardsByOwnerResponse?.data) {
+    return <InfoSection>No hyperboards found...</InfoSection>;
+  }
+
   const createdHypercerts = hypercertsByCreatorResponse.hypercerts.data || [];
   const ownedHyperboards = hyperboardsByOwnerResponse?.data || [];
 
@@ -97,18 +86,11 @@ const Profile = () => {
 
   return (
     <Fragment>
-      <section className="flex space-x-2 items-center">
-        <h1 className="font-serif text-3xl lg:text-4xl tracking-tight">
+      <section className="flex flex-wrap gap-2 items-center">
+        <h1 className="font-serif text-2xl lg:text-3xl tracking-tight">
           Profile
         </h1>
-        <div className="flex items-center gap-1 px-2 py-1 bg-slate-100 w-max rounded-lg h-max">
-          <div className="h-2 w-2 bg-green-400 rounded-full"></div>
-          {address && (
-            <p className="text-xs">
-              Connected as {truncateEthereumAddress(address)}
-            </p>
-          )}
-        </div>
+        <EthAddress address={address} />
       </section>
       <Separator className="my-4" />
       <section className="flex space-x-2">
