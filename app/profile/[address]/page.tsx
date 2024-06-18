@@ -9,12 +9,12 @@ import {
 } from "@/app/profile/[address]/tabs";
 import ConnectDialog from "@/components/connect-dialog";
 import { Separator } from "@/components/ui/separator";
+import { supabaseData } from "@/lib/supabase";
 import { truncateEthereumAddress } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { usePathname } from "next/navigation";
 import { Fragment, useState } from "react";
 import { useAccount } from "wagmi";
-import { supabaseData } from "@/lib/supabase";
 
 const Profile = () => {
   const { address } = useAccount();
@@ -84,13 +84,14 @@ const Profile = () => {
   }
 
   const createdHypercerts = hypercertsByCreatorResponse.hypercerts.data || [];
+  const ownedHyperboards = hyperboardsByOwnerResponse?.data || [];
 
   const tabData: Record<ProfileTabKey, { data: any[] }> = {
     "hypercerts:created": {
-      data: createdHypercerts || [],
+      data: createdHypercerts,
     },
     "hyperboards:owned": {
-      data: hyperboardsByOwnerResponse?.data || [],
+      data: ownedHyperboards,
     },
   };
 
