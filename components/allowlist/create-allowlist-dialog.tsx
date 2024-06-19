@@ -22,7 +22,7 @@ type AllowListItem = {
   percentage?: string;
 };
 
-export default function AllowlistDialog() {
+export default function CreateAllowlistDialog() {
   const {
     mutate: createAllowList,
     data: createAllowListResponse,
@@ -44,8 +44,8 @@ export default function AllowlistDialog() {
               ...item,
               address: e.target.value,
             }
-          : item
-      )
+          : item,
+      ),
     );
   };
 
@@ -57,8 +57,8 @@ export default function AllowlistDialog() {
               ...item,
               percentage: e.target.value,
             }
-          : item
-      )
+          : item,
+      ),
     );
   };
 
@@ -76,11 +76,11 @@ export default function AllowlistDialog() {
 
   const percentageSum = allowList.reduce(
     (acc, item) => acc + Number.parseFloat(item.percentage || ""),
-    0
+    0,
   );
 
   const allAddressesValid = allowList.every(
-    (item) => item.address && isAddress(item.address)
+    (item) => item.address && isAddress(item.address),
   );
 
   const submitList = async () => {
@@ -168,7 +168,7 @@ export default function AllowlistDialog() {
                   value={item.address}
                   className={cn(
                     "flex-grow",
-                    !isAddress(item.address || "") && "text-red-600"
+                    !isAddress(item.address || "") && "text-red-600",
                   )}
                   onChange={(e) => setAddress(e, i)}
                 />
@@ -178,7 +178,7 @@ export default function AllowlistDialog() {
                   value={item.percentage}
                   className={cn(
                     "w-20 text-right",
-                    !isPercentageValid(item.percentage || "") && "text-red-600"
+                    !isPercentageValid(item.percentage || "") && "text-red-600",
                   )}
                   onChange={(e) => setPercentage(e, i)}
                 />

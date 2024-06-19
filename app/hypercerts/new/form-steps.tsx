@@ -14,12 +14,12 @@ import {
 } from "@/components/ui/popover";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import AllowlistDialog from "../../../components/allowlist/allowlist-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
 import ConnectDialog from "@/components/connect-dialog";
+import CreateAllowlistDialog from "@/components/allowlist/create-allowlist-dialog";
 import HypercertCard from "@/components/hypercert/hypercert-card";
 import { HypercertFormValues } from "@/app/hypercerts/new/page";
 import { Input } from "@/components/ui/input";
@@ -171,7 +171,7 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
                     variant={"outline"}
                     className={cn(
                       "w-full max-w-[280px] pl-3 text-left font-normal",
-                      !field.value && "text-muted-foreground"
+                      !field.value && "text-muted-foreground",
                     )}
                   >
                     {field.value.from ? (
@@ -306,7 +306,7 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
                 allowlist-creator.vercel.app
               </Link>
               ...
-              <AllowlistDialog />
+              <CreateAllowlistDialog />
             </div>
             <FormMessage />
           </FormItem>
@@ -423,11 +423,11 @@ const FormSteps = ({ form, currentStep, setCurrentStep }: FormStepsProps) => {
     const currentStepFields = hypercertFormSteps.get(currentStep)?.fields ?? [];
     const fieldsTouched = currentStepFields.every(
       (field) =>
-        form.formState.touchedFields[field as keyof HypercertFormValues]
+        form.formState.touchedFields[field as keyof HypercertFormValues],
     );
 
     const currentStepErrors = currentStepFields.some(
-      (field) => form.formState.errors[field as keyof HypercertFormValues]
+      (field) => form.formState.errors[field as keyof HypercertFormValues],
     );
 
     return fieldsTouched && !currentStepErrors;
