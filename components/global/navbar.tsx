@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ArrowUpRight, ChevronDown } from "lucide-react";
 
-import ChainDisplay from "@/components/chain-connect";
+import ChainDisplay from "@/components/chain-display";
 import { buttonVariants } from "@/components/ui/button";
 import { WalletProfile } from "@/components/wallet-profile";
 import { siteConfig } from "@/configs/site";
