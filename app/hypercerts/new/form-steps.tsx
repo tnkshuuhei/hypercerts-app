@@ -26,6 +26,7 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
+import UploadAllowlistDialog from "../../../components/allowlist/upload-allowlist-dialog";
 import { UseFormReturn } from "react-hook-form";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
@@ -295,18 +296,14 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
                 placeholder="https://"
               />
             </FormControl>
-            <div className="inline-flex text-xs space-x-1">
-              <span>Create an allowlist at</span>
-              <Link
-                href="https://allowlist-creator.vercel.app/"
-                target="_blank"
-                rel="noreferrer"
-                className="underline text-slate-500 text-wrap hover:text-slate-700 transition-colors"
-              >
-                allowlist-creator.vercel.app
-              </Link>
-              ...
+            <FormDescription>
+              Allowlists determine the number of units each address is allowed
+              to mint. You can submit an already available allowlist, create one
+              or upload a CSV file.
+            </FormDescription>
+            <div className="flex text-xs space-x-2 w-full justify-end">
               <CreateAllowlistDialog />
+              <UploadAllowlistDialog />
             </div>
             <FormMessage />
           </FormItem>
