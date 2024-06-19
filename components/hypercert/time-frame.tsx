@@ -4,6 +4,7 @@ import * as R from "remeda";
 
 import { type HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
 import { useEffect, useState } from "react";
+import { fromUnixTime } from "date-fns";
 
 export default function WorkTimeFrame({
   hypercert,
@@ -29,10 +30,10 @@ export default function WorkTimeFrame({
     }).format(date);
 
   let workTimeFrameFrom = hypercert.metadata?.work_timeframe_from
-    ? new Date(hypercert.metadata?.work_timeframe_from)
+    ? fromUnixTime(hypercert.metadata?.work_timeframe_from)
     : null;
   let workTimeFrameTo = hypercert.metadata.work_timeframe_to
-    ? new Date(hypercert.metadata.work_timeframe_to)
+    ? fromUnixTime(hypercert.metadata.work_timeframe_to)
     : null;
 
   const workTimeFrame =
@@ -44,9 +45,6 @@ export default function WorkTimeFrame({
 
   return (
     <div className="space-y-2 w-full">
-      <h5 className="uppercase text-sm text-gray-500 font-medium tracking-wider">
-        TIMEFRAME
-      </h5>
       <p className="text-base text-gray-800 font-medium">
         {workTimeFrame ?? "--"}
       </p>
