@@ -85,8 +85,7 @@ export default function CreateAllowlistDialog() {
 
   const submitList = async () => {
     console.log("Submitting allow list");
-    // const totalUnits = parseEther("1");
-    const totalUnits = BigInt(100);
+    const totalUnits = parseEther("1");
     try {
       const parsedAllowList = allowList.map((entry) => {
         if (
@@ -121,6 +120,27 @@ export default function CreateAllowlistDialog() {
     }
   };
 
+  const CreateAllowListErrorMessage = () => {
+    if (createAllowListError) {
+      if (errorHasMessage(createAllowListError)) {
+        return (
+          <div className="text-red-600 text-sm">
+            {createAllowListError.message}
+          </div>
+        );
+      }
+      return (
+        <div className="text-red-600 text-sm">Couldnt create allow list</div>
+      );
+    }
+    if (createAllowListResponse && createAllowListResponse.status >= 400) {
+      return (
+        <div className="text-red-600 text-sm">Failed to create allow list</div>
+      );
+    }
+    return null;
+  };
+
   const percentageError =
     percentageSum !== 100 &&
     allowList[0].percentage !== "" &&
@@ -129,13 +149,10 @@ export default function CreateAllowlistDialog() {
   const createButtonDisabled =
     allowList.length === 0 || percentageSum !== 100 || !allAddressesValid;
 
-  console.log(createAllowListResponse);
-  console.log(createAllowListError);
-
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline">Edit Profile</Button>
+        <Button variant="outline">Create allowlist</Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
@@ -143,15 +160,16 @@ export default function CreateAllowlistDialog() {
             Create allowlist
           </DialogTitle>
         </DialogHeader>
-        <div className="flex flex-col px-2 pt-3">
-          Allow lists determine the number of units each address is allowed to
-          mint. The allow list is a list of addresses and the number of units
-          they are allowed to mint. When you submit the form, the application
-          will execute additional validations before uploading the allow list to
-          IPFS. When successful the allow list will be available at the CID
-          displayed. Hypercerts will be minted with a total supply of 1 ether
-          (10 ^ 18 units). The percentages provided in the form below will be
-          used to calculate the number of units each address is allowed to mint.
+        <div className="flex flex-col gap-3">
+          <p>
+            Add addresses and the percentage of total units each address is
+            allowed to mint. Hypercerts are created with a total supply of 1
+            ether (10^18 units).
+          </p>
+          <p>
+            Once created, your allowlist will be stored on IPFS and linked to
+            the Hypercert.
+          </p>
         </div>
         <div className="flex flex-col gap-2">
           <div className="flex gap-2">
@@ -200,6 +218,7 @@ export default function CreateAllowlistDialog() {
             </Button>
           </div>
         </div>
+        <CreateAllowListErrorMessage />
         <div className="flex gap-2 justify-evenly w-full">
           <DialogClose asChild>
             <Button type="button" variant="secondary" className="flex-grow">
