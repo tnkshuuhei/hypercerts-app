@@ -1,17 +1,18 @@
 "use client";
 
-import { ArrowUpRight, ChevronDown } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ArrowUpRight, ChevronDown } from "lucide-react";
 
-import Link from "next/link";
-import { WalletProfile } from "@/components/wallet-profile";
+import ChainDisplay from "@/components/chain-connect";
 import { buttonVariants } from "@/components/ui/button";
+import { WalletProfile } from "@/components/wallet-profile";
 import { siteConfig } from "@/configs/site";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const Navbar = () => {
@@ -106,6 +107,7 @@ const Navbar = () => {
         </div>
       </div>
       <div className="hidden md:flex items-center space-x-4">
+        <ChainDisplay />
         <WalletProfile />
       </div>
     </nav>
