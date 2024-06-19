@@ -14,7 +14,7 @@ import { getEvaluationStatus } from "../../hypercerts/getEvaluationStatus";
 export type HypercertMiniDisplayProps = {
   hypercertId: string;
   name: string;
-  chainId: number;
+  chainId: 11155111 | 1 | 10;
   attestations: {
     data:
       | {

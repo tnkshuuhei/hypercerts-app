@@ -133,12 +133,6 @@ export default async function HypercertPage({
 }) {
   return (
     <main className="flex flex-col p-8 md:px-24 md:pt-14 pb-24 space-y-4">
-      <Link href={`/explore`}>
-        <div className="flex items-center space-x-2 text-sm text-gray-700 font-medium">
-          <ArrowLeftIcon className="w-4 h-4" />
-          <span>Explore more hypercerts</span>
-        </div>
-      </Link>
       <Suspense fallback={<PageSkeleton />} key={params.hypercertId}>
         <HypercertPageInner {...{ params }} />
       </Suspense>
