@@ -31,6 +31,7 @@ import { UseFormReturn } from "react-hook-form";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { toPng } from "html-to-image";
+import { url } from "inspector";
 import { useAccount } from "wagmi";
 
 interface FormStepsProps {
@@ -157,6 +158,11 @@ const GeneralInformation = ({ form }: FormStepsProps) => {
 };
 
 const DatesAndPeople = ({ form }: FormStepsProps) => {
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
+  const setAllowlistUrl = (url: string) => {
+    form.setValue("allowlistURL", url);
+  };
   return (
     <section className="space-y-8">
       <FormField
@@ -302,8 +308,29 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
               or upload a CSV file.
             </FormDescription>
             <div className="flex text-xs space-x-2 w-full justify-end">
-              <CreateAllowlistDialog />
-              <UploadAllowlistDialog />
+              <Button
+                variant="outline"
+                onClick={() => setCreateDialogOpen(true)}
+              >
+                Create allowlist
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => setUploadDialogOpen(true)}
+              >
+                Upload allowlist
+              </Button>
+
+              <CreateAllowlistDialog
+                setAllowlistUrl={setAllowlistUrl}
+                open={createDialogOpen}
+                setOpen={setCreateDialogOpen}
+              />
+              <UploadAllowlistDialog
+                setAllowlistUrl={setAllowlistUrl}
+                open={uploadDialogOpen}
+                setOpen={setUploadDialogOpen}
+              />
             </div>
             <FormMessage />
           </FormItem>

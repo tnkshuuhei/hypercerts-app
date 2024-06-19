@@ -20,6 +20,9 @@ export const useCreateAllowList = () => {
       const tree = StandardMerkleTree.of(values, ["address", "uint256"]);
       return fetch(`${HYPERCERTS_API_URL_REST}/allowlists`, {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           allowList: JSON.stringify(tree.dump()),
           totalUnits: totalUnits.toString(),

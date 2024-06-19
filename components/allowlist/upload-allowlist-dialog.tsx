@@ -9,6 +9,7 @@ import {
 import { Download, LoaderCircle } from "lucide-react";
 import { FormControl, FormItem, FormLabel } from "../ui/form";
 import { isAddress, parseEther } from "viem";
+import { useEffect, useState } from "react";
 
 import { AllowlistEntry } from "@hypercerts-org/sdk";
 import { Button } from "../ui/button";
@@ -17,19 +18,51 @@ import { errorHasMessage } from "../../lib/errorHasMessage";
 import { parse } from "csv-parse/sync";
 import { toast } from "../ui/use-toast";
 import { useCreateAllowList } from "../../hypercerts/hooks/useCreateAllowLists";
-import { useState } from "react";
 
 const TOTAL_UNITS = parseEther("1");
 
-export default function UploadAllowlistDialog() {
+export default function UploadAllowlistDialog({
+  setAllowlistUrl,
+  setOpen,
+  open,
+}: {
+  setAllowlistUrl: (url: string) => void;
+  setOpen: (open: boolean) => void;
+  open: boolean;
+}) {
   const {
     mutate: createAllowList,
     data: createAllowListResponse,
     isPending,
     error: createAllowListError,
+    reset,
   } = useCreateAllowList();
 
   const [allowList, setAllowList] = useState<AllowlistEntry[]>();
+
+  useEffect(() => {
+    if (
+      createAllowListResponse &&
+      (createAllowListResponse.status === 200 ||
+        createAllowListResponse.status === 201)
+    ) {
+      (async () => {
+        const res = await createAllowListResponse.json();
+        if (
+          "success" in res &&
+          res.success &&
+          "data" in res &&
+          "cid" in res.data
+        ) {
+          const cid = res.data.cid;
+          const url = `ipfs://${cid}`;
+          setAllowlistUrl(url);
+          reset();
+          setOpen(false);
+        }
+      })();
+    }
+  }, [createAllowListResponse, setAllowlistUrl, setOpen, reset]);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setAllowList(undefined);
@@ -54,11 +87,11 @@ export default function UploadAllowlistDialog() {
       let _allowlist: AllowlistEntry[] = [];
       let totalUnits = BigInt(0);
       for (const entry of parsedCsv.slice(1)) {
-        const address = entry[1];
+        const address = entry[0];
         if (!isAddress(address)) {
           throw new Error("Invalid allow list address: " + address);
         }
-        const units = BigInt(entry[3]);
+        const units = BigInt(entry[1]);
         _allowlist.push({
           address,
           units,
@@ -136,10 +169,7 @@ export default function UploadAllowlistDialog() {
   };
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="outline">Upload allowlist</Button>
-      </DialogTrigger>
+    <Dialog open={open}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle className="font-serif text-3xl font-normal">

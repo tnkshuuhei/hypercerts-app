@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, use, useEffect, useState } from "react";
 import {
   Dialog,
   DialogClose,
@@ -22,19 +22,52 @@ type AllowListItem = {
   percentage?: string;
 };
 
-export default function CreateAllowlistDialog() {
+export default function CreateAllowlistDialog({
+  setAllowlistUrl,
+  setOpen,
+  open,
+}: {
+  setAllowlistUrl: (url: string) => void;
+  setOpen: (open: boolean) => void;
+  open: boolean;
+}) {
   const {
     mutate: createAllowList,
     data: createAllowListResponse,
     isPending,
     error: createAllowListError,
+    reset,
   } = useCreateAllowList();
   const [allowList, setAllowList] = useState<AllowListItem[]>([
     {
-      address: undefined,
-      percentage: undefined,
+      address: "",
+      percentage: "",
     },
   ]);
+
+  useEffect(() => {
+    if (
+      createAllowListResponse &&
+      (createAllowListResponse.status === 200 ||
+        createAllowListResponse.status === 201)
+    ) {
+      (async () => {
+        const res = await createAllowListResponse.json();
+        if (
+          "success" in res &&
+          res.success &&
+          "data" in res &&
+          "cid" in res.data
+        ) {
+          const cid = res.data.cid;
+          const url = `ipfs://${cid}`;
+          setAllowlistUrl(url);
+          reset();
+          setOpen(false);
+        }
+      })();
+    }
+  }, [createAllowListResponse, setAllowlistUrl, setOpen, reset]);
 
   const setAddress = (e: ChangeEvent<HTMLInputElement>, i: number) => {
     setAllowList((allowList) =>
@@ -84,7 +117,6 @@ export default function CreateAllowlistDialog() {
   );
 
   const submitList = async () => {
-    console.log("Submitting allow list");
     const totalUnits = parseEther("1");
     try {
       const parsedAllowList = allowList.map((entry) => {
@@ -106,7 +138,6 @@ export default function CreateAllowlistDialog() {
         throw new Error("Allow list is empty");
       }
       createAllowList({ allowList: parsedAllowList, totalUnits });
-      console.log("Submitted allow list");
     } catch (e) {
       if (errorHasMessage(e)) {
         toast({
@@ -150,10 +181,7 @@ export default function CreateAllowlistDialog() {
     allowList.length === 0 || percentageSum !== 100 || !allAddressesValid;
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="outline">Create allowlist</Button>
-      </DialogTrigger>
+    <Dialog open={open}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle className="font-serif text-3xl font-normal">
