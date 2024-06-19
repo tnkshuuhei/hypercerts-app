@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, use, useEffect, useState } from "react";
 import {
   Dialog,
   DialogClose,
@@ -22,19 +22,52 @@ type AllowListItem = {
   percentage?: string;
 };
 
-export default function AllowlistDialog() {
+export default function CreateAllowlistDialog({
+  setAllowlistUrl,
+  setOpen,
+  open,
+}: {
+  setAllowlistUrl: (url: string) => void;
+  setOpen: (open: boolean) => void;
+  open: boolean;
+}) {
   const {
     mutate: createAllowList,
     data: createAllowListResponse,
     isPending,
     error: createAllowListError,
+    reset,
   } = useCreateAllowList();
   const [allowList, setAllowList] = useState<AllowListItem[]>([
     {
-      address: undefined,
-      percentage: undefined,
+      address: "",
+      percentage: "",
     },
   ]);
+
+  useEffect(() => {
+    if (
+      createAllowListResponse &&
+      (createAllowListResponse.status === 200 ||
+        createAllowListResponse.status === 201)
+    ) {
+      (async () => {
+        const res = await createAllowListResponse.json();
+        if (
+          "success" in res &&
+          res.success &&
+          "data" in res &&
+          "cid" in res.data
+        ) {
+          const cid = res.data.cid;
+          const url = `ipfs://${cid}`;
+          setAllowlistUrl(url);
+          reset();
+          setOpen(false);
+        }
+      })();
+    }
+  }, [createAllowListResponse, setAllowlistUrl, setOpen, reset]);
 
   const setAddress = (e: ChangeEvent<HTMLInputElement>, i: number) => {
     setAllowList((allowList) =>
@@ -44,8 +77,8 @@ export default function AllowlistDialog() {
               ...item,
               address: e.target.value,
             }
-          : item
-      )
+          : item,
+      ),
     );
   };
 
@@ -57,8 +90,8 @@ export default function AllowlistDialog() {
               ...item,
               percentage: e.target.value,
             }
-          : item
-      )
+          : item,
+      ),
     );
   };
 
@@ -76,17 +109,15 @@ export default function AllowlistDialog() {
 
   const percentageSum = allowList.reduce(
     (acc, item) => acc + Number.parseFloat(item.percentage || ""),
-    0
+    0,
   );
 
   const allAddressesValid = allowList.every(
-    (item) => item.address && isAddress(item.address)
+    (item) => item.address && isAddress(item.address),
   );
 
   const submitList = async () => {
-    console.log("Submitting allow list");
-    // const totalUnits = parseEther("1");
-    const totalUnits = BigInt(100);
+    const totalUnits = parseEther("1");
     try {
       const parsedAllowList = allowList.map((entry) => {
         if (
@@ -107,7 +138,6 @@ export default function AllowlistDialog() {
         throw new Error("Allow list is empty");
       }
       createAllowList({ allowList: parsedAllowList, totalUnits });
-      console.log("Submitted allow list");
     } catch (e) {
       if (errorHasMessage(e)) {
         toast({
@@ -121,6 +151,27 @@ export default function AllowlistDialog() {
     }
   };
 
+  const CreateAllowListErrorMessage = () => {
+    if (createAllowListError) {
+      if (errorHasMessage(createAllowListError)) {
+        return (
+          <div className="text-red-600 text-sm">
+            {createAllowListError.message}
+          </div>
+        );
+      }
+      return (
+        <div className="text-red-600 text-sm">Couldnt create allow list</div>
+      );
+    }
+    if (createAllowListResponse && createAllowListResponse.status >= 400) {
+      return (
+        <div className="text-red-600 text-sm">Failed to create allow list</div>
+      );
+    }
+    return null;
+  };
+
   const percentageError =
     percentageSum !== 100 &&
     allowList[0].percentage !== "" &&
@@ -129,29 +180,24 @@ export default function AllowlistDialog() {
   const createButtonDisabled =
     allowList.length === 0 || percentageSum !== 100 || !allAddressesValid;
 
-  console.log(createAllowListResponse);
-  console.log(createAllowListError);
-
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="outline">Edit Profile</Button>
-      </DialogTrigger>
+    <Dialog open={open}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle className="font-serif text-3xl font-normal">
             Create allowlist
           </DialogTitle>
         </DialogHeader>
-        <div className="flex flex-col px-2 pt-3">
-          Allow lists determine the number of units each address is allowed to
-          mint. The allow list is a list of addresses and the number of units
-          they are allowed to mint. When you submit the form, the application
-          will execute additional validations before uploading the allow list to
-          IPFS. When successful the allow list will be available at the CID
-          displayed. Hypercerts will be minted with a total supply of 1 ether
-          (10 ^ 18 units). The percentages provided in the form below will be
-          used to calculate the number of units each address is allowed to mint.
+        <div className="flex flex-col gap-3">
+          <p>
+            Add addresses and the percentage of total units each address is
+            allowed to mint. Hypercerts are created with a total supply of 1
+            ether (10^18 units).
+          </p>
+          <p>
+            Once created, your allowlist will be stored on IPFS and linked to
+            the Hypercert.
+          </p>
         </div>
         <div className="flex flex-col gap-2">
           <div className="flex gap-2">
@@ -168,7 +214,7 @@ export default function AllowlistDialog() {
                   value={item.address}
                   className={cn(
                     "flex-grow",
-                    !isAddress(item.address || "") && "text-red-600"
+                    !isAddress(item.address || "") && "text-red-600",
                   )}
                   onChange={(e) => setAddress(e, i)}
                 />
@@ -178,7 +224,7 @@ export default function AllowlistDialog() {
                   value={item.percentage}
                   className={cn(
                     "w-20 text-right",
-                    !isPercentageValid(item.percentage || "") && "text-red-600"
+                    !isPercentageValid(item.percentage || "") && "text-red-600",
                   )}
                   onChange={(e) => setPercentage(e, i)}
                 />
@@ -200,6 +246,7 @@ export default function AllowlistDialog() {
             </Button>
           </div>
         </div>
+        <CreateAllowListErrorMessage />
         <div className="flex gap-2 justify-evenly w-full">
           <DialogClose asChild>
             <Button type="button" variant="secondary" className="flex-grow">

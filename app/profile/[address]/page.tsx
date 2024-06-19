@@ -11,14 +11,13 @@ import EthAddress from "@/components/eth-address";
 import { Separator } from "@/components/ui/separator";
 import { supabaseData } from "@/lib/supabase";
 import { useQuery } from "@tanstack/react-query";
-import { usePathname } from "next/navigation";
 import { Fragment, useState } from "react";
 
-const Profile = () => {
+const Profile = ({ params }: { params: { address: string } }) => {
   const [activeTab, setActiveTab] =
     useState<ProfileTabKey>("hypercerts:created");
 
-  const address = usePathname().split("/")[2];
+  const address = params.address;
   const {
     data: hypercertsByCreatorResponse,
     isLoading: isHypercertsByCreatorLoading,

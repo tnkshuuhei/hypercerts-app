@@ -14,22 +14,24 @@ import {
 } from "@/components/ui/popover";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import AllowlistDialog from "../../../components/allowlist/allowlist-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
 import ConnectDialog from "@/components/connect-dialog";
+import CreateAllowlistDialog from "@/components/allowlist/create-allowlist-dialog";
 import HypercertCard from "@/components/hypercert/hypercert-card";
 import { HypercertFormValues } from "@/app/hypercerts/new/page";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
+import UploadAllowlistDialog from "../../../components/allowlist/upload-allowlist-dialog";
 import { UseFormReturn } from "react-hook-form";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { toPng } from "html-to-image";
+import { url } from "inspector";
 import { useAccount } from "wagmi";
 
 interface FormStepsProps {
@@ -156,6 +158,11 @@ const GeneralInformation = ({ form }: FormStepsProps) => {
 };
 
 const DatesAndPeople = ({ form }: FormStepsProps) => {
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
+  const setAllowlistUrl = (url: string) => {
+    form.setValue("allowlistURL", url);
+  };
   return (
     <section className="space-y-8">
       <FormField
@@ -171,7 +178,7 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
                     variant={"outline"}
                     className={cn(
                       "w-full max-w-[280px] pl-3 text-left font-normal",
-                      !field.value && "text-muted-foreground"
+                      !field.value && "text-muted-foreground",
                     )}
                   >
                     {field.value.from ? (
@@ -295,18 +302,35 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
                 placeholder="https://"
               />
             </FormControl>
-            <div className="inline-flex text-xs space-x-1">
-              <span>Create an allowlist at</span>
-              <Link
-                href="https://allowlist-creator.vercel.app/"
-                target="_blank"
-                rel="noreferrer"
-                className="underline text-slate-500 text-wrap hover:text-slate-700 transition-colors"
+            <FormDescription>
+              Allowlists determine the number of units each address is allowed
+              to mint. You can submit an already available allowlist, create one
+              or upload a CSV file.
+            </FormDescription>
+            <div className="flex text-xs space-x-2 w-full justify-end">
+              <Button
+                variant="outline"
+                onClick={() => setCreateDialogOpen(true)}
               >
-                allowlist-creator.vercel.app
-              </Link>
-              ...
-              <AllowlistDialog />
+                Create allowlist
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => setUploadDialogOpen(true)}
+              >
+                Upload allowlist
+              </Button>
+
+              <CreateAllowlistDialog
+                setAllowlistUrl={setAllowlistUrl}
+                open={createDialogOpen}
+                setOpen={setCreateDialogOpen}
+              />
+              <UploadAllowlistDialog
+                setAllowlistUrl={setAllowlistUrl}
+                open={uploadDialogOpen}
+                setOpen={setUploadDialogOpen}
+              />
             </div>
             <FormMessage />
           </FormItem>
@@ -423,11 +447,11 @@ const FormSteps = ({ form, currentStep, setCurrentStep }: FormStepsProps) => {
     const currentStepFields = hypercertFormSteps.get(currentStep)?.fields ?? [];
     const fieldsTouched = currentStepFields.every(
       (field) =>
-        form.formState.touchedFields[field as keyof HypercertFormValues]
+        form.formState.touchedFields[field as keyof HypercertFormValues],
     );
 
     const currentStepErrors = currentStepFields.some(
-      (field) => form.formState.errors[field as keyof HypercertFormValues]
+      (field) => form.formState.errors[field as keyof HypercertFormValues],
     );
 
     return fieldsTouched && !currentStepErrors;

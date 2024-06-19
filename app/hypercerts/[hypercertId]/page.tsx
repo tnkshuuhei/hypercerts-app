@@ -10,14 +10,14 @@ import ExternalUrl from "@/components/hypercert/external-url";
 import Fractions from "@/components/hypercert/fractions";
 import Image from "next/image";
 import Link from "next/link";
+import { ListForSaleButton } from "@/components/marketplace/list-for-sale-button";
+import OrdersList from "@/components/marketplace/orders-list";
 import PageSkeleton from "../../../components/hypercert/page-skeleton";
 import ReadMore from "@/components/read-more";
 import { Separator } from "@/components/ui/separator";
 import WorkScope from "@/components/hypercert/scope";
 import WorkTimeFrame from "@/components/hypercert/time-frame";
 import { getHypercert } from "@/hypercerts/getHypercert";
-import { ListForSaleButton } from "@/components/marketplace/list-for-sale-button";
-import OrdersList from "@/components/marketplace/orders-list";
 
 type Props = {
   params: { hypercertId: string };
@@ -78,6 +78,9 @@ async function HypercertPageInner({
           {(hypercert?.metadata?.work_timeframe_from as string) && (
             <Fragment>
               <Separator />
+              <h5 className="uppercase text-sm text-gray-500 font-medium tracking-wider">
+                TIMEFRAME
+              </h5>
               <WorkTimeFrame hypercert={hypercert} />
             </Fragment>
           )}
