@@ -5,12 +5,10 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-import { HypercertListFragment } from "../../hypercerts/fragments/hypercert-list.fragment";
-import Image from "next/image";
-import Link from "next/link";
-import React from "react";
 import { SUPPORTED_CHAINS } from "@/lib/constants";
 import { ShieldCheck } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 import { getEvaluationStatus } from "../../hypercerts/getEvaluationStatus";
 
 export type HypercertMiniDisplayProps = {
@@ -18,15 +16,17 @@ export type HypercertMiniDisplayProps = {
   name: string;
   chainId: number;
   attestations: {
-    data: {
-        data: unknown;
-    }[] | null;
+    data:
+      | {
+          data: unknown;
+        }[]
+      | null;
     count: number | null;
-} | null;
+  } | null;
   hasTrustedEvaluator?: boolean;
   percentAvailable?: number;
   lowestPrice?: string;
-}
+};
 
 const HypercertMiniDisplay = ({
   hasTrustedEvaluator,
@@ -35,12 +35,11 @@ const HypercertMiniDisplay = ({
   hypercertId,
   name,
   chainId,
-  attestations
+  attestations,
 }: HypercertMiniDisplayProps) => {
-  const cardChain = (chainId: number) => {
+  const cardChain = (chainId: 11155111 | 1 | 10) => {
     return SUPPORTED_CHAINS.get(chainId);
   };
-
 
   const evaluationStatus = getEvaluationStatus(attestations);
 
