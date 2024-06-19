@@ -1,4 +1,5 @@
 "use client";
+import ChainDisplay from "@/components/chain-display";
 import {
   Menubar,
   MenubarContent,
@@ -57,11 +58,14 @@ const MobileNav = () => {
           </Link>
         </MenubarContent>
       </MenubarMenu>
-      <MenubarMenu>
-        <div className="pr-2 py-0 bg-none data-[state=open]:bg-none focus:bg-none">
-          <WalletProfile />
-        </div>
-      </MenubarMenu>
+      <section className="flex space-x-2">
+        <ChainDisplay />
+        <MenubarMenu>
+          <div className="pr-2 py-0 bg-none data-[state=open]:bg-none focus:bg-none">
+            <WalletProfile />
+          </div>
+        </MenubarMenu>
+      </section>
     </Menubar>
   );
 };
