@@ -17,11 +17,6 @@ export default async function ExplorePageInner({
 }) {
   return (
     <main className="flex flex-col p-8 md:p-24 pb-24 space-y-4">
-      <div>
-        VERCEL_PROJECT_PRODUCTION_URL:{" "}
-        {process.env.VERCEL_PROJECT_PRODUCTION_URL}
-      </div>
-      <div>VERCEL_URL: {process.env.VERCEL_URL}</div>
       <section>
         <h1 className="font-serif text-3xl lg:text-5xl tracking-tight">
           Explore

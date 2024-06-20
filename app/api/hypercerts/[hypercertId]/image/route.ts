@@ -22,7 +22,7 @@ const PLACEHOLDER_IMAGE_URL = "/hypercert-placeholder.webp";
 
 // Extract image data from a base64 string or a URL
 async function getImageData(
-  imageOrUrl: string
+  imageOrUrl: string,
 ): Promise<{ contentType: string; buffer: Buffer }> {
   if (imageOrUrl.startsWith("data:image")) {
     const [metadata, base64Data] = imageOrUrl.split(",");
@@ -43,11 +43,22 @@ async function getImageData(
 
 // Fetch and respond with the placeholder image
 async function placeholderImageResponse(request: NextRequest) {
-  const placeholderResponse = await fetch(
-    `${request.headers.get("x-forwarded-proto")}://${request.headers.get(
-      "host"
-    )}${PLACEHOLDER_IMAGE_URL}`
-  );
+  const vercelUrl = process.env.VERCEL_URL;
+
+  let placeholderResponse;
+
+  if (vercelUrl) {
+    placeholderResponse = await fetch(
+      `https://${vercelUrl}/${PLACEHOLDER_IMAGE_URL}`,
+    );
+  } else {
+    placeholderResponse = await fetch(
+      `${request.headers.get("x-forwarded-proto")}://${request.headers.get(
+        "host",
+      )}${PLACEHOLDER_IMAGE_URL}`,
+    );
+  }
+
   const blob = await placeholderResponse.blob();
   const buffer = Buffer.from(await blob.arrayBuffer());
   return new NextResponse(buffer, {
@@ -59,7 +70,7 @@ async function placeholderImageResponse(request: NextRequest) {
 // GET handler to fetch and return the image associated with the given hypercert ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { hypercertId: string } }
+  { params }: { params: { hypercertId: string } },
 ) {
   const { hypercertId } = params;
 
