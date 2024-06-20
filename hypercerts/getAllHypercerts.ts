@@ -7,21 +7,17 @@ import { HypercertListFragment } from "@/hypercerts/fragments/hypercert-list.fra
 import request from "graphql-request";
 
 export type ClaimsOrderBy =
-  | "timestamp_asc"
-  | "timestamp_desc"
-  | "name_asc"
-  | "name_desc"
-  | "attestations_asc"
-  | "attestations_desc";
+  | "block_number_asc"
+  | "block_number_desc"
+  | "claim_attestation_count_asc"
+  | "claim_attestation_count_desc";
 
 export function isClaimsOrderBy(value: string): value is ClaimsOrderBy {
   return [
-    "timestamp_asc",
-    "timestamp_desc",
-    "name_asc",
-    "name_desc",
-    "attestations_asc",
-    "attestations_desc",
+    "block_number_asc",
+    "block_number_desc",
+    "claim_attestation_count_asc",
+    "claim_attestation_count_desc",
   ].includes(value);
 }
 
@@ -61,8 +57,9 @@ function createOrderBy({
   orderBy?: ClaimsOrderBy;
 }): VariableTypes["sort"] {
   if (orderBy) {
-    const orderByAttribute = orderBy.split("_")[0];
-    const orderByDirection = orderBy.split("_")[1];
+    const directionDivider = orderBy.lastIndexOf("_");
+    const orderByAttribute = orderBy.substring(0, directionDivider);
+    const orderByDirection = orderBy.substring(directionDivider + 1);
     if (orderByAttribute === "block_number") {
       return {
         by: {
@@ -70,7 +67,7 @@ function createOrderBy({
         },
       };
     }
-    if (orderByAttribute === "attestations") {
+    if (orderByAttribute === "claim_attestation_count") {
       return {
         by: {
           claim_attestation_count:
@@ -79,6 +76,11 @@ function createOrderBy({
       };
     }
   }
+  return {
+    by: {
+      block_number: "descending",
+    },
+  };
 }
 
 function createFilter({
