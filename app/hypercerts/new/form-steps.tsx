@@ -1,4 +1,4 @@
-import { ArrowLeftIcon, ArrowRightIcon, CalendarIcon } from "lucide-react";
+"use client";
 import {
   FormControl,
   FormDescription,
@@ -12,26 +12,24 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { ArrowLeftIcon, ArrowRightIcon, CalendarIcon } from "lucide-react";
+import { useState } from "react";
 
+import { HypercertFormValues } from "@/app/hypercerts/new/page";
+import CreateAllowlistDialog from "@/components/allowlist/create-allowlist-dialog";
+import UploadAllowlistDialog from "@/components/allowlist/upload-allowlist-dialog";
+import ConnectDialog from "@/components/connect-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
-import ConnectDialog from "@/components/connect-dialog";
-import CreateAllowlistDialog from "@/components/allowlist/create-allowlist-dialog";
-import HypercertCard from "@/components/hypercert/hypercert-card";
-import { HypercertFormValues } from "@/app/hypercerts/new/page";
 import { Input } from "@/components/ui/input";
-import Link from "next/link";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
-import UploadAllowlistDialog from "@/components/allowlist/upload-allowlist-dialog";
-import { UseFormReturn } from "react-hook-form";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { toPng } from "html-to-image";
-import { url } from "inspector";
+import Link from "next/link";
+import { UseFormReturn } from "react-hook-form";
 import { useAccount } from "wagmi";
 
 interface FormStepsProps {
@@ -341,49 +339,8 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
 };
 
 const ReviewAndSubmit = ({ form }: FormStepsProps) => {
-  const cardRef = useRef<HTMLDivElement>(null);
-
-  const takeCardSnapshot = useCallback(() => {
-    if (cardRef.current === null) {
-      return;
-    }
-
-    toPng(cardRef.current, {
-      cacheBust: true,
-      fetchRequestInit: { mode: "cors" },
-    })
-      .then((dataUrl) => {
-        form.setValue("cardImage", dataUrl);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, [cardRef, form]);
-
-  useEffect(() => {
-    takeCardSnapshot();
-  }, [takeCardSnapshot]);
-
   return (
     <section className="space-y-8">
-      <div className="flex flex-col space-y-4 items-center md:hidden">
-        <HypercertCard
-          name={form.getValues().title || undefined}
-          description={form.getValues().description || undefined}
-          banner={
-            `https://cors-proxy.hypercerts.workers.dev/?url=${
-              form.getValues().banner
-            }` || undefined
-          }
-          logo={
-            `https://cors-proxy.hypercerts.workers.dev/?url=${
-              form.getValues().logo
-            }` || undefined
-          }
-          ref={cardRef}
-        />
-      </div>
-
       <FormField
         control={form.control}
         name="acceptTerms"
