@@ -22,7 +22,7 @@ const PLACEHOLDER_IMAGE_URL = "/hypercert-placeholder.webp";
 
 // Extract image data from a base64 string or a URL
 async function getImageData(
-  imageOrUrl: string
+  imageOrUrl: string,
 ): Promise<{ contentType: string; buffer: Buffer }> {
   if (imageOrUrl.startsWith("data:image")) {
     const [metadata, base64Data] = imageOrUrl.split(",");
@@ -41,25 +41,22 @@ async function getImageData(
   throw new Error("Invalid image data");
 }
 
-// Fetch and respond with the placeholder image
-async function placeholderImageResponse(request: NextRequest) {
-  const placeholderResponse = await fetch(
-    `${request.headers.get("x-forwarded-proto")}://${request.headers.get(
-      "host"
-    )}${PLACEHOLDER_IMAGE_URL}`
-  );
-  const blob = await placeholderResponse.blob();
-  const buffer = Buffer.from(await blob.arrayBuffer());
-  return new NextResponse(buffer, {
-    status: 200,
-    headers: { "Content-Type": blob.type },
-  });
+// Redirect to the placeholder image
+async function placeholderImageRedirect(request: NextRequest) {
+  const vercelUrl = process.env.VERCEL_URL;
+  const placeholderImageUrl = vercelUrl
+    ? `https://${vercelUrl}${PLACEHOLDER_IMAGE_URL}`
+    : `${request.headers.get("x-forwarded-proto")}://${request.headers.get(
+        "host",
+      )}${PLACEHOLDER_IMAGE_URL}`;
+
+  return NextResponse.redirect(placeholderImageUrl);
 }
 
 // GET handler to fetch and return the image associated with the given hypercert ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { hypercertId: string } }
+  { params }: { params: { hypercertId: string } },
 ) {
   const { hypercertId } = params;
 
@@ -76,7 +73,7 @@ export async function GET(
 
     // Use placeholder image if no image URL or data is found
     if (!imageOrUrl) {
-      return placeholderImageResponse(request);
+      return placeholderImageRedirect(request);
     }
 
     // Get image data or use placeholder image if data is invalid
@@ -91,7 +88,7 @@ export async function GET(
       });
     } catch (error) {
       console.error(`Error parsing image data: ${error}`);
-      return placeholderImageResponse(request);
+      return placeholderImageRedirect(request);
     }
   } catch (error) {
     console.error(`Error fetching image metadata: ${error}`);

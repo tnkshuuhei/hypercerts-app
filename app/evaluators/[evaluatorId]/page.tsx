@@ -1,5 +1,5 @@
-import EvaluatorDetail from "../../../components/evaluator/evaluator-detail";
-import PageSkeleton from "../../../components/hypercert/page-skeleton";
+import EvaluatorDetail from "@/components/evaluator/evaluator-detail";
+import PageSkeleton from "@/components/hypercert/page-skeleton";
 import { Suspense } from "react";
 
 export default async function EvaluatorPage({

@@ -10,8 +10,8 @@ import HypercertMiniDisplay, {
 import ExploreListSkeleton from "./explore-list-skeleton";
 import ExplorePagination from "./explore-pagination";
 import { HYPERCERTS_PER_PAGE } from "@/configs/ui";
-import { Suspense } from "react";
 import { InfoSection } from "@/app/profile/[address]/sections";
+import { Suspense } from "react";
 import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
 import { formatEther } from "viem";
 import { type SupportedChainIdType } from "@/lib/constants";
@@ -103,7 +103,10 @@ export default async function ExploreList({
 }) {
   const suspenseKey = new URLSearchParams(searchParams).toString();
   return (
-    <Suspense fallback={<ExploreListSkeleton />} key={suspenseKey}>
+    <Suspense
+      fallback={<ExploreListSkeleton length={HYPERCERTS_PER_PAGE} />}
+      key={suspenseKey}
+    >
       <ExploreListInner {...{ searchParams }} />
     </Suspense>
   );

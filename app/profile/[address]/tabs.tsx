@@ -1,123 +1,22 @@
-import { HypercertsByCreatorQueryResponse } from "@/app/profile/[address]/queries";
 import { EmptySection } from "@/app/profile/[address]/sections";
+import ExploreListSkeleton from "@/components/explore/explore-list-skeleton";
 import HypercertMiniDisplay from "@/components/hypercert/hypercert-mini-display";
+import UnclaimedHypercertsList from "@/components/profile/unclaimed-hypercerts-list";
 import { Button } from "@/components/ui/button";
+import { getHypercertsByCreator } from "@/hypercerts/getHypercertsByCreator";
 import { type SupportedChainIdType } from "@/lib/constants";
+import { supabaseData } from "@/lib/supabase";
+import Link from "next/link";
 import Script from "next/script";
-import { Dispatch, ReactNode, SetStateAction } from "react";
+import { Suspense } from "react";
 
-type ProfileTabKey = "hypercerts:created" | "hyperboards:owned";
+const HyperBoardsTabContentInner = async ({ address }: { address: string }) => {
+  const hyperboards = await supabaseData
+    .from("hyperboards")
+    .select("id")
+    .eq("admin_id", address.toLowerCase());
 
-type Tab = {
-  tabLabel: string;
-  tabKey: ProfileTabKey;
-};
-
-type ProfileTabDetails = Tab & {
-  subTabs: Tab[];
-};
-
-type ProfileTabProps = Tab & {
-  activeTab: ProfileTabKey;
-  setActiveTab: Dispatch<SetStateAction<ProfileTabKey>>;
-};
-
-const profileTabs: ProfileTabDetails[] = [
-  {
-    tabLabel: "Hypercerts",
-    tabKey: "hypercerts:created",
-    subTabs: [{ tabLabel: "Created by me", tabKey: "hypercerts:created" }],
-  },
-  {
-    tabLabel: "Hyperboards",
-    tabKey: "hyperboards:owned",
-    subTabs: [{ tabLabel: "My contributions", tabKey: "hyperboards:owned" }],
-  },
-];
-
-const ProfileMainTabButton = ({
-  tabLabel,
-  tabKey,
-  activeTab,
-  setActiveTab,
-}: ProfileTabProps) => {
-  const isActive = activeTab.split(":")[0] === tabKey.split(":")[0];
-
-  return (
-    <Button
-      variant={isActive ? "default" : "outline"}
-      size={"default"}
-      className={`space-x-1 border-[1.5px]`}
-      onClick={() => setActiveTab(tabKey)}
-    >
-      <h3 className={`text-lg`}>{tabLabel}</h3>
-    </Button>
-  );
-};
-
-const ProfileSubTabButton = ({
-  tabLabel,
-  tabKey,
-  activeTab,
-  setActiveTab,
-  count,
-}: ProfileTabProps & { count: number }) => {
-  const isActive = activeTab === tabKey;
-
-  const badgeActiveClasses = isActive
-    ? "bg-black text-white"
-    : "text-slate-400 bg-white border-[1.5px] border-slate-300";
-
-  const textActiveClasses = isActive ? "text-primary" : "text-slate-400";
-
-  const buttonActiveClasses = isActive ? "border-primary" : "border-slate-300";
-
-  return (
-    <Button
-      variant={isActive ? "secondary" : "ghost"}
-      size={"sm"}
-      className={`space-x-1 ${buttonActiveClasses}`}
-      onClick={() => setActiveTab(tabKey)}
-    >
-      <h2 className={`text-sm ${textActiveClasses}`}>{tabLabel}</h2>
-      <span
-        className={`text-xs ${badgeActiveClasses} px-1 py-0.5 rounded-lg h-max`}
-      >
-        {count}
-      </span>
-    </Button>
-  );
-};
-
-const HypercertsTabContent = ({
-  hypercerts,
-}: {
-  hypercerts: HypercertsByCreatorQueryResponse["hypercerts"]["data"]; // TODO: update type
-}) => {
-  if (!hypercerts || !hypercerts.length) {
-    return <EmptySection />;
-  }
-  return (
-    <div className="flex flex-wrap gap-5 justify-center lg:justify-start pt-3">
-      {hypercerts.map((hypercert, index) => {
-        const props = {
-          hypercertId: hypercert.hypercert_id as string,
-          name: hypercert.metadata?.name as string,
-          chainId: Number(hypercert.contract?.chain_id) as SupportedChainIdType,
-          attestations: hypercert.attestations,
-        };
-        return <HypercertMiniDisplay key={index} {...props} />; // TODO: show hypercert mini displays
-      })}
-    </div>
-  );
-};
-
-const HyperboardsTabContent = ({
-  hyperboards,
-}: {
-  hyperboards: any[]; // TODO: update to hyperboards
-}) => {
-  if (!hyperboards || hyperboards.length === 0) {
+  if (!hyperboards || !hyperboards.data) {
     return <EmptySection />;
   }
 
@@ -128,11 +27,11 @@ const HyperboardsTabContent = ({
         type="module"
       />
       <div className="flex flex-col gap-4">
-        {hyperboards.map((hyperboard) => (
+        {hyperboards.data.map((hyperboard) => (
           <div
-            key={hyperboard}
+            key={hyperboard.id}
             className="hyperboard-widget"
-            data-hyperboard-id={hyperboard}
+            data-hyperboard-id={hyperboard.id}
           ></div>
         ))}
       </div>
@@ -140,65 +39,93 @@ const HyperboardsTabContent = ({
   );
 };
 
-const ProfileTabContent = ({
-  activeTab,
-  data,
-}: {
-  activeTab: ProfileTabKey;
-  data: any[];
-}) => {
-  const tabContent: { [key in ProfileTabKey]: ReactNode } = {
-    "hypercerts:created": <HypercertsTabContent hypercerts={data} />,
-    "hyperboards:owned": <HyperboardsTabContent hyperboards={data} />,
-  };
+const HyperboardsTabContent = ({ address }: { address: string }) => {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <HyperBoardsTabContentInner address={address} />
+    </Suspense>
+  );
+};
 
-  return <section className="py-2">{tabContent[activeTab]}</section>;
+const HypercertsTabContentInner = async ({ address }: { address: string }) => {
+  const hypercerts = await getHypercertsByCreator({ creatorAddress: address });
+
+  if (!hypercerts || hypercerts.data?.length === 0) {
+    return <EmptySection />;
+  }
+
+  return (
+    <>
+      <div>
+        <Button variant="secondary" size="sm" className={`space-x-1`}>
+          <h2 className={`text-sm`}>Created by me</h2>
+          <span
+            className={`bg-black text-white text-xs px-1 py-0.5 rounded-lg h-max`}
+          >
+            {hypercerts.count}
+          </span>
+        </Button>
+      </div>
+      <div className="flex flex-wrap gap-5 justify-center lg:justify-start pt-3">
+        {hypercerts.data.map((hypercert, index) => {
+          const props = {
+            hypercertId: hypercert.hypercert_id as string,
+            name: hypercert.metadata?.name as string,
+            chainId: Number(
+              hypercert.contract?.chain_id,
+            ) as SupportedChainIdType,
+            attestations: hypercert.attestations,
+          };
+          return <HypercertMiniDisplay key={index} {...props} />; // TODO: show hypercert mini displays
+        })}
+      </div>
+      <h1 className="font-serif text-2xl lg:text-3xl tracking-tight">
+        Unclaimed hypercerts
+      </h1>
+      <UnclaimedHypercertsList address={address} />
+    </>
+  );
+};
+
+const HypercertsTabContent = ({ address }: { address: string }) => {
+  return (
+    <Suspense fallback={<ExploreListSkeleton length={4} />}>
+      <HypercertsTabContentInner address={address} />
+    </Suspense>
+  );
 };
 
 const ProfileTabSection = ({
-  activeTab,
-  setActiveTab,
-  data,
+  address,
+  active = "hypercerts",
 }: {
-  activeTab: ProfileTabKey;
-  setActiveTab: Dispatch<SetStateAction<ProfileTabKey>>;
-  data: Record<ProfileTabKey, { data: any[] }>;
+  address: string;
+  active: string;
 }) => {
-  const activeTabPrefix = activeTab.split(":")[0];
   return (
     <section className="w-full space-y-2">
       <section className="space-x-1 w-full flex">
-        {profileTabs.map((tab) => (
-          <>
-            <ProfileMainTabButton
-              key={tab.tabKey}
-              {...tab}
-              activeTab={activeTab}
-              setActiveTab={setActiveTab}
-            />
-          </>
-        ))}
-      </section>
-      <section className="space-x-1">
-        {profileTabs
-          .find((tab) => tab.tabKey.split(":")[0] === activeTabPrefix)
-          ?.subTabs.map((subTab) => (
-            <ProfileSubTabButton
-              key={subTab.tabKey}
-              {...subTab}
-              activeTab={activeTab}
-              setActiveTab={setActiveTab}
-              count={data[subTab.tabKey].data.length}
-            />
-          ))}
+        <Link href={`/profile/${address}?tab=hypercerts`}>
+          <Button
+            variant={active === "hypercerts" ? "default" : "outline"}
+            size={"default"}
+            className={`space-x-1 border-[1.5px]`}
+          >
+            <h3 className={`text-lg`}>Hypercerts</h3>
+          </Button>
+        </Link>
+        <Link href={`/profile/${address}?tab=hyperboards`}>
+          <Button
+            variant={active === "hyperboards" ? "default" : "outline"}
+            size={"default"}
+            className={`space-x-1 border-[1.5px]`}
+          >
+            <h3 className={`text-lg`}>Hyperboards</h3>
+          </Button>
+        </Link>
       </section>
     </section>
   );
 };
 
-export {
-  ProfileTabContent,
-  ProfileTabSection,
-  profileTabs,
-  type ProfileTabKey,
-};
+export { HyperboardsTabContent, HypercertsTabContent, ProfileTabSection };

@@ -12,7 +12,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ListForSaleButton } from "@/components/marketplace/list-for-sale-button";
 import OrdersList from "@/components/marketplace/orders-list";
-import PageSkeleton from "../../../components/hypercert/page-skeleton";
+import PageSkeleton from "@/components/hypercert/page-skeleton";
 import ReadMore from "@/components/read-more";
 import { Separator } from "@/components/ui/separator";
 import WorkScope from "@/components/hypercert/scope";

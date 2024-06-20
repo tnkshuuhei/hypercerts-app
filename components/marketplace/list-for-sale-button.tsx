@@ -1,20 +1,21 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { useHypercertClient } from "@/hooks/use-hypercert-client";
-import { useState } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { ListForSaleForm } from "@/components/marketplace/list-for-sale-form";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+
+import { Button } from "@/components/ui/button";
+import { ListForSaleForm } from "@/components/marketplace/list-for-sale-form";
+import { parseClaimOrFractionId } from "@hypercerts-org/sdk";
 import { useAccount } from "wagmi";
 import { useFetchHypercertFractionsByHypercertId } from "@/components/marketplace/create-fractional-sale-form";
 import { useFetchMarketplaceOrdersForHypercert } from "@/marketplace/hooks";
-import { parseClaimOrFractionId } from "@hypercerts-org/sdk";
+import { useHypercertClient } from "@/hooks/use-hypercert-client";
+import { useState } from "react";
 
 type Props = {
   hypercertId: string;
@@ -73,18 +74,18 @@ export function ListForSaleButton({
       return "You do not own any fractions of this hypercert";
     }
 
-    const fractionsWithoutOrder = fractionsOwnedByUser.filter(
-      (fraction) =>
-        !marketplaceOrders?.find(
-          (order) =>
-            order.itemIds[0] ===
-            parseClaimOrFractionId(fraction.fraction_id!).id.toString(),
-        ),
-    );
+    // const fractionsWithoutOrder = fractionsOwnedByUser.filter(
+    //   (fraction) =>
+    //     !marketplaceOrders?.find(
+    //       (order) =>
+    //         order.itemIds[0] ===
+    //         parseClaimOrFractionId(fraction.fraction_id!).id.toString(),
+    //     ),
+    // );
 
-    if (!fractionsWithoutOrder.length) {
-      return "All your fractions are already listed for sale";
-    }
+    // if (!fractionsWithoutOrder.length) {
+    //   return "All your fractions are already listed for sale";
+    // }
 
     return null;
   };

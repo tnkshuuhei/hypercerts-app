@@ -26,7 +26,7 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
-import UploadAllowlistDialog from "../../../components/allowlist/upload-allowlist-dialog";
+import UploadAllowlistDialog from "@/components/allowlist/upload-allowlist-dialog";
 import { UseFormReturn } from "react-hook-form";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
