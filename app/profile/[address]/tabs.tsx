@@ -12,9 +12,9 @@ const HyperBoardsTabContentInner = async ({ address }: { address: string }) => {
   const hyperboards = await supabaseData
     .from("hyperboards")
     .select("id")
-    .eq("admin_id", address!.toLowerCase());
+    .eq("admin_id", address.toLowerCase());
 
-  if (!hyperboards || !hyperboards.count || !hyperboards.data) {
+  if (!hyperboards || !hyperboards.data) {
     return <EmptySection />;
   }
 
