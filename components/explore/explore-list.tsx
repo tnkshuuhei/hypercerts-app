@@ -100,7 +100,10 @@ export default async function ExploreList({
 }) {
   const suspenseKey = new URLSearchParams(searchParams).toString();
   return (
-    <Suspense fallback={<ExploreListSkeleton />} key={suspenseKey}>
+    <Suspense
+      fallback={<ExploreListSkeleton length={HYPERCERTS_PER_PAGE} />}
+      key={suspenseKey}
+    >
       <ExploreListInner {...{ searchParams }} />
     </Suspense>
   );

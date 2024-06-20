@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { EmptySection } from "@/app/profile/[address]/sections";
+import ExploreListSkeleton from "../../../components/explore/explore-list-skeleton";
 import HypercertMiniDisplay from "@/components/hypercert/hypercert-mini-display";
 import Link from "next/link";
 import Script from "next/script";
@@ -85,7 +86,7 @@ const HypercertsTabContentInner = async ({ address }: { address: string }) => {
 
 const HypercertsTabContent = ({ address }: { address: string }) => {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<ExploreListSkeleton length={4} />}>
       <HypercertsTabContentInner address={address} />
     </Suspense>
   );
