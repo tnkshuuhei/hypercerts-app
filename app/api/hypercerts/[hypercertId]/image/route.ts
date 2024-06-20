@@ -41,30 +41,16 @@ async function getImageData(
   throw new Error("Invalid image data");
 }
 
-// Fetch and respond with the placeholder image
-async function placeholderImageResponse(request: NextRequest) {
+// Redirect to the placeholder image
+async function placeholderImageRedirect(request: NextRequest) {
   const vercelUrl = process.env.VERCEL_URL;
-
-  let placeholderResponse;
-
-  if (vercelUrl) {
-    placeholderResponse = await fetch(
-      `https://${vercelUrl}${PLACEHOLDER_IMAGE_URL}`,
-    );
-  } else {
-    placeholderResponse = await fetch(
-      `${request.headers.get("x-forwarded-proto")}://${request.headers.get(
+  const placeholderImageUrl = vercelUrl
+    ? `https://${vercelUrl}${PLACEHOLDER_IMAGE_URL}`
+    : `${request.headers.get("x-forwarded-proto")}://${request.headers.get(
         "host",
-      )}${PLACEHOLDER_IMAGE_URL}`,
-    );
-  }
+      )}${PLACEHOLDER_IMAGE_URL}`;
 
-  const blob = await placeholderResponse.blob();
-  const buffer = Buffer.from(await blob.arrayBuffer());
-  return new NextResponse(buffer, {
-    status: 200,
-    headers: { "Content-Type": blob.type },
-  });
+  return NextResponse.redirect(placeholderImageUrl);
 }
 
 // GET handler to fetch and return the image associated with the given hypercert ID
@@ -87,7 +73,7 @@ export async function GET(
 
     // Use placeholder image if no image URL or data is found
     if (!imageOrUrl) {
-      return placeholderImageResponse(request);
+      return placeholderImageRedirect(request);
     }
 
     // Get image data or use placeholder image if data is invalid
