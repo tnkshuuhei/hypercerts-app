@@ -10,6 +10,7 @@ export const AllowListRecordFragment = graphql(`
     id
     hypercert_id
     token_id
+    root
     leaf
     entry
     user_address

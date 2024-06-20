@@ -6,14 +6,14 @@ export default async function UnclaimedHypercertsList({
 }: {
   address: string;
 }) {
-  const unclaimedHypercerts = await getAllowListRecordsForAddress(address);
+  const allowList = await getAllowListRecordsForAddress(address);
 
   if (
-    !unclaimedHypercerts ||
-    unclaimedHypercerts.count === 0 ||
-    !unclaimedHypercerts.data ||
-    !Array.isArray(unclaimedHypercerts.data) ||
-    unclaimedHypercerts.data.length === 0
+    !allowList ||
+    allowList.count === 0 ||
+    !allowList.data ||
+    !Array.isArray(allowList.data) ||
+    allowList.data.length === 0
   ) {
     return <div>No unclaimed hypercerts found</div>;
   }
@@ -65,7 +65,7 @@ export default async function UnclaimedHypercertsList({
 
   return (
     <div className="flex flex-col gap-5 w-full">
-      {unclaimedHypercerts.data.map((unclaimedHypercert, i) => (
+      {allowList.data.map((unclaimedHypercert, i) => (
         <UnclaimedHypercertListItem
           allowListRecordFragment={unclaimedHypercert}
           key={i}
