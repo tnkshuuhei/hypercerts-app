@@ -49,7 +49,7 @@ async function placeholderImageResponse(request: NextRequest) {
 
   if (vercelUrl) {
     placeholderResponse = await fetch(
-      `https://${vercelUrl}/${PLACEHOLDER_IMAGE_URL}`,
+      `https://${vercelUrl}${PLACEHOLDER_IMAGE_URL}`,
     );
   } else {
     placeholderResponse = await fetch(
