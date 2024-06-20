@@ -1,7 +1,3 @@
-import { useForm } from "react-hook-form";
-
-import React from "react";
-import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -10,10 +6,6 @@ import {
   FormItem,
   FormLabel,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { useQuery } from "@tanstack/react-query";
-import { useAccount, useChainId } from "wagmi";
-import { useHypercertClient } from "@/hooks/use-hypercert-client";
 import {
   Select,
   SelectContent,
@@ -21,12 +13,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
-import { StepProcessDialogProvider } from "@/components/global/step-process-dialog";
+import { useAccount, useChainId } from "wagmi";
 import {
   useCreateFractionalMakerAsk,
   useFetchMarketplaceOrdersForHypercert,
 } from "@/marketplace/hooks";
+
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import React from "react";
+import { StepProcessDialogProvider } from "@/components/global/step-process-dialog";
+import { useForm } from "react-hook-form";
+import { useHypercertClient } from "@/hooks/use-hypercert-client";
+import { useQuery } from "@tanstack/react-query";
 
 export interface CreateFractionalOfferFormValues {
   fractionId: string;
@@ -132,12 +132,12 @@ const CreateFractionalOrderFormInner = ({
     ? Object.values(currentOrdersForHypercert).map((order) => order.itemIds[0])
     : [];
 
-  const yourFractionsWithoutActiveOrder = yourFractions.filter(
-    (fraction) => !fractionsWithActiveOrder.includes(fraction.fraction_id!),
-  );
+  // const yourFractionsWithoutActiveOrder = yourFractions.filter(
+  //   (fraction) => !fractionsWithActiveOrder.includes(fraction.fraction_id!),
+  // );
 
-  const hasFractionsWithoutActiveOrder =
-    yourFractionsWithoutActiveOrder.length > 0;
+  // const hasFractionsWithoutActiveOrder =
+  //   yourFractionsWithoutActiveOrder.length > 0;
 
   const submitDisabled = !isValid || isSubmitting;
 
@@ -148,7 +148,7 @@ const CreateFractionalOrderFormInner = ({
           <div>
             <div>Create fractional sale</div>
 
-            {hasFractionsWithoutActiveOrder ? (
+            {/* {hasFractionsWithoutActiveOrder ? (
               <div>
                 <FormField
                   name={"fractionId"}
@@ -278,7 +278,7 @@ const CreateFractionalOrderFormInner = ({
               </div>
             ) : (
               <div>You don{"'"}t have any fractions to sell</div>
-            )}
+            )} */}
           </div>
         </Form>
       )}
