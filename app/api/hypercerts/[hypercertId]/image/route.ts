@@ -88,7 +88,7 @@ export async function GET(
       });
     } catch (error) {
       console.error(`Error parsing image data: ${error}`);
-      return placeholderImageResponse(request);
+      return placeholderImageRedirect(request);
     }
   } catch (error) {
     console.error(`Error fetching image metadata: ${error}`);
