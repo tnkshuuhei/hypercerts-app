@@ -2,6 +2,7 @@ import { HypercertsByCreatorQueryResponse } from "@/app/profile/[address]/querie
 import { EmptySection } from "@/app/profile/[address]/sections";
 import HypercertMiniDisplay from "@/components/hypercert/hypercert-mini-display";
 import { Button } from "@/components/ui/button";
+import { type SupportedChainIdType } from "@/lib/constants";
 import Script from "next/script";
 import { Dispatch, ReactNode, SetStateAction } from "react";
 
@@ -102,9 +103,9 @@ const HypercertsTabContent = ({
         const props = {
           hypercertId: hypercert.hypercert_id as string,
           name: hypercert.metadata?.name as string,
-          chainId: Number(hypercert.contract?.chain_id),
+          chainId: Number(hypercert.contract?.chain_id) as SupportedChainIdType,
           attestations: hypercert.attestations,
-      };
+        };
         return <HypercertMiniDisplay key={index} {...props} />; // TODO: show hypercert mini displays
       })}
     </div>

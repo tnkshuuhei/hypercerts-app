@@ -14,6 +14,7 @@ import { Suspense } from "react";
 import { InfoSection } from "@/app/profile/[address]/sections";
 import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
 import { formatEther } from "viem";
+import { type SupportedChainIdType } from "@/lib/constants";
 
 function HypercertsListNoResults() {
   return "No results found";
@@ -75,7 +76,9 @@ async function ExploreListInner({
           const props: HypercertMiniDisplayProps = {
             hypercertId: hypercert.hypercert_id as string,
             name: hypercert.metadata?.name as string,
-            chainId: Number(hypercert.contract?.chain_id),
+            chainId: Number(
+              hypercert.contract?.chain_id,
+            ) as SupportedChainIdType,
             attestations: hypercert.attestations,
             lowestPrice: formatEther(lowestPricePerPercent),
             percentAvailable,
