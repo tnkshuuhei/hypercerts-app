@@ -1,13 +1,14 @@
-import { Button } from "@/components/ui/button";
 import { EmptySection } from "@/app/profile/[address]/sections";
-import ExploreListSkeleton from "../../../components/explore/explore-list-skeleton";
+import ExploreListSkeleton from "@/components/explore/explore-list-skeleton";
 import HypercertMiniDisplay from "@/components/hypercert/hypercert-mini-display";
+import UnclaimedHypercertsList from "@/components/profile/unclaimed-hypercerts-list";
+import { Button } from "@/components/ui/button";
+import { getHypercertsByCreator } from "@/hypercerts/getHypercertsByCreator";
+import { type SupportedChainIdType } from "@/lib/constants";
+import { supabaseData } from "@/lib/supabase";
 import Link from "next/link";
 import Script from "next/script";
 import { Suspense } from "react";
-import UnclaimedHypercertsList from "../../../components/profile/unclaimed-hypercerts-list";
-import { getHypercertsByCreator } from "../../../hypercerts/getHypercertsByCreator";
-import { supabaseData } from "../../../lib/supabase";
 
 const HyperBoardsTabContentInner = async ({ address }: { address: string }) => {
   const hyperboards = await supabaseData
@@ -70,7 +71,9 @@ const HypercertsTabContentInner = async ({ address }: { address: string }) => {
           const props = {
             hypercertId: hypercert.hypercert_id as string,
             name: hypercert.metadata?.name as string,
-            chainId: Number(hypercert.contract?.chain_id),
+            chainId: Number(
+              hypercert.contract?.chain_id,
+            ) as SupportedChainIdType,
             attestations: hypercert.attestations,
           };
           return <HypercertMiniDisplay key={index} {...props} />; // TODO: show hypercert mini displays
@@ -125,4 +128,4 @@ const ProfileTabSection = ({
   );
 };
 
-export { HypercertsTabContent, HyperboardsTabContent, ProfileTabSection };
+export { HyperboardsTabContent, HypercertsTabContent, ProfileTabSection };

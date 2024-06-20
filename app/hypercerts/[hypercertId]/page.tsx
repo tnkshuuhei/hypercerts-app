@@ -12,7 +12,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ListForSaleButton } from "@/components/marketplace/list-for-sale-button";
 import OrdersList from "@/components/marketplace/orders-list";
-import PageSkeleton from "../../../components/hypercert/page-skeleton";
+import PageSkeleton from "@/components/hypercert/page-skeleton";
 import ReadMore from "@/components/read-more";
 import { Separator } from "@/components/ui/separator";
 import WorkScope from "@/components/hypercert/scope";
@@ -133,12 +133,6 @@ export default async function HypercertPage({
 }) {
   return (
     <main className="flex flex-col p-8 md:px-24 md:pt-14 pb-24 space-y-4">
-      <Link href={`/explore`}>
-        <div className="flex items-center space-x-2 text-sm text-gray-700 font-medium">
-          <ArrowLeftIcon className="w-4 h-4" />
-          <span>Explore more hypercerts</span>
-        </div>
-      </Link>
       <Suspense fallback={<PageSkeleton />} key={params.hypercertId}>
         <HypercertPageInner {...{ params }} />
       </Suspense>

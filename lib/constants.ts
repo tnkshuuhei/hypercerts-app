@@ -1,13 +1,11 @@
-export const SUPPORTED_CHAINS = new Map([
-  [1, "Ethereum"],
-  [11155111, "Sepolia Testnet"],
-]);
+import { mainnet, optimism, sepolia } from "viem/chains";
 
-// export const SUPPORTED_CHAINS = new Map([
-//   [1, "Ethereum"],
-//   [11155111, "Sepolia Testnet"],
-//   [42220, "Celo"],
-//   [10, "OP Mainnet"],
-//   [84532, "Base Sepolia Testnet"],
-//   [8453, "Base"],
-// ]);
+const chainEntries = [
+  [sepolia.id, "Sepolia"],
+  [mainnet.id, "Ethereum"],
+  [optimism.id, "OP Mainnet"],
+] as const;
+
+export const SUPPORTED_CHAINS = new Map(chainEntries);
+
+export type SupportedChainIdType = (typeof chainEntries)[number][0];
