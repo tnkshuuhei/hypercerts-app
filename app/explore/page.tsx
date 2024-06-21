@@ -22,7 +22,7 @@ export default async function ExplorePageInner({
           Explore
         </h1>
         <div className="p-1"></div>
-        <p className="md:text-lg">
+        <p>
           The best place to discover and contribute to hypercerts and
           hyperboards.
         </p>
