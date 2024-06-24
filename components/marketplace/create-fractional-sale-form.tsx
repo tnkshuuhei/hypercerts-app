@@ -27,6 +27,7 @@ import { StepProcessDialogProvider } from "@/components/global/step-process-dial
 import { useForm } from "react-hook-form";
 import { useHypercertClient } from "@/hooks/use-hypercert-client";
 import { useQuery } from "@tanstack/react-query";
+import { getFractionsByHypercert } from "@/hypercerts/getFractionsByHypercert";
 
 export interface CreateFractionalOfferFormValues {
   fractionId: string;
@@ -57,20 +58,18 @@ export const useFetchHypercertFractionsByHypercertId = (
       }
 
       const fractions =
-        (await client.indexer
-          .fractionsByHypercert({ hypercertId })
-          .then((res) =>
-            res?.hypercerts.data?.flatMap((x) => x.fractions?.data),
-          )) || [];
+        (await getFractionsByHypercert(hypercertId).then((res) => {
+          return res?.data;
+        })) || [];
       const totalUnitsForAllFractions = fractions?.reduce(
-        (acc, cur) => acc + BigInt(cur?.units),
+        (acc, cur) => acc + BigInt(cur?.units ?? "0"),
         BigInt(0),
       );
 
       return fractions.map((fraction) => ({
         ...fraction,
         percentage: Number(
-          (BigInt(fraction?.units) * BigInt(100)) / totalUnitsForAllFractions,
+          (BigInt(fraction?.units ?? "0") * BigInt(100)) / totalUnitsForAllFractions,
         ),
       }));
     },

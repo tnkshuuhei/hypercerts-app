@@ -23,16 +23,16 @@ export default function Creator({ hypercert }: { hypercert: HypercertFull }) {
           </span>
         </div>
       )}
-      {hypercert?.block_number && (
+      {hypercert?.creation_block_number && (
         <div className="flex space-x-2 items-center">
           <span className="text-slate-400"> — </span>
           <span
             className="flex space-x-1 items-center"
-            title={`Minted on block ${hypercert.block_number}`}
-            aria-label={`Minted on block ${hypercert.block_number}`}
+            title={`Minted on block ${hypercert.creation_block_number}`}
+            aria-label={`Minted on block ${hypercert.creation_block_number}`}
           >
             <Cuboid className="w-4 h-4" />
-            <p>{hypercert.block_number}</p>
+            <p>{hypercert.creation_block_number}</p>
           </span>
         </div>
       )}

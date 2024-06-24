@@ -11,7 +11,10 @@ export const HypercertFullFragment = graphql(`
       work_timeframe_to
       contributors
     }
-    block_number
+    creation_block_number
+    creation_block_timestamp
+    last_update_block_number
+    last_update_block_timestamp 
     hypercert_id
     contract {
       chain_id
@@ -24,7 +27,10 @@ export const HypercertFullFragment = graphql(`
       data {
         data
         uid
-        block_timestamp
+        creation_block_number
+        creation_block_timestamp
+        last_update_block_number
+        last_update_block_timestamp
         attester
       }
     }
