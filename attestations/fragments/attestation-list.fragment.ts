@@ -4,7 +4,8 @@ export const AttestationListFragment = graphql(`
   fragment AttestationListFragment on Attestation {
     id
     attester
-    block_timestamp
+    creation_block_number
+    creation_block_timestamp 
     data
   }
 `);

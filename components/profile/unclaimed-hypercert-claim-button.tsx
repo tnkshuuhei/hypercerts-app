@@ -24,11 +24,13 @@ export default function UnclaimedHypercertClaimButton({
     const root: `0x${string}` =
       "0x0000000000000000000000000000000000000000000000000000000000000000";
 
+      console.log(allowListRecord)
+
     const tx = await client.mintClaimFractionFromAllowlist(
       BigInt(allowListRecord.token_id),
       BigInt(allowListRecord.units),
       allowListRecord.proof as `0x${string}`[],
-      root,
+      undefined,
     );
 
     console.log(tx);

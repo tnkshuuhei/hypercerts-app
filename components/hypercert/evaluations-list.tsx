@@ -28,7 +28,7 @@ export default async function EvaluationsList({
         const data: EvaluationData = attestation.data as EvaluationData;
         return (
           <div key={attestation.uid} className="pb-5 flex flex-col gap-5">
-            <FormattedDate seconds={attestation.block_timestamp} />
+            <FormattedDate seconds={attestation.creation_block_timestamp} />
 
             <Link
               href={`/evaluators/${attestation.attester}`}
