@@ -1,7 +1,7 @@
 import { type HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
 import EthAddress from "../eth-address";
 import { Cuboid } from "lucide-react";
-import { SUPPORTED_CHAINS, type SupportedChainIdType } from "@/lib/constants";
+import { type SupportedChainIdType, supportedChains } from "@/lib/constants";
 
 export default function Creator({ hypercert }: { hypercert: HypercertFull }) {
   if (!hypercert) return null;
@@ -17,22 +17,28 @@ export default function Creator({ hypercert }: { hypercert: HypercertFull }) {
         <div className="flex space-x-2 items-center">
           <span className="text-slate-400">•</span>
           <span>
-            {SUPPORTED_CHAINS.get(
-              Number(hypercert.contract?.chain_id) as SupportedChainIdType,
-            )}
+            {
+              supportedChains.find(
+                (x) =>
+                  x.id ===
+                  (Number(
+                    hypercert.contract?.chain_id,
+                  ) as SupportedChainIdType),
+              )?.name
+            }
           </span>
         </div>
       )}
-      {hypercert?.block_number && (
+      {hypercert?.creation_block_number && (
         <div className="flex space-x-2 items-center">
           <span className="text-slate-400"> — </span>
           <span
             className="flex space-x-1 items-center"
-            title={`Minted on block ${hypercert.block_number}`}
-            aria-label={`Minted on block ${hypercert.block_number}`}
+            title={`Minted on block ${hypercert.creation_block_number}`}
+            aria-label={`Minted on block ${hypercert.creation_block_number}`}
           >
             <Cuboid className="w-4 h-4" />
-            <p>{hypercert.block_number}</p>
+            <p>{hypercert.creation_block_number}</p>
           </span>
         </div>
       )}

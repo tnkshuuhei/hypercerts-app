@@ -65,14 +65,15 @@ async function ExploreListInner({
       )}
       <div className="flex flex-row flex-wrap gap-5 justify-center md:justify-start">
         {hypercerts?.data?.map((hypercert) => {
-          const percentAvailable = calculateBigIntPercentage(
-            hypercert.orders?.totalUnitsForSale,
-            hypercert.units,
-          );
+          // TODO fix when orders are available again
+          // const percentAvailable = calculateBigIntPercentage(
+          //   hypercert.orders?.totalUnitsForSale,
+          //   hypercert.units,
+          // );
           const unitsPerPercent = BigInt(hypercert.units || 0) / BigInt(100);
-          const lowestPricePerPercent =
-            unitsPerPercent *
-            BigInt(hypercert.orders?.lowestAvailablePrice || 0);
+          // const lowestPricePerPercent =
+          //   unitsPerPercent *
+          //   BigInt(hypercert.orders?.lowestAvailablePrice || 0);
           const props: HypercertMiniDisplayProps = {
             hypercertId: hypercert.hypercert_id as string,
             name: hypercert.metadata?.name as string,
@@ -80,8 +81,8 @@ async function ExploreListInner({
               hypercert.contract?.chain_id,
             ) as SupportedChainIdType,
             attestations: hypercert.attestations,
-            lowestPrice: formatEther(lowestPricePerPercent),
-            percentAvailable,
+            lowestPrice: formatEther(BigInt(1_000_000_000)),
+            percentAvailable: 20,
           };
           return (
             <HypercertMiniDisplay {...props} key={hypercert.hypercert_id} />

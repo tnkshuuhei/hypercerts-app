@@ -19,7 +19,7 @@ async function EvaluatorEvaluationsListInner({ address }: { address: string }) {
           <EvaluatorEvaluationsListItem
             key={i}
             data={attestation.data as EvaluationData}
-            blockTimestamp={attestation.block_timestamp}
+            blockTimestamp={attestation.creation_block_timestamp}
           />
         );
       })}

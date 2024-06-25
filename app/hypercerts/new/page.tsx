@@ -1,5 +1,6 @@
 "use client";
 
+import FormSteps, { hypercertFormSteps } from "@/app/hypercerts/new/form-steps";
 import StepProcessDialog from "@/components/global/step-process-dialog";
 import HypercertCard from "@/components/hypercert/hypercert-card";
 import { Form } from "@/components/ui/form";
@@ -12,14 +13,13 @@ import {
   TransferRestrictions,
   formatHypercertData,
 } from "@hypercerts-org/sdk";
+import { toPng } from "html-to-image";
 import { ArrowUpRightIcon } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { TransactionReceipt } from "viem";
 import { z } from "zod";
-import FormSteps from "./form-steps";
-
 const DEFAULT_NUM_FRACTIONS: number = 10000;
 const DEFAULT_HYPERCERT_VERSION: string = "0.0.1";
 
@@ -67,8 +67,6 @@ const formSchema = z.object({
     message: "You must confirm that all contributors gave their permission",
   }),
   allowlistURL: z.union([z.string().url(), z.literal(""), z.null().optional()]),
-  //   percentDistribution: z.number().nullable(),
-  //   mergeDistribution: z.boolean().nullable(),
 });
 
 export type HypercertFormValues = z.infer<typeof formSchema>;
@@ -90,8 +88,6 @@ const formDefaultValues: HypercertFormValues = {
   acceptTerms: false,
   confirmContributorsPermission: false,
   allowlistURL: "",
-  // percentDistribution: null,
-  // mergeDistribution: null,
 };
 
 export default function NewHypercertForm() {
@@ -103,11 +99,34 @@ export default function NewHypercertForm() {
     defaultValues: formDefaultValues,
     mode: "onChange",
   });
+  const cardRef = useRef<HTMLDivElement>(null);
 
   const [txReceipt, setTxReceipt] = useState<TransactionReceipt | null>(null);
   const onMintComplete = (receipt: TransactionReceipt) => {
     setTxReceipt(receipt);
   };
+
+  const takeCardSnapshot = useCallback(() => {
+    if (cardRef.current === null) {
+      return;
+    }
+    toPng(cardRef.current, {
+      cacheBust: true,
+      fetchRequestInit: { mode: "cors" },
+    })
+      .then((dataUrl) => {
+        console.log({ savedImage: dataUrl });
+        return form.setValue("cardImage", dataUrl);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, [cardRef, form]);
+
+  useEffect(() => {
+    if (currentStep !== hypercertFormSteps.size) return;
+    takeCardSnapshot();
+  }, [currentStep, takeCardSnapshot]);
 
   const {
     write: mintClaim,
@@ -174,7 +193,7 @@ export default function NewHypercertForm() {
         New hypercert
       </h1>
       <div className="p-3"></div>
-      <section className="flex space-x-4 items-stretch md:justify-start">
+      <section className="flex flex-col-reverse lg:flex-row space-x-4 items-stretch md:justify-start">
         <section className="flex flex-col space-y-4 flex-1 md:pr-5 md:border-r-[1.5px] md:border-slate-200">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -186,7 +205,7 @@ export default function NewHypercertForm() {
             </form>
           </Form>
         </section>
-        <div className="hidden md:flex flex-col p-6 items-center">
+        <div className="flex flex-col p-6 items-center">
           <HypercertCard
             name={form.getValues().title || undefined}
             description={form.getValues().description || undefined}
@@ -201,6 +220,7 @@ export default function NewHypercertForm() {
               form.getValues().projectDates?.to?.toISOString(),
               language,
             )}
+            ref={cardRef}
           />
         </div>
       </section>
