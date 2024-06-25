@@ -14,7 +14,7 @@ export default function ExploreOrderBySelect() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const selectedValue = searchParams.get("orderBy") || "creation_block_number_desc";
+  const selectedValue = searchParams.get("orderBy") || "created_desc";
 
   const orderBy = (value: string) => {
     const urlSearchParams = new URLSearchParams(searchParams);
@@ -24,7 +24,7 @@ export default function ExploreOrderBySelect() {
 
   return (
     <Select
-      defaultValue="creation_block_number_desc"
+      defaultValue="created_desc"
       onValueChange={orderBy}
       value={selectedValue}
     >
@@ -32,8 +32,8 @@ export default function ExploreOrderBySelect() {
         <SelectValue placeholder="Sort by" />
       </SelectTrigger>
       <SelectContent className="w-max">
-        <SelectItem value="creation_block_number_desc">Newest first</SelectItem>
-        <SelectItem value="creation_block_number_asc">Oldest first</SelectItem>
+        <SelectItem value="created_desc">Newest first</SelectItem>
+        <SelectItem value="created_asc">Oldest first</SelectItem>
         <SelectItem value="claim_attestation_count_desc">
           Most evaluations first
         </SelectItem>

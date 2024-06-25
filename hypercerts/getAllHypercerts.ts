@@ -7,15 +7,15 @@ import { HypercertListFragment } from "@/hypercerts/fragments/hypercert-list.fra
 import request from "graphql-request";
 
 export type ClaimsOrderBy =
-  | "creation_block_number_asc"
-  | "creation_block_number_desc"
+  | "created_asc"
+  | "created_desc"
   | "claim_attestation_count_asc"
   | "claim_attestation_count_desc";
 
 export function isClaimsOrderBy(value: string): value is ClaimsOrderBy {
   return [
-    "creation_block_number_asc",
-    "creation_block_number_desc",
+    "created_asc",
+    "created_desc",
     "claim_attestation_count_asc",
     "claim_attestation_count_desc",
   ].includes(value);
@@ -60,10 +60,11 @@ function createOrderBy({
     const directionDivider = orderBy.lastIndexOf("_");
     const orderByAttribute = orderBy.substring(0, directionDivider);
     const orderByDirection = orderBy.substring(directionDivider + 1);
-    if (orderByAttribute === "block_number") {
+    if (orderByAttribute === "created") {
       return {
         by: {
-          creation_block_number: orderByDirection === "asc" ? "ascending" : "descending",
+          creation_block_timestamp:
+            orderByDirection === "asc" ? "ascending" : "descending",
         },
       };
     }
@@ -78,7 +79,7 @@ function createOrderBy({
   }
   return {
     by: {
-      creation_block_number: "descending",
+      creation_block_timestamp: "descending",
     },
   };
 }
