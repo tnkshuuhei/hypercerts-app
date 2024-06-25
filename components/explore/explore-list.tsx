@@ -15,7 +15,7 @@ import { Suspense } from "react";
 import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
 import { formatEther } from "viem";
 import { type SupportedChainIdType } from "@/lib/constants";
-import HypercertWindow from "@/components/hypercert/hc-window";
+import HypercertWindow from "@/components/hypercert/hypercert-window";
 
 function HypercertsListNoResults() {
   return "No results found";

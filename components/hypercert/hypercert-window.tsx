@@ -51,7 +51,7 @@ const HypercertWindow = ({
             />
           </div>
         </div>
-        <section className="absolute top-4 left-4 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150 ease-out">
+        <section className="absolute top-4 left-4 flex space-x-1 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity duration-150 ease-out">
           <div className="rounded-md px-2 py-0.5 bg-black border border-white/60 text-white text-xs">
             {cardChain(chainId)}
           </div>
