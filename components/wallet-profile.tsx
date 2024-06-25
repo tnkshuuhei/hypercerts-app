@@ -19,6 +19,7 @@ import { Loader2, VenetianMaskIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { mainnet } from "viem/chains";
 import DisconnectDialog from "@/components/disconnect-dialog";
+import Image from "next/image";
 
 const WalletProfile = ({
   alignment = "end",
@@ -64,10 +65,10 @@ const WalletProfile = ({
       <DropdownMenuTrigger
         asChild
         className={cn(
-          "relative w-10 h-10 rounded-full overflow-hidden ring-[1.5px] ring-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-400"
+          "relative w-8 h-8 rounded-full overflow-hidden ring-[1.5px] ring-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-400",
         )}
       >
-        <Avatar className="h-10 w-10 bg-stone-50">
+        <Avatar className="h-8 w-8 bg-stone-50">
           {ensAvatar && (
             <AvatarImage
               src={ensAvatar}
@@ -76,7 +77,7 @@ const WalletProfile = ({
             />
           )}
           <AvatarFallback>
-            <VenetianMaskIcon />
+            <Image src="/avatar-default.jpg" fill alt="Default avatar" />
           </AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>

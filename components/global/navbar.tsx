@@ -14,17 +14,27 @@ import { WalletProfile } from "@/components/wallet-profile";
 import { siteConfig } from "@/configs/site";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
 
 const Navbar = () => {
   const currentPath = usePathname();
 
   return (
     <nav className="flex items-center justify-between p-8 md:px-24">
-      <div className="flex items-center space-x-4">
+      <div className="flex items-center space-x-6">
         <Link href="/">
-          <span className="font-bold tex-base md:text-xl tracking-tight">
-            Hypercerts
-          </span>
+          <div className="relative flex space-x-1">
+            <Image
+              src="/hypercerts-logo.png"
+              width={20}
+              height={20}
+              className="object-contain"
+              alt="Hypercerts mark"
+            />
+            <span className="font-semibold text-base md:text-xl tracking-tight">
+              Hypercerts
+            </span>
+          </div>
         </Link>
         <div className="hidden md:flex items-center space-x-2">
           <Link
