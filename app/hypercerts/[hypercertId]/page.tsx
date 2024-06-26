@@ -1,7 +1,7 @@
 import { Fragment, Suspense } from "react";
 import { Metadata, ResolvingMetadata } from "next";
 
-import { ArrowLeftIcon } from "lucide-react";
+// import { ArrowLeftIcon } from "lucide-react";
 import Contributors from "@/components/hypercert/contributors";
 import Creator from "@/components/hypercert/creator";
 import EvaluateButton from "@/components/hypercert/evaluate-button";
@@ -10,8 +10,8 @@ import ExternalUrl from "@/components/hypercert/external-url";
 import Fractions from "@/components/hypercert/fractions";
 import Image from "next/image";
 import Link from "next/link";
-import { ListForSaleButton } from "@/components/marketplace/list-for-sale-button";
-import OrdersList from "@/components/marketplace/orders-list";
+// import { ListForSaleButton } from "@/components/marketplace/list-for-sale-button";
+// import OrdersList from "@/components/marketplace/orders-list";
 import PageSkeleton from "@/components/hypercert/page-skeleton";
 import ReadMore from "@/components/read-more";
 import { Separator } from "@/components/ui/separator";
@@ -113,14 +113,14 @@ async function HypercertPageInner({
       </div>
       <EvaluationsList hypercert={hypercert} />
       <Separator />
-      <div className="flex justify-between">
+      {/* <div className="flex justify-between">
         <h5 className="uppercase text-sm text-gray-500 font-medium tracking-wider">
           Marketplace
         </h5>
 
         <ListForSaleButton hypercertId={hypercertId} />
       </div>
-      <OrdersList hypercertId={hypercertId} />
+      <OrdersList hypercertId={hypercertId} /> */}
     </section>
   );
 }

@@ -1,18 +1,15 @@
 "use client";
 
+import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
 import React, { Suspense, useState } from "react";
 import {
+  SortingState,
   createColumnHelper,
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
-  SortingState,
   useReactTable,
 } from "@tanstack/react-table";
-import { MarketplaceOrder } from "@/marketplace/types";
-import { useFetchMarketplaceOrdersForHypercert } from "@/marketplace/hooks";
-import { StepProcessDialogProvider } from "@/components/global/step-process-dialog";
-import { BuyFractionalOrderForm } from "@/components/marketplace/buy-fractional-order-form";
 import {
   Table,
   TableBody,
@@ -21,13 +18,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { ArrowUpDown } from "lucide-react";
 import { decodeAbiParameters, formatEther, parseAbiParameters } from "viem";
+
+import { ArrowUpDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { BuyFractionalOrderForm } from "@/components/marketplace/buy-fractional-order-form";
 import EthAddress from "@/components/eth-address";
-import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
-import { useHypercertClient } from "@/hooks/use-hypercert-client";
+import { MarketplaceOrder } from "@/marketplace/types";
+import { StepProcessDialogProvider } from "@/components/global/step-process-dialog";
 import { cn } from "@/lib/utils";
+import { useFetchMarketplaceOrdersForHypercert } from "@/marketplace/hooks";
+import { useHypercertClient } from "@/hooks/use-hypercert-client";
 
 function OrdersListInner({ hypercertId }: { hypercertId: string }) {
   const { data: openOrders } =
@@ -87,16 +88,16 @@ function OrdersListInner({ hypercertId }: { hypercertId: string }) {
     }),
   ];
   const [sorting, setSorting] = useState<SortingState>([]);
-  const table = useReactTable({
-    data: openOrders || [],
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    onSortingChange: setSorting,
-    state: {
-      sorting,
-    },
-  });
+  // const table = useReactTable({
+  //   data: openOrders || [],
+  //   columns,
+  //   getCoreRowModel: getCoreRowModel(),
+  //   getSortedRowModel: getSortedRowModel(),
+  //   onSortingChange: setSorting,
+  //   state: {
+  //     sorting,
+  //   },
+  // });
 
   const [selectedOrder, setSelectedOrder] = useState<MarketplaceOrder | null>(
     null,
@@ -118,7 +119,7 @@ function OrdersListInner({ hypercertId }: { hypercertId: string }) {
     <div className="w-full">
       <div className="flex items-center py-4">
         <div className="rounded-md border  w-full">
-          <Table>
+          {/* <Table>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
@@ -171,11 +172,11 @@ function OrdersListInner({ hypercertId }: { hypercertId: string }) {
                 </TableRow>
               )}
             </TableBody>
-          </Table>
+          </Table> */}
         </div>
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="space-x-2">
+        {/* <div className="space-x-2">
           <Button
             variant="outline"
             size="sm"
@@ -192,7 +193,7 @@ function OrdersListInner({ hypercertId }: { hypercertId: string }) {
           >
             Next
           </Button>
-        </div>
+        </div> */}
       </div>
       {selectedOrder && (
         <Dialog
