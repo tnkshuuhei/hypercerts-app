@@ -243,7 +243,7 @@ export const useFetchMarketplaceOrdersForHypercert = (hypercertId: string) => {
       const { data: orders } = await apiClient.fetchOrdersByHypercertId({
         hypercertId,
       });
-      return orders;
+      return orders as MarketplaceOrder[];
     },
     enabled: !!chainId,
   });
