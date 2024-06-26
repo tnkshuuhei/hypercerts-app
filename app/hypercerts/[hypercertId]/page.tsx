@@ -64,6 +64,7 @@ async function HypercertPageInner({
               src={`/api/hypercerts/${hypercertId}/image`}
               alt={hypercert?.metadata?.name || ""}
               fill
+              sizes="500px"
               className="object-contain object-top p-2"
             />
           </div>

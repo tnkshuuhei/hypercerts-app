@@ -1,9 +1,5 @@
 "use client";
-import Link from "next/link";
-import { normalize } from "viem/ens";
-import { useAccount, useEnsAvatar, useEnsName } from "wagmi";
 
-import ConnectDialog from "@/components/connect-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -14,12 +10,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { cn, truncateEthereumAddress } from "@/lib/utils";
 import { Loader2, VenetianMaskIcon } from "lucide-react";
+import { cn, truncateEthereumAddress } from "@/lib/utils";
+import { useAccount, useEnsAvatar, useEnsName } from "wagmi";
 import { useEffect, useState } from "react";
-import { mainnet } from "viem/chains";
+
+import ConnectDialog from "@/components/connect-dialog";
 import DisconnectDialog from "@/components/disconnect-dialog";
 import Image from "next/image";
+import Link from "next/link";
+import { mainnet } from "viem/chains";
+import { normalize } from "viem/ens";
 
 const WalletProfile = ({
   alignment = "end",
@@ -77,7 +78,13 @@ const WalletProfile = ({
             />
           )}
           <AvatarFallback>
-            <Image src="/avatar-default.jpg" fill alt="Default avatar" />
+            <Image
+              src="/avatar-default.jpg"
+              alt="Default avatar"
+              width={40}
+              height={40}
+              className="h-8 w-8"
+            />
           </AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
