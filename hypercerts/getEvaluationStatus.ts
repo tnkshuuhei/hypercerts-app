@@ -1,5 +1,4 @@
 import { EvaluationData } from "../eas/types/evaluation-data.type";
-import { HypercertListFragment } from "./fragments/hypercert-list.fragment";
 
 export type EvaluationStatus =
   | "not-evaluated"
@@ -22,9 +21,11 @@ function countEvaluationValue(data: EvaluationData, value: number): number {
 }
 
 export type HypercertAttestations = {
-  data: {
-      data: unknown;
-  }[] | null;
+  data:
+    | {
+        data: unknown;
+      }[]
+    | null;
   count: number | null;
 } | null;
 

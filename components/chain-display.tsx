@@ -22,12 +22,7 @@ const ChainDisplay = () => {
     if (!chosenChainId || chosenChainId === connectedChain?.id) {
       return;
     }
-    console.log(
-      "switching chains from",
-      connectedChain?.id,
-      "to",
-      chosenChainId,
-    );
+
     switchChain({ chainId: chosenChainId, connector });
   }, [chosenChainId, switchChain, connector, connectedChain?.id]);
 

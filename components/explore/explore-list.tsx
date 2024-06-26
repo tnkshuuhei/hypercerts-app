@@ -15,6 +15,7 @@ import { Suspense } from "react";
 import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
 import { formatEther } from "viem";
 import { type SupportedChainIdType } from "@/lib/constants";
+import HypercertWindow from "@/components/hypercert/hypercert-window";
 
 function HypercertsListNoResults() {
   return "No results found";
@@ -63,7 +64,7 @@ async function ExploreListInner({
           Showing search results for: <b>{search}</b>
         </div>
       )}
-      <div className="flex flex-row flex-wrap gap-5 justify-center md:justify-start">
+      <div className="flex flex-row flex-wrap gap-3 justify-center md:justify-start">
         {hypercerts?.data?.map((hypercert) => {
           // TODO fix when orders are available again
           // const percentAvailable = calculateBigIntPercentage(
@@ -84,9 +85,7 @@ async function ExploreListInner({
             lowestPrice: formatEther(BigInt(1_000_000_000)),
             percentAvailable: 20,
           };
-          return (
-            <HypercertMiniDisplay {...props} key={hypercert.hypercert_id} />
-          );
+          return <HypercertWindow {...props} key={hypercert.hypercert_id} />;
         })}
       </div>
       <ExplorePagination
