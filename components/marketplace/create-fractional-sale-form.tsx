@@ -24,10 +24,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import React from "react";
 import { StepProcessDialogProvider } from "@/components/global/step-process-dialog";
+import { getFractionsByHypercert } from "@/hypercerts/getFractionsByHypercert";
 import { useForm } from "react-hook-form";
 import { useHypercertClient } from "@/hooks/use-hypercert-client";
 import { useQuery } from "@tanstack/react-query";
-import { getFractionsByHypercert } from "@/hypercerts/getFractionsByHypercert";
 
 export interface CreateFractionalOfferFormValues {
   fractionId: string;
@@ -128,16 +128,16 @@ const CreateFractionalOrderFormInner = ({
     (fraction) => fraction.owner_address === address,
   );
 
-  const fractionsWithActiveOrder = currentOrdersForHypercert
-    ? Object.values(currentOrdersForHypercert).map((order) => order.itemIds[0])
-    : [];
+  // const fractionsWithActiveOrder = currentOrdersForHypercert
+  //   ? Object.values(currentOrdersForHypercert).map((order) => order.itemIds[0])
+  //   : [];
 
-  const yourFractionsWithoutActiveOrder = yourFractions.filter(
-    (fraction) => !fractionsWithActiveOrder.includes(fraction.fraction_id!),
-  );
+  // const yourFractionsWithoutActiveOrder = yourFractions.filter(
+  //   (fraction) => !fractionsWithActiveOrder.includes(fraction.fraction_id!),
+  // );
 
-  const hasFractionsWithoutActiveOrder =
-    yourFractionsWithoutActiveOrder.length > 0;
+  // const hasFractionsWithoutActiveOrder =
+  //   yourFractionsWithoutActiveOrder.length > 0;
 
   const submitDisabled = !isValid || isSubmitting;
 
@@ -148,7 +148,7 @@ const CreateFractionalOrderFormInner = ({
           <div>
             <div>Create fractional sale</div>
 
-            {hasFractionsWithoutActiveOrder ? (
+            {/* {hasFractionsWithoutActiveOrder ? (
               <div>
                 <FormField
                   name={"fractionId"}
@@ -276,9 +276,9 @@ const CreateFractionalOrderFormInner = ({
                   </Button>
                 </div>
               </div>
-            ) : (
-              <div>You don{"'"}t have any fractions to sell</div>
-            )}
+            ) : ( */}
+            <div>You don{"'"}t have any fractions to sell</div>
+            {/* )} */}
           </div>
         </Form>
       )}
