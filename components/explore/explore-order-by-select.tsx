@@ -28,7 +28,7 @@ export default function ExploreOrderBySelect() {
       onValueChange={orderBy}
       value={selectedValue}
     >
-      <SelectTrigger className="w-max">
+      <SelectTrigger className="w-[180px]">
         <SelectValue placeholder="Sort by" />
       </SelectTrigger>
       <SelectContent className="w-max">

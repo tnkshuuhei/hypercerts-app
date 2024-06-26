@@ -33,7 +33,7 @@ export default function ChainFilterSelect() {
       onValueChange={selectFilter}
       value={selectedValue}
     >
-      <SelectTrigger className="w-max">
+      <SelectTrigger className="w-[130px]">
         <SelectValue placeholder="All chains" />
       </SelectTrigger>
       <SelectContent className="w-max">
