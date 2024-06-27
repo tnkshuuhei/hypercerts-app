@@ -8,39 +8,49 @@ import {
   SelectValue,
 } from "../ui/select";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { supportedChains } from "@/lib/constants";
 
-export default function ChainFilterSelect() {
+export default function EvaluationFilterSelect() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const selectedValue = searchParams.get("chain") || "all";
+  const selectedValue = searchParams.get("evalType") || "any";
+
+  const evalTypes = [
+    {
+      label: "Verifiably evaluated",
+      value: "verified",
+    },
+    {
+      label: "Evaluated",
+      value: "evaluated",
+    },
+  ];
 
   const selectFilter = (value: string) => {
     const urlSearchParams = new URLSearchParams(searchParams);
     if (value === "all") {
-      urlSearchParams.delete("chain");
+      urlSearchParams.delete("evalType");
     } else {
-      urlSearchParams.set("chain", value);
+      urlSearchParams.set("evalType", value);
     }
     router.push(`${pathname}?${urlSearchParams.toString()}`);
   };
 
   return (
     <Select
-      defaultValue="timestamp_desc"
+      defaultValue="evaluated"
       onValueChange={selectFilter}
       value={selectedValue}
     >
-      <SelectTrigger className="w-[130px]">
-        <SelectValue placeholder="All chains" />
+      <SelectTrigger className="w-[180px]">
+        <SelectValue placeholder="Select evaluation type" />
       </SelectTrigger>
       <SelectContent className="w-max">
-        <SelectItem value="all">All chains</SelectItem>
-        {supportedChains.map((chain) => (
-          <SelectItem key={chain.id} value={chain.id.toString()}>
-            {chain.name}
+        <SelectItem value="any">Any evaluation type</SelectItem>
+        {evalTypes.map((evalType) => (
+          <SelectItem key={evalType.value} value={evalType.value}>
+            {evalType.label}
           </SelectItem>
         ))}
       </SelectContent>

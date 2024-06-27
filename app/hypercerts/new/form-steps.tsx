@@ -62,7 +62,7 @@ const GeneralInformation = ({ form }: FormStepsProps) => {
           <FormItem>
             <FormLabel>Description</FormLabel>
             <FormControl>
-              <Textarea {...field} className="resize-none h-32" />
+              <Textarea {...field} />
             </FormControl>
             <FormDescription>
               Describe your project: why it was created, and how it works
@@ -76,7 +76,7 @@ const GeneralInformation = ({ form }: FormStepsProps) => {
         name="link"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Link</FormLabel>
+            <FormLabel>Link (optional)</FormLabel>
             <FormControl>
               <Input {...field} placeholder="https://" />
             </FormControl>
@@ -129,7 +129,7 @@ const GeneralInformation = ({ form }: FormStepsProps) => {
                 onChange={(e) => {
                   const tags = e.target.value
                     .split(",")
-                    .map((tag) => tag.trim().toLowerCase());
+                    .map((tag) => tag.toLowerCase());
                   field.onChange(tags.length > 0 ? tags : []);
                 }}
               />
@@ -382,14 +382,14 @@ export const hypercertFormSteps = new Map([
     1,
     {
       title: "General Details",
-      fields: ["title", "banner", "description", "logo", "link", "tags"],
+      fields: ["title", "banner", "description", "logo", "tags"],
     },
   ],
   [
     2,
     {
       title: "Dates & People",
-      fields: ["projectDates", "contributors", "confirmContributorsPermission"],
+      fields: ["contributors", "confirmContributorsPermission"],
     },
   ],
   [3, { title: "Review & Mint", fields: ["acceptTerms"] }],
@@ -465,7 +465,9 @@ const FormSteps = ({ form, currentStep, setCurrentStep }: FormStepsProps) => {
         />
       )}
 
-      <div className="flex justify-between items-center py-3">
+      <div
+        className={`flex items-center py-3 ${currentStep === 1 ? "justify-end" : "justify-between"}`}
+      >
         <Button
           onClick={() => setCurrentStep(currentStep - 1)}
           className={currentStep === 1 ? "hidden" : ""}
@@ -478,7 +480,8 @@ const FormSteps = ({ form, currentStep, setCurrentStep }: FormStepsProps) => {
         {!isLastStep && (
           <Button
             onClick={() => setCurrentStep(currentStep + 1)}
-            className={!isCurrentStepValid() ? "hidden" : ""}
+            // className={!isCurrentStepValid() ? "hidden" : ""}
+            disabled={!isCurrentStepValid()}
             type="button"
           >
             Next

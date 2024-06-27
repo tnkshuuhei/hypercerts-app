@@ -1,3 +1,4 @@
+import EvaluationFilterSelect from "@/components/explore/evaluation-filter";
 import ExploreChainFilterSelect from "@/components/explore/explore-chain-filter-select";
 import ExploreList from "@/components/explore/explore-list";
 import ExploreOrderBySelect from "@/components/explore/explore-order-by-select";
@@ -16,20 +17,14 @@ export default async function ExplorePageInner({
   searchParams: Record<string, string>;
 }) {
   return (
-    <main className="flex flex-col p-8 md:p-24 pb-24 space-y-4">
-      <section>
-        <h1 className="font-serif text-3xl lg:text-5xl tracking-tight">
-          Explore
-        </h1>
-        <div className="p-1"></div>
-        <p>
-          The best place to discover and contribute to hypercerts and
-          hyperboards.
-        </p>
-      </section>
-      <section className="flex flex-col md:flex-row gap-4">
+    <main className="flex flex-col p-8 md:px-24 pt-8 pb-24 space-y-4">
+      <h1 className="font-serif text-3xl lg:text-6xl tracking-tight">
+        Explore
+      </h1>
+      <section className="flex flex-col gap-4 justify-between">
         <ExploreSearchBar />
-        <div className="flex gap-2">
+        <div className="flex space-x-2">
+          <EvaluationFilterSelect />
           <ExploreChainFilterSelect />
           <ExploreOrderBySelect />
         </div>

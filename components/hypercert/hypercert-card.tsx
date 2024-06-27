@@ -40,7 +40,7 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
       logo,
       scopes,
     }: HypercertCardProps = defaultValues,
-    ref
+    ref,
   ) => {
     title = title ?? defaultValues.name;
     description = description ?? defaultValues.description;
@@ -55,7 +55,7 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
     const CardContent = () => (
       <article
         ref={ref}
-        className="relative w-[275px] rounded-xl border-[1.5px] border-slate-500 overflow-clip bg-black"
+        className="relative w-[275px] rounded-xl border-[1.5px] border-black overflow-clip bg-black"
       >
         <header className="relative h-[135px] w-full flex items-center justify-center rounded-b-xl overflow-clip">
           {banner ? (
@@ -71,15 +71,6 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
               <span className="text-slate-500 text-lg">Your banner here</span>
             </div>
           )}
-          <div className="absolute inset-0 mix-blend-luminosity w-full h-full">
-            <Image
-              src={"/hc-guilloche.svg"}
-              alt="Guilloche"
-              className="object-cover opacity-25"
-              fill
-              unoptimized
-            />
-          </div>
         </header>
         <section className="absolute top-4 left-3 border-white border-2 rounded-full overflow-hidden bg-slate-200">
           <div className="relative w-8 h-8 flex items-center justify-center border border-slate-300 rounded-full overflow-hidden">
@@ -105,7 +96,7 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
             </span>
           </div>
           <h5
-            className="text-base font-semibold text-slate-800 h-10 line-clamp-2 text-ellipsis tracking-tight leading-tight"
+            className="text-base font-semibold text-slate-800 line-clamp-3 text-ellipsis tracking-tight leading-tight"
             title={title}
           >
             {title}
@@ -126,7 +117,7 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
       </article>
     );
     return <CardContent />;
-  }
+  },
 );
 
 HypercertCard.displayName = "HypercertCard";

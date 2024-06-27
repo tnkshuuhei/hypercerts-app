@@ -115,12 +115,9 @@ export default function ConnectDialog({
 
         <DialogTrigger
           asChild
-          className={`${buttonVariants({ variant: "outline" })} cursor-pointer`}
+          className={`${buttonVariants({ variant: "default", size: "sm" })} cursor-pointer`}
         >
-          <div className="flex items-center justify-center gap-2">
-            {isConnected ? "Connected" : "Connect wallet"}
-            <Wallet2 size={16} />
-          </div>
+          <p>Connect wallet</p>
         </DialogTrigger>
 
         <DialogContent>
@@ -144,7 +141,7 @@ export default function ConnectDialog({
 
       <DrawerTrigger
         asChild
-        className={buttonVariants({ variant: "outline", size: "sm" })}
+        className={buttonVariants({ variant: "default", size: "sm" })}
       >
         <div className="flex items-center justify-center gap-2">
           Connect wallet
