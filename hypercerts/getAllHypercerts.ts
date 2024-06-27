@@ -23,6 +23,10 @@ export function isClaimsOrderBy(value: string): value is ClaimsOrderBy {
 
 export type ClaimsFilter = "all" | "evaluated";
 
+export function isClaimsFilter(value: string): value is ClaimsFilter {
+  return ["all", "evaluated"].includes(value);
+}
+
 const query = graphql(
   `
     query AllHypercerts(

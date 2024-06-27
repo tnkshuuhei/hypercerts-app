@@ -1,6 +1,7 @@
 import {
   GetAllHypercertsParams,
   getAllHypercerts,
+  isClaimsFilter,
   isClaimsOrderBy,
 } from "@/hypercerts/getAllHypercerts";
 import HypercertMiniDisplay, {
@@ -34,6 +35,7 @@ async function ExploreListInner({
   const chain = Number(searchParams?.chain);
   const search = searchParams?.search;
   const orderBy = searchParams?.orderBy;
+  const filter = searchParams?.filter;
   const params: GetAllHypercertsParams = {
     first: HYPERCERTS_PER_PAGE,
     offset: HYPERCERTS_PER_PAGE * (currentPage - 1),
@@ -43,6 +45,9 @@ async function ExploreListInner({
   }
   if (search) {
     params.search = search;
+  }
+  if (isClaimsFilter(filter)) {
+    params.filter = filter;
   }
   if (isClaimsOrderBy(orderBy)) {
     params.orderBy = orderBy;
