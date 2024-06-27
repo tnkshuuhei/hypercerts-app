@@ -41,14 +41,18 @@ const formSchema = z.object({
   projectDates: z
     .object(
       {
-        from: z.date(),
-        to: z.date(),
+        from: z.date().refine((date) => date !== null, {
+          message: "Please enter a start date",
+        }),
+        to: z.date().refine((date) => date !== null, {
+          message: "Please enter an end date",
+        }),
       },
       {
         required_error: "Please select a date range",
       },
     )
-    .refine((data) => data.from <= data.to, {
+    .refine((data) => data.from && data.to && data.from <= data.to, {
       path: ["projectDates"],
       message: "From date must be before to date",
     }),
@@ -71,20 +75,38 @@ const formSchema = z.object({
 
 export type HypercertFormValues = z.infer<typeof formSchema>;
 
+// const formDefaultValues: HypercertFormValues = {
+//   title: "A Grave Matter",
+//   banner:
+//     "https://www.bungie.net/common/destiny2_content/icons/2f1a39b33e30b98402b2badaa13f8631.jpg",
+//   description: "Complete the 'Ghosts of the Deep' Dungeon solo, flawlessly.",
+//   logo: "https://www.bungie.net/common/destiny2_content/icons/cb01f3cbfd11000b1d19537e73922f55.jpg",
+//   link: "https://destinyemblemcollector.com/emblem?id=2069797998",
+//   cardImage: "",
+//   tags: ["ghosts,deep,legend,skeleton,skeleton-king,grave,helion,skald"],
+//   projectDates: {
+//     from: new Date(),
+//     to: new Date(),
+//   },
+//   contributors: ["0x123, 0xlos, peter.eth"],
+//   acceptTerms: false,
+//   confirmContributorsPermission: false,
+//   allowlistURL: "",
+// };
+
 const formDefaultValues: HypercertFormValues = {
-  title: "A Grave Matter",
-  banner:
-    "https://www.bungie.net/common/destiny2_content/icons/2f1a39b33e30b98402b2badaa13f8631.jpg",
-  description: "Complete the 'Ghosts of the Deep' Dungeon solo, flawlessly.",
-  logo: "https://www.bungie.net/common/destiny2_content/icons/cb01f3cbfd11000b1d19537e73922f55.jpg",
-  link: "https://destinyemblemcollector.com/emblem?id=2069797998",
+  title: "",
+  banner: "",
+  description: "",
+  logo: "",
+  link: "",
   cardImage: "",
-  tags: ["ghosts,deep,legend,skeleton,skeleton-king,grave,helion,skald"],
+  tags: [],
   projectDates: {
     from: new Date(),
-    to: new Date(),
+    to: new Date(Date.now() + 24 * 60 * 60 * 1000),
   },
-  contributors: ["0x123, 0xlos, peter.eth"],
+  contributors: [],
   acceptTerms: false,
   confirmContributorsPermission: false,
   allowlistURL: "",
@@ -163,11 +185,12 @@ export default function NewHypercertForm() {
       excludedWorkScope: [],
       rights: ["Public Display"],
       excludedRights: [],
-      workTimeframeStart: values.projectDates.from.getTime() / 1000,
-      workTimeframeEnd: values.projectDates.to.getTime() / 1000,
-      impactTimeframeStart: values.projectDates.from.getTime() / 1000,
-      impactTimeframeEnd: values.projectDates.to.getTime() / 1000,
-      contributors: values.contributors,
+      workTimeframeStart: values.projectDates?.from?.getTime?.() / 1000 ?? null,
+      workTimeframeEnd: values.projectDates?.to?.getTime?.() / 1000 ?? null,
+      impactTimeframeStart:
+        values.projectDates?.from?.getTime?.() / 1000 ?? null,
+      impactTimeframeEnd: values.projectDates?.to?.getTime?.() / 1000 ?? null,
+      contributors: values.contributors ?? [],
     });
 
     if (!formattedMetadata.valid) {

@@ -389,7 +389,7 @@ export const hypercertFormSteps = new Map([
     2,
     {
       title: "Dates & People",
-      fields: ["projectDates", "contributors", "confirmContributorsPermission"],
+      fields: ["contributors", "confirmContributorsPermission"],
     },
   ],
   [3, { title: "Review & Mint", fields: ["acceptTerms"] }],
@@ -465,7 +465,9 @@ const FormSteps = ({ form, currentStep, setCurrentStep }: FormStepsProps) => {
         />
       )}
 
-      <div className="flex justify-between items-center py-3">
+      <div
+        className={`flex items-center py-3 ${currentStep === 1 ? "justify-end" : "justify-between"}`}
+      >
         <Button
           onClick={() => setCurrentStep(currentStep - 1)}
           className={currentStep === 1 ? "hidden" : ""}
@@ -478,7 +480,8 @@ const FormSteps = ({ form, currentStep, setCurrentStep }: FormStepsProps) => {
         {!isLastStep && (
           <Button
             onClick={() => setCurrentStep(currentStep + 1)}
-            className={!isCurrentStepValid() ? "hidden" : ""}
+            // className={!isCurrentStepValid() ? "hidden" : ""}
+            disabled={!isCurrentStepValid()}
             type="button"
           >
             Next
