@@ -20,8 +20,8 @@ const Navbar = () => {
   const currentPath = usePathname();
 
   return (
-    <nav className="flex items-center justify-between p-8 md:px-24">
-      <div className="flex items-center space-x-6">
+    <nav className="flex items-center justify-between p-3 md:px-24 border-b-[1.5px] border-black">
+      <div className="flex items-center space-x-6 w-full">
         <Link href="/">
           <div className="relative flex space-x-1">
             <Image
@@ -36,7 +36,7 @@ const Navbar = () => {
             </span>
           </div>
         </Link>
-        <div className="hidden md:flex items-center space-x-2">
+        <div className="hidden md:flex items-center justify-center space-x-2 w-full">
           <Link
             key={siteConfig.links.explore}
             href={siteConfig.links.explore}
