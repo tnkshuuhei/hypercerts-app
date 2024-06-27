@@ -169,7 +169,7 @@ export default function UploadAllowlistDialog({
   };
 
   return (
-    <Dialog open={open}>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle className="font-serif text-3xl font-normal">
