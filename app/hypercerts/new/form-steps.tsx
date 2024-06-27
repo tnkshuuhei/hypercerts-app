@@ -129,7 +129,7 @@ const GeneralInformation = ({ form }: FormStepsProps) => {
                 onChange={(e) => {
                   const tags = e.target.value
                     .split(",")
-                    .map((tag) => tag.trim().toLowerCase());
+                    .map((tag) => tag.toLowerCase());
                   field.onChange(tags.length > 0 ? tags : []);
                 }}
               />
