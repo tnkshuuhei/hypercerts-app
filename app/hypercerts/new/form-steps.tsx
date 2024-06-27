@@ -62,7 +62,7 @@ const GeneralInformation = ({ form }: FormStepsProps) => {
           <FormItem>
             <FormLabel>Description</FormLabel>
             <FormControl>
-              <Textarea {...field} className="resize-none h-32" />
+              <Textarea {...field} />
             </FormControl>
             <FormDescription>
               Describe your project: why it was created, and how it works
