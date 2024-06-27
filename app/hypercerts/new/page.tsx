@@ -31,7 +31,11 @@ const formSchema = z.object({
     .string()
     .trim()
     .min(10, { message: "We need a longer description for your hypercert" }),
-  link: z.string().url("Link URL is not valid"),
+  link: z
+    .string()
+    .url("Please enter a valid link")
+    .optional()
+    .or(z.literal("")),
   cardImage: z.string().url("Card image not generated"),
   tags: z
     .array(z.string())

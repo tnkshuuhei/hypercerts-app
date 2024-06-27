@@ -76,7 +76,7 @@ const GeneralInformation = ({ form }: FormStepsProps) => {
         name="link"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Link</FormLabel>
+            <FormLabel>Link (optional)</FormLabel>
             <FormControl>
               <Input {...field} placeholder="https://" />
             </FormControl>
@@ -382,7 +382,7 @@ export const hypercertFormSteps = new Map([
     1,
     {
       title: "General Details",
-      fields: ["title", "banner", "description", "logo", "link", "tags"],
+      fields: ["title", "banner", "description", "logo", "tags"],
     },
   ],
   [
