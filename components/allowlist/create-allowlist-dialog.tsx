@@ -181,7 +181,7 @@ export default function CreateAllowlistDialog({
     allowList.length === 0 || percentageSum !== 100 || !allAddressesValid;
 
   return (
-    <Dialog open={open}>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle className="font-serif text-3xl font-normal">
@@ -248,11 +248,14 @@ export default function CreateAllowlistDialog({
         </div>
         <CreateAllowListErrorMessage />
         <div className="flex gap-2 justify-evenly w-full">
-          <DialogClose asChild>
-            <Button type="button" variant="secondary" className="flex-grow">
-              Close
-            </Button>
-          </DialogClose>
+          <Button
+            type="button"
+            variant="secondary"
+            className="flex-grow"
+            onClick={() => setOpen(false)}
+          >
+            Close
+          </Button>
           <Button
             className="flex-grow"
             disabled={createButtonDisabled}
