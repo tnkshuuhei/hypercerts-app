@@ -55,7 +55,7 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
     const CardContent = () => (
       <article
         ref={ref}
-        className="relative w-[275px] rounded-xl border-[1.5px] border-slate-500 overflow-clip bg-black"
+        className="relative w-[275px] rounded-xl border-[1.5px] border-black overflow-clip bg-black"
       >
         <header className="relative h-[135px] w-full flex items-center justify-center rounded-b-xl overflow-clip">
           {banner ? (
@@ -96,7 +96,7 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
             </span>
           </div>
           <h5
-            className="text-base font-semibold text-slate-800 h-10 line-clamp-2 text-ellipsis tracking-tight leading-tight"
+            className="text-base font-semibold text-slate-800 line-clamp-3 text-ellipsis tracking-tight leading-tight"
             title={title}
           >
             {title}
