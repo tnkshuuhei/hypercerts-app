@@ -1,5 +1,5 @@
-import EvaluationFilterSelect from "@/components/explore/evaluation-filter";
 import ExploreChainFilterSelect from "@/components/explore/explore-chain-filter-select";
+import ExploreEvaluationsFilterSelect from "../../components/explore/explore-evaluations-filter-select";
 import ExploreList from "@/components/explore/explore-list";
 import ExploreOrderBySelect from "@/components/explore/explore-order-by-select";
 import ExploreSearchBar from "@/components/explore/explore-search-bar";
@@ -22,10 +22,10 @@ export default async function ExplorePageInner({
         Explore
       </h1>
       <section className="flex flex-col gap-4 justify-between">
-        <ExploreSearchBar />
         <div className="flex space-x-2">
-          <EvaluationFilterSelect />
+          <ExploreSearchBar />
           <ExploreChainFilterSelect />
+          <ExploreEvaluationsFilterSelect />
           <ExploreOrderBySelect />
         </div>
       </section>
