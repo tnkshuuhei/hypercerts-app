@@ -1,7 +1,6 @@
 import { Fragment, Suspense } from "react";
 import { Metadata, ResolvingMetadata } from "next";
 
-import { ArrowLeftIcon } from "lucide-react";
 import Contributors from "@/components/hypercert/contributors";
 import Creator from "@/components/hypercert/creator";
 import EvaluateButton from "@/components/hypercert/evaluate-button";
@@ -9,7 +8,6 @@ import EvaluationsList from "@/components/hypercert/evaluations-list";
 import ExternalUrl from "@/components/hypercert/external-url";
 import Fractions from "@/components/hypercert/fractions";
 import Image from "next/image";
-import Link from "next/link";
 import { ListForSaleButton } from "@/components/marketplace/list-for-sale-button";
 import OrdersList from "@/components/marketplace/orders-list";
 import PageSkeleton from "@/components/hypercert/page-skeleton";
@@ -64,6 +62,7 @@ async function HypercertPageInner({
               src={`/api/hypercerts/${hypercertId}/image`}
               alt={hypercert?.metadata?.name || ""}
               fill
+              sizes="500px"
               className="object-contain object-top p-2"
             />
           </div>

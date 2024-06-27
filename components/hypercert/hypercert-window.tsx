@@ -47,6 +47,7 @@ const HypercertWindow = ({
               src={`/api/hypercerts/${hypercertId}/image`}
               alt={name || "Untitled"}
               fill
+              sizes="300px"
               className="object-contain object-center p-4"
             />
           </div>

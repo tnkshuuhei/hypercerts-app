@@ -96,7 +96,7 @@ export function ListForSaleButton({
     return (
       <TooltipProvider>
         <Tooltip>
-          <TooltipTrigger>
+          <TooltipTrigger asChild>
             <div>
               <Button disabled {...props}>
                 {text}

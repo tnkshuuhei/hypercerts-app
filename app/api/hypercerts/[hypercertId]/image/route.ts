@@ -1,8 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { HYPERCERTS_API_URL } from "@/configs/hypercerts";
+import { promises as fs } from "fs";
 import graphQlrequest from "graphql-request";
 import { graphql } from "@/lib/graphql";
+import path from "path";
+
+const PLACEHOLDER_IMAGE_PATH = path.join(
+  process.cwd(),
+  "public",
+  "hypercert-placeholder.webp",
+);
 
 // GraphQL query to fetch the image metadata for a given hypercert ID
 const IMAGE_QUERY = graphql(`
@@ -16,9 +24,6 @@ const IMAGE_QUERY = graphql(`
     }
   }
 `);
-
-// Default placeholder image URL
-const PLACEHOLDER_IMAGE_URL = "/hypercert-placeholder.webp";
 
 // Extract image data from a base64 string or a URL
 async function getImageData(
@@ -41,16 +46,17 @@ async function getImageData(
   throw new Error("Invalid image data");
 }
 
-// Redirect to the placeholder image
-async function placeholderImageRedirect(request: NextRequest) {
-  const vercelUrl = process.env.VERCEL_URL;
-  const placeholderImageUrl = vercelUrl
-    ? `https://${vercelUrl}${PLACEHOLDER_IMAGE_URL}`
-    : `${request.headers.get("x-forwarded-proto")}://${request.headers.get(
-        "host",
-      )}${PLACEHOLDER_IMAGE_URL}`;
-
-  return NextResponse.redirect(placeholderImageUrl);
+// Serve the placeholder image from disk
+async function servePlaceholderImage() {
+  const buffer = await fs.readFile(PLACEHOLDER_IMAGE_PATH);
+  const contentType = "image/webp";
+  return new NextResponse(buffer, {
+    status: 200,
+    headers: {
+      "Content-Type": contentType,
+      "Cache-Control": "s-maxage=864000", // 10 days cache
+    },
+  });
 }
 
 // GET handler to fetch and return the image associated with the given hypercert ID
@@ -73,7 +79,7 @@ export async function GET(
 
     // Use placeholder image if no image URL or data is found
     if (!imageOrUrl) {
-      return placeholderImageRedirect(request);
+      return servePlaceholderImage();
     }
 
     // Get image data or use placeholder image if data is invalid
@@ -88,7 +94,7 @@ export async function GET(
       });
     } catch (error) {
       console.error(`Error parsing image data: ${error}`);
-      return placeholderImageRedirect(request);
+      return servePlaceholderImage();
     }
   } catch (error) {
     console.error(`Error fetching image metadata: ${error}`);

@@ -1,18 +1,15 @@
 "use client";
 
+import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
 import React, { Suspense, useState } from "react";
 import {
+  SortingState,
   createColumnHelper,
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
-  SortingState,
   useReactTable,
 } from "@tanstack/react-table";
-import { MarketplaceOrder } from "@/marketplace/types";
-import { useFetchMarketplaceOrdersForHypercert } from "@/marketplace/hooks";
-import { StepProcessDialogProvider } from "@/components/global/step-process-dialog";
-import { BuyFractionalOrderForm } from "@/components/marketplace/buy-fractional-order-form";
 import {
   Table,
   TableBody,
@@ -21,13 +18,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { ArrowUpDown } from "lucide-react";
 import { decodeAbiParameters, formatEther, parseAbiParameters } from "viem";
+
+import { ArrowUpDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { BuyFractionalOrderForm } from "@/components/marketplace/buy-fractional-order-form";
 import EthAddress from "@/components/eth-address";
-import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
-import { useHypercertClient } from "@/hooks/use-hypercert-client";
+import { MarketplaceOrder } from "@/marketplace/types";
+import { StepProcessDialogProvider } from "@/components/global/step-process-dialog";
 import { cn } from "@/lib/utils";
+import { useFetchMarketplaceOrdersForHypercert } from "@/marketplace/hooks";
+import { useHypercertClient } from "@/hooks/use-hypercert-client";
 
 function OrdersListInner({ hypercertId }: { hypercertId: string }) {
   const { data: openOrders } =

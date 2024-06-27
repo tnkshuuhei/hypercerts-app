@@ -55,6 +55,7 @@ const HypercertMiniDisplay = ({
             alt={name || "Untitled"}
             unoptimized
             fill
+            sizes="300px"
             className="object-cover object-top"
           />
         </div>

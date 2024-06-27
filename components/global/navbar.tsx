@@ -1,20 +1,20 @@
 "use client";
 
+import { ArrowUpRight, ChevronDown } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ArrowUpRight, ChevronDown } from "lucide-react";
 
 import ChainDisplay from "@/components/chain-display";
-import { buttonVariants } from "@/components/ui/button";
-import { WalletProfile } from "@/components/wallet-profile";
-import { siteConfig } from "@/configs/site";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
+import { WalletProfile } from "@/components/wallet-profile";
+import { buttonVariants } from "@/components/ui/button";
+import { siteConfig } from "@/configs/site";
+import { usePathname } from "next/navigation";
 
 const Navbar = () => {
   const currentPath = usePathname();
@@ -28,8 +28,8 @@ const Navbar = () => {
               src="/hypercerts-logo.png"
               width={20}
               height={20}
-              className="object-contain"
               alt="Hypercerts mark"
+              className="w-6 h-6"
             />
             <span className="font-semibold text-base md:text-xl tracking-tight">
               Hypercerts
