@@ -4,24 +4,32 @@ import React, { useEffect, useState } from "react";
 
 import { isString } from "remeda";
 
-export function FormattedUnits({ children }: { children: string | number }) {
-  const [formatted, setFormatted] = useState<string | number>(children);
+export function FormattedUnits({
+  children,
+}: {
+  children: string | number | null | undefined;
+}) {
+  const [formattedUnits, setFormattedUnits] = useState<
+    string | number | null | undefined
+  >(children);
 
   useEffect(() => {
-    let formattedValue: string | number = children;
-    if (isString(children)) {
-      formattedValue = Number.parseInt(children, 10);
+    let units = children;
+
+    if (!units) return;
+    if (isString(units)) {
+      units = Number.parseInt(units, 10);
     }
 
     if (typeof window !== "undefined" && typeof navigator !== "undefined") {
-      formattedValue = new Intl.NumberFormat(navigator.language, {
+      units = new Intl.NumberFormat(navigator.language, {
         notation: "compact",
         compactDisplay: "short",
-      }).format(formattedValue as number);
+      }).format(units as number);
     }
 
-    setFormatted(formattedValue);
+    setFormattedUnits(units);
   }, [children]);
 
-  return <>{formatted}</>;
+  return <>{formattedUnits}</>;
 }
