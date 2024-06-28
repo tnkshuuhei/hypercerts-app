@@ -77,7 +77,7 @@ const WalletProfile = ({
                 <AvatarImage
                   src={ensAvatar}
                   alt="ENS Avatar"
-                  className="object-center object-contain"
+                  className="object-center object-cover"
                 />
               )}
               <AvatarFallback>
@@ -85,7 +85,7 @@ const WalletProfile = ({
                   src="/avatar-default.jpg"
                   alt="Default avatar"
                   fill
-                  className="h-5 w-5 object-contain object-center"
+                  className="h-5 w-5 object-cover object-center"
                 />
               </AvatarFallback>
             </Avatar>
