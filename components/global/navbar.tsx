@@ -48,17 +48,6 @@ const Navbar = () => {
           >
             <span className="hover:underline">Explore</span>
           </Link>
-          <Link
-            key={siteConfig.links.evaluators}
-            href={siteConfig.links.evaluators}
-            className={`${buttonVariants({ variant: "link" })} text-lg ${
-              currentPath === siteConfig.links.evaluators
-                ? "opacity-1 font-semibold hover:opacity-100"
-                : "opacity-70 hover:opacity-100"
-            }`}
-          >
-            <span className="hover:underline">Evaluators</span>
-          </Link>
           <DropdownMenu>
             <DropdownMenuTrigger
               className={`${buttonVariants({
