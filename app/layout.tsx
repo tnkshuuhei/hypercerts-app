@@ -12,6 +12,7 @@ import { config } from "@/configs/wagmi";
 import { cookieToInitialState } from "wagmi";
 import { headers } from "next/headers";
 import { siteConfig } from "@/configs/site";
+import Footer from "@/components/global/footer";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -56,6 +57,7 @@ export default function RootLayout({
           <MobileNav />
         </Web3ModalProvider>
         <Toaster />
+        <Footer />
       </body>
     </html>
   );
