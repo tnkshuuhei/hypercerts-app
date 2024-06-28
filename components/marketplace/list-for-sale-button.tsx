@@ -26,7 +26,7 @@ type Props = {
 
 export function ListForSaleButton({
   hypercertId,
-  text = "List for sale",
+  text = "List for sale (OLD)",
   onClickViewListings,
   onClick,
   ...props

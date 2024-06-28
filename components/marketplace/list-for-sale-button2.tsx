@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { HypercertFull } from "../../hypercerts/fragments/hypercert-full.fragment";
 import ListDialog from "./list-dialog";
+import { StepProcessDialogProvider } from "../global/step-process-dialog";
 import { useAccount } from "wagmi";
 import { useHypercertClient } from "@/hooks/use-hypercert-client";
 import { useState } from "react";
@@ -78,9 +79,11 @@ export function ListForSaleButton2({
   return (
     <>
       <Button onClick={() => setIsOpen(true)}>List for sale</Button>
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <ListDialog hypercert={hypercert} />
-      </Dialog>
+      <StepProcessDialogProvider>
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+          <ListDialog hypercert={hypercert} setIsOpen={setIsOpen} />
+        </Dialog>
+      </StepProcessDialogProvider>
     </>
   );
 }

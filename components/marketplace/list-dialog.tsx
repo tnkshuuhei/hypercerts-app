@@ -12,7 +12,9 @@ import { HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
 import { ListAskedPrice } from "./list-asked-price";
 import ListDialogSettingsForm from "./list-dialog-settings-form";
 import ListFractionSelect from "./list-fraction-select";
+import { LoaderCircle } from "lucide-react";
 import { useAccount } from "wagmi";
+import { useCreateFractionalMakerAsk } from "../../marketplace/hooks";
 import { useState } from "react";
 
 type State = {
@@ -27,10 +29,16 @@ type State = {
 
 export default function ListDialog({
   hypercert,
+  setIsOpen,
 }: {
   hypercert: HypercertFull;
+  setIsOpen: (isOpen: boolean) => void;
 }) {
   const { address } = useAccount();
+  const { mutateAsync: createFractionalMakerAsk, isPending } =
+    useCreateFractionalMakerAsk({
+      hypercertId: hypercert.hypercert_id || "",
+    });
 
   const units = Number.parseInt(hypercert.units || "0");
   const fractions = hypercert.fractions?.data || [];
@@ -44,7 +52,7 @@ export default function ListDialog({
     currency: "ETH",
     unitsForSale: fractions.length === 1 ? fractions[0].units || "" : "",
     unitsMinPerOrder: "1",
-    unitsMaxPerOrder: "1",
+    unitsMaxPerOrder: fractions.length === 1 ? fractions[0].units || "" : "",
     formIsValid: true,
   });
 
@@ -60,6 +68,30 @@ export default function ListDialog({
     state.currency !== undefined;
 
   const createButtonEnabled = isPriceValid && state.formIsValid;
+
+  const handleListButtonClick = async () => {
+    if (
+      !createFractionalMakerAsk ||
+      !isPriceValid ||
+      !state.formIsValid ||
+      !state.fractionId ||
+      !state.unitsMinPerOrder ||
+      !state.unitsForSale
+    ) {
+      return;
+    }
+
+    await createFractionalMakerAsk({
+      fractionId: state.fractionId,
+      minUnitAmount: state.unitsMinPerOrder,
+      maxUnitAmount: state.unitsMaxPerOrder || state.unitsForSale,
+      minUnitsToKeep: (
+        units - Number.parseInt(state.unitsForSale, 10)
+      ).toString(),
+      price: state.price,
+      sellLeftoverFraction: false,
+    });
+  };
 
   return (
     <DialogContent className="gap-5 max-w-2xl">
@@ -158,11 +190,20 @@ export default function ListDialog({
       </div>
 
       <div className="flex gap-2 justify-evenly">
-        <Button variant={"outline"} className="w-full">
+        <Button
+          variant={"outline"}
+          className="w-full"
+          onClick={() => setIsOpen(false)}
+        >
           Cancel
         </Button>
-        <Button disabled={!createButtonEnabled} className="w-full">
-          Create listing
+        <Button
+          disabled={!createButtonEnabled}
+          className="w-full"
+          onClick={handleListButtonClick}
+        >
+          {isPending && <LoaderCircle className="h-4 w-4 animate-spin mr-1" />}
+          {isPending ? "Creating listing" : "Create listing"}
         </Button>
       </div>
     </DialogContent>

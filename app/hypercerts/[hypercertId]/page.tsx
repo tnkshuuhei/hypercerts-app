@@ -117,8 +117,10 @@ async function HypercertPageInner({
           Marketplace
         </h5>
 
-        <ListForSaleButton hypercertId={hypercertId} />
-        <ListForSaleButton2 hypercert={hypercert} />
+        <div className="flex gap-2">
+          <ListForSaleButton hypercertId={hypercertId} />
+          <ListForSaleButton2 hypercert={hypercert} />
+        </div>
       </div>
       <OrdersList hypercertId={hypercertId} />
     </section>
