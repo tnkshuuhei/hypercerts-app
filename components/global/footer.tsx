@@ -15,7 +15,7 @@ const footerLinks = [
 ];
 
 const Footer = () => (
-  <footer className="flex flex-col space-y-2 items-center py-5 px-3 border-t-[1.5px] border-black pb-24 md:pb-5 bg-slate-50">
+  <footer className="flex flex-col space-y-2 justify-center items-center py-5 px-3 border-t-[1.5px] border-black pb-24 md:pb-5 bg-slate-50">
     <Link className="relative" href={"/"} title="Hypercerts">
       <Image
         src={"/hypercerts-logo.png"}
