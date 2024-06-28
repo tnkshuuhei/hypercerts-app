@@ -17,8 +17,8 @@ export default async function ExplorePageInner({
   searchParams: Record<string, string>;
 }) {
   return (
-    <main className="flex flex-col p-8 md:px-24 pt-8 pb-24 space-y-4">
-      <h1 className="font-serif text-3xl lg:text-6xl tracking-tight">
+    <main className="flex flex-col p-8 md:px-24 pt-8 pb-24 space-y-4 flex-1 container max-w-screen-2xl">
+      <h1 className="font-serif text-3xl lg:text-5xl tracking-tight w-full">
         Explore
       </h1>
       <section className="flex flex-col gap-4 justify-between">

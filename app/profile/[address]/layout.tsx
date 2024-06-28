@@ -10,5 +10,9 @@ export default function ProfileLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <main className="flex flex-col p-8 md:px-24 pb-24">{children}</main>;
+  return (
+    <main className="flex flex-col p-8 md:px-24 pt-8 pb-24 space-y-4 flex-1 container max-w-screen-2xl">
+      {children}
+    </main>
+  );
 }
