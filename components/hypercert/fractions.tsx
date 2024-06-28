@@ -12,6 +12,7 @@ import { type HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragme
 import { truncateEthereumAddress } from "@/lib/utils";
 import { UserCircle2 } from "lucide-react";
 import { useState } from "react";
+import { FormattedUnits } from "../formatted-units";
 
 const MAX_FRACTIONS_DISPLAYED = 5;
 
@@ -25,7 +26,7 @@ function Fraction({
   return (
     <div className="flex flex-col w-full">
       {truncateEthereumAddress(ownerAddress as `0x${string}`)} &mdash;{" "}
-      {units as string} units
+      <FormattedUnits>{units as string}</FormattedUnits>
     </div>
   );
 }

@@ -21,7 +21,7 @@ export default function EvaluateButton({
 }: {
   hypercert: HypercertFull;
 }) {
-  const { address } = useAccount();
+  const { isConnected, address } = useAccount();
   const [evaluator, setEvaluator] = useState<TrustedAttestor>();
   const { chainId } = useAccount();
 
@@ -34,6 +34,18 @@ export default function EvaluateButton({
         });
     }
   }, [address]);
+
+  const getTooltipMessage = () => {
+    if (!isConnected) {
+      return "Connect your wallet to access this feature.";
+    }
+
+    if (!isChainIdSupported(chainId)) {
+      return "Evaulations are only available on supported chains.";
+    }
+
+    return "Evaluation is only available to the group of trusted evaluators at this time.";
+  };
 
   const enabled = address && evaluator && isChainIdSupported(chainId);
 
@@ -67,11 +79,7 @@ export default function EvaluateButton({
             <Button disabled={true}>Evaluate this Hypercert</Button>
           </div>
         </TooltipTrigger>
-        <TooltipContent>
-          {!isChainIdSupported(chainId)
-            ? "Evaulations are only available on supported chains."
-            : "Evaluation is only available to the group of trusted evaluators at this time."}
-        </TooltipContent>
+        <TooltipContent>{getTooltipMessage()}</TooltipContent>
       </Tooltip>
     </TooltipProvider>
   );

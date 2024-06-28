@@ -50,10 +50,10 @@ export function EvaluateDrawer({ hypercert }: { hypercert: HypercertFull }) {
 
   // Global state
   const whitelistAttestTags = useGlobalState(
-    (state) => state.whitelistAttestTags
+    (state) => state.whitelistAttestTags,
   );
   const addWhitelistAttestTag = useGlobalState(
-    (state) => state.addWhitelistAttestTag
+    (state) => state.addWhitelistAttestTag,
   );
 
   // Local state
@@ -140,7 +140,7 @@ export function EvaluateDrawer({ hypercert }: { hypercert: HypercertFull }) {
     const url = `${easConfig?.explorerUrl}/attestation/view/${uid}`;
     return (
       <>
-        <Drawer.Title className="font-serif text-3xl lg:text-5xl tracking-tight">
+        <Drawer.Title className="font-serif text-3xl font-medium tracking-tight">
           Evaluate Hypercert
         </Drawer.Title>
         <p>Your attestation has been created!</p>
@@ -173,7 +173,7 @@ export function EvaluateDrawer({ hypercert }: { hypercert: HypercertFull }) {
 
   return (
     <>
-      <Drawer.Title className="font-serif text-3xl lg:text-5xl tracking-tight">
+      <Drawer.Title className="font-serif text-3xl font-medium tracking-tight">
         Evaluate Hypercert
       </Drawer.Title>
 
