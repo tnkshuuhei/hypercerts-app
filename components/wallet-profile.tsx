@@ -10,13 +10,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Loader2, VenetianMaskIcon } from "lucide-react";
-import { cn, truncateEthereumAddress } from "@/lib/utils";
-import { useAccount, useEnsAvatar, useEnsName } from "wagmi";
+import { truncateEthereumAddress } from "@/lib/utils";
+import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useAccount, useEnsAvatar, useEnsName } from "wagmi";
 
 import ConnectDialog from "@/components/connect-dialog";
 import DisconnectDialog from "@/components/disconnect-dialog";
+import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
 import { mainnet } from "viem/chains";
@@ -63,30 +64,39 @@ const WalletProfile = ({
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger
-        asChild
-        className={cn(
-          "relative w-8 h-8 rounded-full overflow-hidden ring-[1.5px] ring-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-400",
-        )}
-      >
-        <Avatar className="h-8 w-8 bg-stone-50">
-          {ensAvatar && (
-            <AvatarImage
-              src={ensAvatar}
-              alt="ENS Avatar"
-              className="object-center object-cover"
-            />
-          )}
-          <AvatarFallback>
-            <Image
-              src="/avatar-default.jpg"
-              alt="Default avatar"
-              width={40}
-              height={40}
-              className="h-8 w-8"
-            />
-          </AvatarFallback>
-        </Avatar>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant={"default"}
+          size={"sm"}
+          className="flex items-center justify-center space-x-2"
+        >
+          <div className="h-6 w-6 rounded-full relative overflow-hidden flex items-center border-[1.5px] border-white/60">
+            <Avatar className="w-5 h-5 bg-stone-50">
+              {ensAvatar && (
+                <AvatarImage
+                  src={ensAvatar}
+                  alt="ENS Avatar"
+                  className="object-center object-contain"
+                />
+              )}
+              <AvatarFallback>
+                <Image
+                  src="/avatar-default.jpg"
+                  alt="Default avatar"
+                  fill
+                  className="h-5 w-5 object-contain object-center"
+                />
+              </AvatarFallback>
+            </Avatar>
+          </div>
+          <p className="hidden md:block text-xs">
+            {ensName
+              ? ensName
+              : address
+                ? truncateEthereumAddress(address)
+                : "unknown address"}
+          </p>
+        </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
         className="w-56 bg-slate-50"
