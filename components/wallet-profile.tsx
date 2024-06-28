@@ -22,6 +22,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { mainnet } from "viem/chains";
 import { normalize } from "viem/ens";
+import { siteConfig } from "@/configs/site";
 
 const WalletProfile = ({
   alignment = "end",
@@ -118,6 +119,11 @@ const WalletProfile = ({
           <Link href={`/profile/${address}`}>
             <DropdownMenuItem className="cursor-pointer">
               Profile
+            </DropdownMenuItem>
+          </Link>
+          <Link href={siteConfig.links.evaluators}>
+            <DropdownMenuItem className="cursor-pointer">
+              Evaluators
             </DropdownMenuItem>
           </Link>
           <Link href={`/profile/${address}/settings`}>
