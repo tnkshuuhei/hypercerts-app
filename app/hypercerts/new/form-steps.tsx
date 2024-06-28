@@ -50,7 +50,9 @@ const GeneralInformation = ({ form }: FormStepsProps) => {
             <FormControl>
               <Input {...field} />
             </FormControl>
-            <FormDescription>Keep it short but descriptive!</FormDescription>
+            <FormDescription>
+              Keep it short but descriptive! (max 100 characters)
+            </FormDescription>
             <FormMessage />
           </FormItem>
         )}
@@ -80,7 +82,9 @@ const GeneralInformation = ({ form }: FormStepsProps) => {
             <FormControl>
               <Input {...field} placeholder="https://" />
             </FormControl>
-            <FormDescription>Paste a link to the project</FormDescription>
+            <FormDescription>
+              Paste a link to your impact report or project
+            </FormDescription>
             <FormMessage />
           </FormItem>
         )}
@@ -381,18 +385,18 @@ export const hypercertFormSteps = new Map([
   [
     1,
     {
-      title: "General Details",
+      title: "General",
       fields: ["title", "banner", "description", "logo", "tags"],
     },
   ],
   [
     2,
     {
-      title: "Dates & People",
+      title: "Who did what & when",
       fields: ["contributors", "confirmContributorsPermission"],
     },
   ],
-  [3, { title: "Review & Mint", fields: ["acceptTerms"] }],
+  [3, { title: "Mint", fields: ["acceptTerms"] }],
 ]);
 
 const FormSteps = ({ form, currentStep, setCurrentStep }: FormStepsProps) => {
