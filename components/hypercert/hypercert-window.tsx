@@ -41,7 +41,7 @@ const HypercertWindow = ({
   return (
     <Link href={`/hypercerts/${hypercertId}`}>
       <article className="transition-transform duration-300 hover:-translate-y-2 relative group bg-black/10 rounded-lg overflow-hidden">
-        <div className="h-[320px] min-w-[300px] max-w-[350px]">
+        <div className="h-[320px] min-w-[300px] max-w-[320px]">
           <div className="relative w-full h-full">
             <Image
               src={`/api/hypercerts/${hypercertId}/image`}

@@ -1,4 +1,4 @@
-import { HYPERCERTS_PER_PAGE } from "../../configs/ui";
+import { HYPERCERTS_PER_PAGE } from "@/configs/ui";
 import PaginationButton from "../pagination-button";
 
 export default async function ExplorePagination({
