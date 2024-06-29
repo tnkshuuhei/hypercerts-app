@@ -20,7 +20,7 @@ export default function ProfilePage({
   return (
     <section className="flex flex-col gap-2">
       <section className="flex flex-wrap gap-2 items-center">
-        <h1 className="font-serif text-2xl lg:text-3xl tracking-tight">
+        <h1 className="font-serif text-3xl lg:text-5xl tracking-tight">
           Profile
         </h1>
         <EthAddress address={address} />

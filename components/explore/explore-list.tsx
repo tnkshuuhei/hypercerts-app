@@ -69,7 +69,7 @@ async function ExploreListInner({
           Showing search results for: <b>{search}</b>
         </div>
       )}
-      <div className="flex flex-row flex-wrap gap-3 justify-center md:justify-start">
+      <div className="flex flex-row flex-wrap gap-4 justify-center md:justify-between">
         {hypercerts?.data?.map((hypercert) => {
           // TODO fix when orders are available again
           // const percentAvailable = calculateBigIntPercentage(

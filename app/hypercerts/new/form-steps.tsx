@@ -484,7 +484,6 @@ const FormSteps = ({ form, currentStep, setCurrentStep }: FormStepsProps) => {
         {!isLastStep && (
           <Button
             onClick={() => setCurrentStep(currentStep + 1)}
-            // className={!isCurrentStepValid() ? "hidden" : ""}
             disabled={!isCurrentStepValid()}
             type="button"
           >

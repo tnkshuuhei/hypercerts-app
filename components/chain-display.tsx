@@ -31,8 +31,14 @@ const ChainDisplay = () => {
   return (
     <Dialog open={open} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="flex justify-between space-x-2">
-          <span>{connectedChain?.name || "Not connected"}</span>
+        <Button
+          variant="secondary"
+          className="flex justify-between space-x-2"
+          size={"sm"}
+        >
+          <span className="text-sm">
+            {connectedChain?.name || "Not connected"}
+          </span>
           <ChevronDown size={16} />
         </Button>
       </DialogTrigger>

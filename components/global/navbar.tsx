@@ -71,7 +71,7 @@ const Navbar = () => {
                   New Hypercert
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem
+              {/* <DropdownMenuItem
                 className={
                   currentPath === siteConfig.links.createHyperboard
                     ? "bg-accent"
@@ -84,7 +84,7 @@ const Navbar = () => {
                 >
                   New Hyperboard
                 </Link>
-              </DropdownMenuItem>
+              </DropdownMenuItem> */}
             </DropdownMenuContent>
           </DropdownMenu>
           <a

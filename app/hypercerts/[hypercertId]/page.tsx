@@ -135,7 +135,7 @@ export default async function HypercertPage({
   };
 }) {
   return (
-    <main className="flex flex-col p-8 md:px-24 md:pt-14 pb-24 space-y-4">
+    <main className="flex flex-col p-8 md:px-24 md:pt-14 pb-24 space-y-4 flex-1">
       <Suspense fallback={<PageSkeleton />} key={params.hypercertId}>
         <HypercertPageInner {...{ params }} />
       </Suspense>
