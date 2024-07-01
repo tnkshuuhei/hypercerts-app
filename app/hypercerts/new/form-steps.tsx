@@ -83,7 +83,7 @@ const GeneralInformation = ({ form }: FormStepsProps) => {
               <Input {...field} placeholder="https://" />
             </FormControl>
             <FormDescription>
-              Paste a link to your impact report or project
+              Paste a link to your impact report or your project
             </FormDescription>
             <FormMessage />
           </FormItem>
@@ -124,7 +124,7 @@ const GeneralInformation = ({ form }: FormStepsProps) => {
         name="tags"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Tags</FormLabel>
+            <FormLabel>Work scope</FormLabel>
             <FormControl>
               <Textarea
                 {...field}
@@ -172,7 +172,7 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
         name="projectDates"
         render={({ field }) => (
           <FormItem className="flex flex-col">
-            <FormLabel>Project start and end date</FormLabel>
+            <FormLabel>Time of work</FormLabel>
             <Popover>
               <PopoverTrigger asChild>
                 <FormControl>
@@ -217,7 +217,7 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
               </PopoverContent>
             </Popover>
             <FormDescription>
-              The start and end date of the work considered in the hypercert
+              The start and end date of the work represented by the hypercert
             </FormDescription>
             <FormMessage />
           </FormItem>
@@ -244,7 +244,8 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
               />
             </FormControl>
             <FormDescription>
-              Add contributors&apos; addresses, names or pseudonyms.
+              “Add contributor addresses, names or pseudonyms, whose work is
+              represented by the hypercert. All information is public.
             </FormDescription>
             <FormMessage />
             {field.value &&
@@ -306,8 +307,9 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
             </FormControl>
             <FormDescription>
               Allowlists determine the number of units each address is allowed
-              to mint. You can submit an already available allowlist, create one
-              or upload a CSV file.
+              to mint. You can submit an already available allowlist, create a
+              new one or upload a CSV file. If you want to keep any fraction,
+              include yourself in the allowlist.
             </FormDescription>
             <div className="flex text-xs space-x-2 w-full justify-end">
               <Button
