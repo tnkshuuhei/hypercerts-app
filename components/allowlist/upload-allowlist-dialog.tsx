@@ -196,7 +196,7 @@ export default function UploadAllowlistDialog({
           </p>
           <p>
             Hypercerts are minted with a total supply of 1 ether (10^18 units).
-            This means the total number of units in the allowlist is need to sum
+            This means the total number of units in the allowlist needs to sum
             to 10^18.
           </p>
         </div>
