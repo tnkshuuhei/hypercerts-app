@@ -18,10 +18,10 @@ import { ArrowUpRightIcon } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { TransactionReceipt } from "viem";
+import { parseEther, TransactionReceipt } from "viem";
 import { z } from "zod";
-const DEFAULT_NUM_FRACTIONS: number = 10000;
-const DEFAULT_HYPERCERT_VERSION: string = "0.0.1";
+const DEFAULT_NUM_FRACTIONS = parseEther("1");
+const DEFAULT_HYPERCERT_VERSION = "0.0.1";
 
 const formSchema = z.object({
   title: z.string().trim().min(1, "We need a title for your hypercert"),
@@ -68,13 +68,15 @@ const formSchema = z.object({
         message: "We need at least one contributor",
       },
     ),
-  acceptTerms: z.boolean().refine((data) => data === true, {
+  acceptTerms: z.boolean().refine((data) => data, {
     message: "You must accept the terms and conditions",
   }),
-  confirmContributorsPermission: z.boolean().refine((data) => data === true, {
+  confirmContributorsPermission: z.boolean().refine((data) => data, {
     message: "You must confirm that all contributors gave their permission",
   }),
-  allowlistURL: z.union([z.string().url(), z.literal(""), z.null().optional()]),
+  allowlistEntries: z
+    .array(z.object({ address: z.string(), units: z.bigint() }))
+    .optional(),
 });
 
 export type HypercertFormValues = z.infer<typeof formSchema>;
@@ -95,7 +97,6 @@ export type HypercertFormValues = z.infer<typeof formSchema>;
 //   contributors: ["0x123, 0xlos, peter.eth"],
 //   acceptTerms: false,
 //   confirmContributorsPermission: false,
-//   allowlistURL: "",
 // };
 
 const formDefaultValues: HypercertFormValues = {
@@ -113,7 +114,6 @@ const formDefaultValues: HypercertFormValues = {
   contributors: [],
   acceptTerms: false,
   confirmContributorsPermission: false,
-  allowlistURL: "",
 };
 
 export default function NewHypercertForm() {
@@ -176,7 +176,6 @@ export default function NewHypercertForm() {
       description: values.description,
       image: values.cardImage,
       external_url: values.link,
-      allowList: values.allowlistURL ?? undefined,
     };
 
     const formattedMetadata = formatHypercertData({
@@ -208,6 +207,10 @@ export default function NewHypercertForm() {
       formattedMetadata.data!,
       DEFAULT_NUM_FRACTIONS,
       TransferRestrictions.FromCreatorOnly,
+      values.allowlistEntries?.map((entry) => ({
+        ...entry,
+        units: BigInt(entry.units),
+      })),
     );
 
     form.reset();
