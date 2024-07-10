@@ -32,7 +32,10 @@ export default async function UnclaimedHypercertListItem({
 
         <div className="flex flex-col justify-center">
           <p>{hypercert?.metadata?.name || "Untitled"}</p>
-          <TimeFrame hypercert={hypercert} />
+          <TimeFrame
+            from={hypercert?.metadata?.work_timeframe_from}
+            to={hypercert?.metadata?.work_timeframe_to}
+          />
         </div>
 
         <div className="flex-grow" />
