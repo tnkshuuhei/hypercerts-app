@@ -77,7 +77,7 @@ const formSchema = z.object({
   allowlistEntries: z
     .array(z.object({ address: z.string(), units: z.bigint() }))
     .optional(),
-  allowlistURL: z.string().url().optional(),
+  allowlistURL: z.string().optional(),
 });
 
 export type HypercertFormValues = z.infer<typeof formSchema>;
