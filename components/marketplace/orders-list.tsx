@@ -1,6 +1,11 @@
 "use client";
 
-import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import React, { Suspense, useState } from "react";
 import {
   SortingState,
@@ -18,7 +23,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { decodeAbiParameters, formatEther, parseAbiParameters } from "viem";
+import { formatEther } from "viem";
 
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -29,14 +34,19 @@ import { StepProcessDialogProvider } from "@/components/global/step-process-dial
 import { cn } from "@/lib/utils";
 import { useFetchMarketplaceOrdersForHypercert } from "@/marketplace/hooks";
 import { useHypercertClient } from "@/hooks/use-hypercert-client";
+import { HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
+import { decodeFractionalOrderParams } from "@/marketplace/utils";
 
-function OrdersListInner({ hypercertId }: { hypercertId: string }) {
-  const { data: openOrders } =
-    useFetchMarketplaceOrdersForHypercert(hypercertId);
+function OrdersListInner({ hypercert }: { hypercert: HypercertFull }) {
+  const { hypercert_id: hypercertId } = hypercert;
+  const { data: openOrders } = useFetchMarketplaceOrdersForHypercert(
+    hypercertId!,
+  );
   const { client } = useHypercertClient();
 
-  const hypercertOnConnectedChain =
-    client.isClaimOrFractionOnConnectedChain(hypercertId);
+  const hypercertOnConnectedChain = client.isClaimOrFractionOnConnectedChain(
+    hypercertId!,
+  );
 
   const columnHelper = createColumnHelper<MarketplaceOrder>();
   const columns = [
@@ -61,29 +71,31 @@ function OrdersListInner({ hypercertId }: { hypercertId: string }) {
         );
       },
       cell: (row) => <div>{formatEther(BigInt(row.getValue()))} ETH</div>,
+      sortingFn: (rowA, rowB) =>
+        BigInt(rowA.getValue("price")) < BigInt(rowB.getValue("price"))
+          ? 1
+          : -1,
     }),
     columnHelper.accessor("additionalParameters", {
       id: "minUnitsToBuy",
       header: "Min units per order",
       cell: (row) => {
         const params = row.getValue();
-        const [unitAmount] = decodeAbiParameters(
-          parseAbiParameters("uint256 a, uint256 b, uint256 c, uint256 d"),
+        const { minUnitAmount } = decodeFractionalOrderParams(
           params as `0x{string}`,
         );
-        return <div>{unitAmount.toString()}</div>;
+        return <div>{minUnitAmount.toString()}</div>;
       },
     }),
     columnHelper.accessor("additionalParameters", {
-      id: "maxUnitsToBuy",
+      id: "maxUnitAmount",
       header: "Max units per order",
       cell: (row) => {
         const params = row.getValue();
-        const [_, maxUnitsToBuy] = decodeAbiParameters(
-          parseAbiParameters("uint256 a, uint256 b, uint256 c, uint256 d"),
+        const { maxUnitAmount } = decodeFractionalOrderParams(
           params as `0x{string}`,
         );
-        return <div>{maxUnitsToBuy.toString()}</div>;
+        return <div>{maxUnitAmount.toString()}</div>;
       },
     }),
   ];
@@ -200,10 +212,17 @@ function OrdersListInner({ hypercertId }: { hypercertId: string }) {
           open={!!selectedOrder}
           onOpenChange={() => setSelectedOrder(null)}
         >
-          <DialogContent>
-            <DialogHeader>Buy fractional sale</DialogHeader>
+          <DialogContent className="gap-5 max-w-2xl">
+            <DialogHeader>
+              <DialogTitle className="font-serif text-3xl font-medium tracking-tight">
+                Buy hypercert fraction
+              </DialogTitle>
+            </DialogHeader>
             <StepProcessDialogProvider>
-              <BuyFractionalOrderForm order={selectedOrder} />
+              <BuyFractionalOrderForm
+                order={selectedOrder}
+                hypercert={hypercert}
+              />
             </StepProcessDialogProvider>
           </DialogContent>
         </Dialog>
@@ -212,10 +231,14 @@ function OrdersListInner({ hypercertId }: { hypercertId: string }) {
   );
 }
 
-export default function OrdersList({ hypercertId }: { hypercertId: string }) {
+export default function OrdersList({
+  hypercert,
+}: {
+  hypercert: HypercertFull;
+}) {
   return (
     <Suspense>
-      <OrdersListInner hypercertId={hypercertId} />
+      <OrdersListInner hypercert={hypercert} />
     </Suspense>
   );
 }
