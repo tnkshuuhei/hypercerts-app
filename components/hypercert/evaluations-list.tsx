@@ -23,7 +23,7 @@ export default async function EvaluationsList({
 
   return (
     <div className="flex flex-col gap-2">
-      {attestations.map((attestation) => {
+      {attestations.map((attestation, index) => {
         if (!attestation.attester) return null;
         const data: EvaluationData = attestation.data as EvaluationData;
         return (
@@ -50,7 +50,7 @@ export default async function EvaluationsList({
             />
             <Tags tags={data.tags} />
             <Comments comments={data.comments} />
-            <Separator />
+            {index < attestations.length - 1 && <Separator />}
           </div>
         );
       })}
