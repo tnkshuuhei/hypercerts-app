@@ -1,6 +1,6 @@
 import { EmptySection } from "@/app/profile/[address]/sections";
 import ExploreListSkeleton from "@/components/explore/explore-list-skeleton";
-import HypercertMiniDisplay from "@/components/hypercert/hypercert-mini-display";
+import { HypercertMiniDisplayProps } from "@/components/hypercert/hypercert-mini-display";
 import UnclaimedHypercertsList from "@/components/profile/unclaimed-hypercerts-list";
 import { Button } from "@/components/ui/button";
 import { getHypercertsByCreator } from "@/hypercerts/getHypercertsByCreator";
@@ -9,6 +9,9 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { HyperboardRow } from "@/components/hyperboard/hyperboard-row";
 import { getCollectionsByAdminAddress } from "@/collections/getCollectionsByAdminAddress";
+import HypercertWindow from "@/components/hypercert/hypercert-window";
+import { formatEther } from "viem";
+import { Separator } from "@/components/ui/separator";
 
 export const defaultDescription =
   "libp2p is an open source project for building network applications free from runtime and address services. You can help define the specification, create applications using libp2p, and craft examples and tutorials to get involved.";
@@ -50,7 +53,7 @@ const HypercertsTabContentInner = async ({ address }: { address: string }) => {
   const showHypercerts = !!hypercerts?.data?.length;
 
   return (
-    <>
+    <div className="flex flex-col gap-5">
       {showHypercerts ? (
         <>
           <div>
@@ -65,26 +68,31 @@ const HypercertsTabContentInner = async ({ address }: { address: string }) => {
           </div>
           <div className="flex flex-wrap gap-5 justify-center lg:justify-start pt-3">
             {hypercerts?.data.map((hypercert, index) => {
-              const props = {
+              const props: HypercertMiniDisplayProps = {
                 hypercertId: hypercert.hypercert_id as string,
                 name: hypercert.metadata?.name as string,
                 chainId: Number(
                   hypercert.contract?.chain_id,
                 ) as SupportedChainIdType,
                 attestations: hypercert.attestations,
+                lowestPrice: formatEther(BigInt(1_000_000_000)),
+                percentAvailable: 20,
               };
-              return <HypercertMiniDisplay key={index} {...props} />; // TODO: show hypercert mini displays
+              return (
+                <HypercertWindow {...props} key={hypercert.hypercert_id} />
+              );
             })}
           </div>
         </>
       ) : (
         <EmptySection />
       )}
+      <Separator />
       <h1 className="font-serif text-2xl lg:text-3xl tracking-tight">
         Unclaimed hypercerts
       </h1>
       <UnclaimedHypercertsList address={address} />
-    </>
+    </div>
   );
 };
 

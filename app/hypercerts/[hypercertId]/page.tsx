@@ -15,7 +15,7 @@ import PageSkeleton from "@/components/hypercert/page-skeleton";
 import ReadMore from "@/components/read-more";
 import { Separator } from "@/components/ui/separator";
 import WorkScope from "@/components/hypercert/scope";
-import WorkTimeFrame from "@/components/hypercert/time-frame";
+import TimeFrame from "@/components/hypercert/time-frame";
 import { getHypercert } from "@/hypercerts/getHypercert";
 
 type Props = {
@@ -79,9 +79,12 @@ async function HypercertPageInner({
             <Fragment>
               <Separator />
               <h5 className="uppercase text-sm text-gray-500 font-medium tracking-wider">
-                TIMEFRAME
+                TIME OF WORK
               </h5>
-              <WorkTimeFrame hypercert={hypercert} />
+              <TimeFrame
+                from={hypercert.metadata?.work_timeframe_from}
+                to={hypercert.metadata?.work_timeframe_to}
+              />
             </Fragment>
           )}
         </section>
