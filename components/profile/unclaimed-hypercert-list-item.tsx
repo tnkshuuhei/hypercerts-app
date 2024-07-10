@@ -1,7 +1,7 @@
 import { AllowListRecord } from "@/allowlists/getAllowListRecordsForAddress";
 import Image from "next/image";
 import UnclaimedHypercertClaimButton from "./unclaimed-hypercert-claim-button";
-import WorkTimeFrame from "../hypercert/time-frame";
+import TimeFrame from "../hypercert/time-frame";
 import { getHypercert } from "@/hypercerts/getHypercert";
 
 export default async function UnclaimedHypercertListItem({
@@ -32,7 +32,7 @@ export default async function UnclaimedHypercertListItem({
 
         <div className="flex flex-col justify-center">
           <p>{hypercert?.metadata?.name || "Untitled"}</p>
-          <WorkTimeFrame hypercert={hypercert} />
+          <TimeFrame hypercert={hypercert} />
         </div>
 
         <div className="flex-grow" />
