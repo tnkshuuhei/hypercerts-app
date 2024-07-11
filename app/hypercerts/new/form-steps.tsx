@@ -464,20 +464,21 @@ const FormSteps = ({
   const { address } = useAccount();
   const [isOpen, setIsOpen] = useState(false);
 
-  const takeCardSnapshot = () => {
+  const takeCardSnapshot = async () => {
     if (cardRef.current === null) {
       return;
     }
-    toPng(cardRef.current, {
-      cacheBust: true,
-      fetchRequestInit: { mode: "cors" },
-    })
-      .then((dataUrl) => {
-        return form.setValue("cardImage", dataUrl);
-      })
-      .catch((err) => {
-        console.log(err);
+
+    console.log(cardRef.current);
+    try {
+      const dataUrl = await toPng(cardRef.current, {
+        cacheBust: true,
+        fetchRequestInit: { mode: "cors" },
       });
+      form.setValue("cardImage", dataUrl);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const isCurrentStepValid = () => {
@@ -490,7 +491,7 @@ const FormSteps = ({
 
   const handleNextClick = async () => {
     if (currentStep === 1) {
-      takeCardSnapshot();
+      await takeCardSnapshot();
     }
     const currentStepFields = hypercertFormSteps.get(currentStep)?.fields ?? [];
     await form.trigger(currentStepFields);
