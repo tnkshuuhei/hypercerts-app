@@ -332,6 +332,7 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
             </FormDescription>
             <div className="flex text-xs space-x-2 w-full justify-end">
               <Button
+                type="button"
                 disabled={!!field.value}
                 variant="outline"
                 onClick={() => setCreateDialogOpen(true)}
