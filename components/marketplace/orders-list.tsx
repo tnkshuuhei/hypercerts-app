@@ -46,7 +46,7 @@ function OrdersListInner({ hypercert }: { hypercert: HypercertFull }) {
   );
   const { client } = useHypercertClient();
 
-  const hypercertOnConnectedChain = client.isClaimOrFractionOnConnectedChain(
+  const hypercertOnConnectedChain = client?.isClaimOrFractionOnConnectedChain(
     hypercertId!,
   );
 
