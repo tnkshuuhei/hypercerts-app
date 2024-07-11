@@ -231,28 +231,27 @@ export default function NewHypercertForm() {
           />
         </div>
       </section>
-      {mintStep !== "preparing" && (
-        <StepProcessDialog
-          steps={dialogSteps}
-          title="Mint your hypercert"
-          triggerLabel="See progress"
-          extraContent={
-            txReceipt && (
-              <Link
-                href={`https://sepolia.etherscan.io/tx/${txReceipt.transactionHash}`}
-                className="flex items-center underline underline-offset-2 hover:opacity-70 font-medium text-blue-700 tracking-tight group"
-                target="_blank"
-              >
-                View transaction on etherscan
-                <ArrowUpRightIcon
-                  size={16}
-                  className="ml-1 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-200"
-                />
-              </Link>
-            )
-          }
-        />
-      )}
+      <StepProcessDialog
+        open={mintClaimPending}
+        steps={dialogSteps}
+        title="Mint your hypercert"
+        triggerLabel="See progress"
+        extraContent={
+          txReceipt && (
+            <Link
+              href={`https://sepolia.etherscan.io/tx/${txReceipt.transactionHash}`}
+              className="flex items-center underline underline-offset-2 hover:opacity-70 font-medium text-blue-700 tracking-tight group"
+              target="_blank"
+            >
+              View transaction on etherscan
+              <ArrowUpRightIcon
+                size={16}
+                className="ml-1 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-200"
+              />
+            </Link>
+          )
+        }
+      />
     </main>
   );
 }
