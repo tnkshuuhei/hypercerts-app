@@ -44,6 +44,7 @@ import {
 } from "@/components/ui/table";
 import { parseEther } from "viem";
 import { toPng } from "html-to-image";
+import { FormattedUnits } from "@/components/formatted-units";
 
 interface FormStepsProps {
   form: UseFormReturn<HypercertFormValues>;
@@ -347,20 +348,27 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
             {!!allowlistEntries?.length && (
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead>Address</TableHead>
+                  <TableRow className="hover:bg-inherit">
+                    <TableHead className="pl-0">Address</TableHead>
                     <TableHead>Percentage</TableHead>
-                    <TableHead>Units</TableHead>
+                    <TableHead className="pr-0">Units</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {allowlistEntries?.map((entry, index) => (
-                    <TableRow key={`${entry.address}-${entry.units}-${index}`}>
-                      <TableCell>{entry.address}</TableCell>
+                    <TableRow
+                      key={`${entry.address}-${entry.units}-${index}`}
+                      className="hover:bg-inherit"
+                    >
+                      <TableCell className="pl-0">{entry.address}</TableCell>
                       <TableCell>
                         {calculatePercentageBigInt(entry.units).toString()}%
                       </TableCell>
-                      <TableCell>{entry.units.toString()}</TableCell>
+                      <TableCell className="pr-0">
+                        <FormattedUnits>
+                          {entry.units.toString()}
+                        </FormattedUnits>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

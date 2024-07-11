@@ -179,7 +179,6 @@ export default function NewHypercertForm() {
   }
 
   const onSubmitInvalid = (errors: FieldErrors) => {
-    console.log("Invalid form", { errors });
     for (const key in errors) {
       if (errors.hasOwnProperty(key)) {
         const error = errors[key];

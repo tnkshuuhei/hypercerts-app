@@ -228,7 +228,15 @@ export default function CreateAllowlistDialog({
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
-              onClick={() => setAllowList((allowList) => [...allowList, {}])}
+              onClick={() =>
+                setAllowList((allowList) => [
+                  ...allowList,
+                  {
+                    address: "",
+                    percentage: "",
+                  },
+                ])
+              }
             >
               <PlusCircle className="h-4 w-4" />
             </Button>
