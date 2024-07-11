@@ -2,6 +2,7 @@ import { ChangeEvent, useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -174,17 +175,17 @@ export default function CreateAllowlistDialog({
             Create allowlist
           </DialogTitle>
         </DialogHeader>
-        <div className="flex flex-col gap-3">
-          <p>
+        <DialogDescription className="flex flex-col gap-3">
+          <div>
             Add addresses and the percentage of total units each address is
             allowed to mint. Hypercerts are created with a total supply of 1
             ether (10^18 units).
-          </p>
-          <p>
+          </div>
+          <div>
             Once created, your allowlist will be stored on IPFS and linked to
             the Hypercert.
-          </p>
-        </div>
+          </div>
+        </DialogDescription>
         <div className="flex flex-col gap-2">
           <div className="flex gap-2">
             <div className="flex-grow"></div>
