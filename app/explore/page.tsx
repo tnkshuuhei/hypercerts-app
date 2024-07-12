@@ -21,9 +21,10 @@ export default async function ExplorePageInner({
       <h1 className="font-serif text-3xl lg:text-5xl tracking-tight w-full">
         Explore
       </h1>
-      <section className="flex flex-col gap-4 justify-between">
+      <section className="flex flex-col lg:flex-row gap-4 justify-between max-w-fit md:max-w-unset">
+        <ExploreSearchBar />
+        <div className="hidden lg:block w-full" />
         <div className="flex space-x-2">
-          <ExploreSearchBar />
           <ExploreChainFilterSelect />
           <ExploreEvaluationsFilterSelect />
           <ExploreOrderBySelect />
