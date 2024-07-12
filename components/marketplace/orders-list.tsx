@@ -129,7 +129,7 @@ function OrdersListInner({ hypercert }: { hypercert: HypercertFull }) {
   };
 
   if (!openOrders?.length) {
-    return <div></div>;
+    return <div>This Hypercert has not yet been listed for sale.</div>;
   }
 
   const classes = cn({
