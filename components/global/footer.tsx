@@ -34,7 +34,7 @@ const Footer = () => (
     </ul>
 
     <p className="flex space-x-1 items-center text-sm">
-      <span>Copyright</span> <Copyright size={12} /> <span>2024</span>
+      <span>Copyright</span> <Copyright size={12} /> <span>{new Date().getFullYear()}</span>
       <span>Hypercerts Foundation</span>
     </p>
   </footer>
