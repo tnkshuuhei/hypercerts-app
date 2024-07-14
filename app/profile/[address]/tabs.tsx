@@ -1,17 +1,18 @@
 import { EmptySection } from "@/app/profile/[address]/sections";
+import { getCollectionsByAdminAddress } from "@/collections/getCollectionsByAdminAddress";
+import CountBadge from "@/components/count-badge";
 import ExploreListSkeleton from "@/components/explore/explore-list-skeleton";
+import { HyperboardRow } from "@/components/hyperboard/hyperboard-row";
 import { HypercertMiniDisplayProps } from "@/components/hypercert/hypercert-mini-display";
+import HypercertWindow from "@/components/hypercert/hypercert-window";
 import UnclaimedHypercertsList from "@/components/profile/unclaimed-hypercerts-list";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import { getHypercertsByCreator } from "@/hypercerts/getHypercertsByCreator";
 import { type SupportedChainIdType } from "@/lib/constants";
 import Link from "next/link";
 import { Suspense } from "react";
-import { HyperboardRow } from "@/components/hyperboard/hyperboard-row";
-import { getCollectionsByAdminAddress } from "@/collections/getCollectionsByAdminAddress";
-import HypercertWindow from "@/components/hypercert/hypercert-window";
 import { formatEther } from "viem";
-import { Separator } from "@/components/ui/separator";
 
 export const defaultDescription =
   "libp2p is an open source project for building network applications free from runtime and address services. You can help define the specification, create applications using libp2p, and craft examples and tutorials to get involved.";
@@ -59,11 +60,7 @@ const HypercertsTabContentInner = async ({ address }: { address: string }) => {
           <div>
             <Button variant="secondary" size="sm" className={`space-x-1`}>
               <h2 className={`text-sm`}>Created by me</h2>
-              <span
-                className={`bg-black text-white text-xs px-1 py-0.5 rounded-lg h-max`}
-              >
-                {hypercerts?.count}
-              </span>
+              <CountBadge count={hypercerts?.count} />
             </Button>
           </div>
           <div className="flex flex-wrap gap-5 justify-center lg:justify-start pt-3">
