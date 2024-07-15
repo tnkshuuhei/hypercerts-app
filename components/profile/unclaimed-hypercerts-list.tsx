@@ -1,3 +1,4 @@
+import { EmptySection } from "@/app/profile/[address]/sections";
 import UnclaimedHypercertListItem from "./unclaimed-hypercert-list-item";
 import { getAllowListRecordsForAddress } from "@/allowlists/getAllowListRecordsForAddress";
 
@@ -18,11 +19,11 @@ export default async function UnclaimedHypercertsList({
     !Array.isArray(allowList.data) ||
     unclaimedCerts.length === 0
   ) {
-    return <div>No unclaimed hypercerts found</div>;
+    return <EmptySection />;
   }
 
   return (
-    <div className="flex flex-col gap-5 w-full">
+    <div className="flex flex-col gap-5 w-full pt-4">
       {unclaimedCerts.map((unclaimedHypercert, i) => (
         <UnclaimedHypercertListItem
           allowListRecordFragment={unclaimedHypercert}
