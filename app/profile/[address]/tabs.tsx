@@ -6,13 +6,40 @@ import { HyperboardRow } from "@/components/hyperboard/hyperboard-row";
 import { HypercertMiniDisplayProps } from "@/components/hypercert/hypercert-mini-display";
 import HypercertWindow from "@/components/hypercert/hypercert-window";
 import UnclaimedHypercertsList from "@/components/profile/unclaimed-hypercerts-list";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { getHypercertsByCreator } from "@/hypercerts/getHypercertsByCreator";
 import { type SupportedChainIdType } from "@/lib/constants";
+import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { Suspense } from "react";
 import { formatEther } from "viem";
+
+const subTabs = [
+  { key: "hypercerts-created", triggerLabel: "Created by me" },
+  { key: "hypercerts-claimable", triggerLabel: "Claimable" },
+] as const;
+
+export type ProfileSubTabKey = (typeof subTabs)[number]["key"] | "collections";
+
+const mainTabs: {
+  prefix: string;
+  triggerLabel: string;
+  defaultSubTabKey: ProfileSubTabKey;
+}[] = [
+  {
+    prefix: "hypercerts",
+    triggerLabel: "Hypercerts",
+    defaultSubTabKey: "hypercerts-created",
+  },
+  {
+    prefix: "collections",
+    triggerLabel: "Collections",
+    defaultSubTabKey: "collections",
+  },
+];
+
+const createTabRoute = (address: string, tabKey: ProfileSubTabKey) =>
+  `/profile/${address}?tab=${tabKey}`;
 
 export const defaultDescription =
   "libp2p is an open source project for building network applications free from runtime and address services. You can help define the specification, create applications using libp2p, and craft examples and tutorials to get involved.";
@@ -48,22 +75,51 @@ const CollectionsTabContent = ({ address }: { address: string }) => {
   );
 };
 
-const HypercertsTabContentInner = async ({ address }: { address: string }) => {
+const HypercertsTabContentInner = async ({
+  address,
+  activeTab,
+}: {
+  address: string;
+  activeTab: ProfileSubTabKey;
+}) => {
   const hypercerts = await getHypercertsByCreator({ creatorAddress: address });
 
   const showHypercerts = !!hypercerts?.data?.length;
+  const hypercertSubTabs = subTabs.filter(
+    (tab) => tab.key.split("-")[0] === "hypercerts",
+  );
+
+  const tabBadgeCounts = {
+    "hypercerts-created": hypercerts?.count ?? 0,
+    "hypercerts-claimable": 0, //TODO: UPDATE WITH CORRECT UNCLAIMED DATA
+  };
 
   return (
-    <div className="flex flex-col gap-5">
-      {showHypercerts ? (
-        <>
-          <div>
-            <Button variant="secondary" size="sm" className={`space-x-1`}>
-              <h2 className={`text-sm`}>Created by me</h2>
-              <CountBadge count={hypercerts?.count} />
-            </Button>
-          </div>
-          <div className="flex flex-wrap gap-5 justify-center lg:justify-start pt-3">
+    <section>
+      <section className="bg-neutral-100 w-max flex rounded-sm p-1">
+        {hypercertSubTabs.map(({ key, triggerLabel }) => (
+          <Link href={createTabRoute(address, key)} key={key}>
+            <button
+              className={cn(
+                "flex gap-1 px-3 py-2 text-sm rounded-md tracking-tight transition duration-300 border-[1.5px] shadow-sm",
+                key === activeTab
+                  ? "bg-white border-neutral-300"
+                  : "opacity-60 border-transparent",
+              )}
+            >
+              {triggerLabel}
+              <CountBadge
+                count={tabBadgeCounts[key]}
+                variant={key === activeTab ? "default" : "secondary"}
+              />
+            </button>
+          </Link>
+        ))}
+      </section>
+
+      {activeTab === "hypercerts-created" &&
+        (showHypercerts ? (
+          <div className="flex flex-wrap gap-3 justify-center lg:justify-start pt-3">
             {hypercerts?.data.map((hypercert, index) => {
               const props: HypercertMiniDisplayProps = {
                 hypercertId: hypercert.hypercert_id as string,
@@ -80,55 +136,59 @@ const HypercertsTabContentInner = async ({ address }: { address: string }) => {
               );
             })}
           </div>
-        </>
-      ) : (
-        <EmptySection />
+        ) : (
+          <section className="pt-4">
+            <EmptySection />
+          </section>
+        ))}
+
+      {activeTab === "hypercerts-claimable" && (
+        <section className="pt-4">
+          <UnclaimedHypercertsList address={address} />
+        </section>
       )}
-      <Separator />
-      <h1 className="font-serif text-2xl lg:text-3xl tracking-tight">
-        Unclaimed hypercerts
-      </h1>
-      <UnclaimedHypercertsList address={address} />
-    </div>
+    </section>
   );
 };
 
-const HypercertsTabContent = ({ address }: { address: string }) => {
+const HypercertsTabContent = ({
+  address,
+  activeTab,
+}: {
+  address: string;
+  activeTab: ProfileSubTabKey;
+}) => {
   return (
     <Suspense fallback={<ExploreListSkeleton length={4} />}>
-      <HypercertsTabContentInner address={address} />
+      <HypercertsTabContentInner address={address} activeTab={activeTab} />
     </Suspense>
   );
 };
 
 const ProfileTabSection = ({
   address,
-  active = "hypercerts",
+  active = "hypercerts-created",
 }: {
   address: string;
   active: string;
 }) => {
+  const tabPrefix = active.split("-")[0];
   return (
-    <section className="w-full space-y-2">
-      <section className="space-x-1 w-full flex">
-        <Link href={`/profile/${address}?tab=hypercerts`}>
-          <Button
-            variant={active === "hypercerts" ? "default" : "outline"}
-            size={"default"}
-            className={`space-x-1 border-[1.5px]`}
-          >
-            <h3 className={`text-lg`}>Hypercerts</h3>
-          </Button>
-        </Link>
-        <Link href={`/profile/${address}?tab=collections`}>
-          <Button
-            variant={active === "collections" ? "default" : "outline"}
-            size={"default"}
-            className={`space-x-1 border-[1.5px]`}
-          >
-            <h3 className={`text-lg`}>Collections</h3>
-          </Button>
-        </Link>
+    <section className="w-full">
+      <section className="flex items-end overflow-clip">
+        {mainTabs.map(({ defaultSubTabKey, prefix, triggerLabel }) => (
+          <Link key={prefix} href={createTabRoute(address, defaultSubTabKey)}>
+            <button
+              className={cn(
+                "px-3 py-2 border-b-2 font-semibold text-lg",
+                tabPrefix === prefix ? "border-black" : "opacity-45",
+              )}
+            >
+              {triggerLabel}
+            </button>
+          </Link>
+        ))}
+        <Separator className="flex-1" />
       </section>
     </section>
   );
