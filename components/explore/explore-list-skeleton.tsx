@@ -7,7 +7,7 @@ export default function ExploreListSkeleton({ length }: { length: number }) {
         {Array.from({ length }, (_, i) => (
           <div
             key={i}
-            className="max-w-screen-sm h-[300px] bg-slate-100 rounded-lg"
+            className="max-w-screen-sm h-[400px] bg-slate-100 rounded-lg"
           />
         ))}
       </div>

@@ -41,13 +41,13 @@ const HypercertWindow = ({
   return (
     <Link href={`/hypercerts/${hypercertId}`}>
       <article className="transition-transform duration-300 hover:-translate-y-2 relative group bg-black/10 rounded-lg overflow-hidden">
-        <div className="h-[200px] w-full relative">
+        <div className="h-[320px] w-full relative p-1">
           <Image
             src={`/api/hypercerts/${hypercertId}/image`}
             alt={name || "Untitled"}
             fill
             sizes="300px"
-            className="object-cover object-center"
+            className="object-contain object-center w-full h-full"
           />
         </div>
         <section className="absolute top-4 left-4 flex space-x-1 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity duration-150 ease-out">
