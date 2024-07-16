@@ -1,3 +1,4 @@
+import { getAllowListRecordsForAddress } from "@/allowlists/getAllowListRecordsForAddress";
 import { EmptySection } from "@/app/profile/[address]/sections";
 import { getCollectionsByAdminAddress } from "@/collections/getCollectionsByAdminAddress";
 import CountBadge from "@/components/count-badge";
@@ -82,16 +83,29 @@ const HypercertsTabContentInner = async ({
   address: string;
   activeTab: ProfileSubTabKey;
 }) => {
-  const hypercerts = await getHypercertsByCreator({ creatorAddress: address });
+  const createdHypercerts = await getHypercertsByCreator({
+    creatorAddress: address,
+  });
+  const allowlist = await getAllowListRecordsForAddress(address);
 
-  const showHypercerts = !!hypercerts?.data?.length;
+  // TODO: Do this in the query. Currently it doesn't support multiple filters at the same time
+  const unclaimedHypercerts =
+    allowlist?.data.filter((item) => !item.claimed) || [];
+
+  const isEmptyAllowlist =
+    !allowlist ||
+    allowlist.count === 0 ||
+    !allowlist.data ||
+    !Array.isArray(allowlist.data);
+
+  const showCreatedHypercerts = !!createdHypercerts?.data?.length;
   const hypercertSubTabs = subTabs.filter(
     (tab) => tab.key.split("-")[0] === "hypercerts",
   );
 
   const tabBadgeCounts = {
-    "hypercerts-created": hypercerts?.count ?? 0,
-    "hypercerts-claimable": 0, //TODO: UPDATE WITH CORRECT UNCLAIMED DATA
+    "hypercerts-created": createdHypercerts?.count ?? 0,
+    "hypercerts-claimable": unclaimedHypercerts.length,
   };
 
   return (
@@ -101,7 +115,7 @@ const HypercertsTabContentInner = async ({
           <Link href={createTabRoute(address, key)} key={key}>
             <button
               className={cn(
-                "flex gap-1 px-3 py-2 text-sm rounded-md tracking-tight transition duration-300 border-[1.5px] shadow-sm",
+                "flex gap-1.5 px-3 py-2 text-sm rounded-md tracking-tight transition duration-300 border-[1.5px] shadow-sm font-semibold",
                 key === activeTab
                   ? "bg-white border-neutral-300"
                   : "opacity-60 border-transparent",
@@ -118,9 +132,9 @@ const HypercertsTabContentInner = async ({
       </section>
 
       {activeTab === "hypercerts-created" &&
-        (showHypercerts ? (
+        (showCreatedHypercerts ? (
           <div className="flex flex-wrap gap-3 justify-center lg:justify-start pt-3">
-            {hypercerts?.data.map((hypercert, index) => {
+            {createdHypercerts?.data.map((hypercert, index) => {
               const props: HypercertMiniDisplayProps = {
                 hypercertId: hypercert.hypercert_id as string,
                 name: hypercert.metadata?.name as string,
@@ -144,7 +158,10 @@ const HypercertsTabContentInner = async ({
 
       {activeTab === "hypercerts-claimable" && (
         <section className="pt-4">
-          <UnclaimedHypercertsList address={address} />
+          <UnclaimedHypercertsList
+            unclaimedHypercerts={unclaimedHypercerts}
+            isEmptyAllowlist={isEmptyAllowlist}
+          />
         </section>
       )}
     </section>
