@@ -193,7 +193,7 @@ function OrdersListInner({ hypercert }: { hypercert: HypercertFull }) {
   const table = useReactTable({
     data:
       openOrders?.filter((order) =>
-        order.invalidated ? order.signer === address : false,
+        order.invalidated ? order.signer === address : true,
       ) || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
