@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { HYPERCERTS_API_URL } from "@/configs/hypercerts";
 import { promises as fs } from "fs";
 import graphQlrequest from "graphql-request";
 import { graphql } from "@/lib/graphql";
 import path from "path";
+import { HYPERCERTS_API_URL_GRAPHQL } from "@/lib/constants";
 
 const PLACEHOLDER_IMAGE_PATH = path.join(
   process.cwd(),
@@ -72,7 +72,7 @@ export async function GET(
   }
 
   try {
-    const res = await graphQlrequest(HYPERCERTS_API_URL, IMAGE_QUERY, {
+    const res = await graphQlrequest(HYPERCERTS_API_URL_GRAPHQL, IMAGE_QUERY, {
       hypercert_id: hypercertId,
     });
     const imageOrUrl = res.hypercerts.data?.[0]?.metadata?.image;

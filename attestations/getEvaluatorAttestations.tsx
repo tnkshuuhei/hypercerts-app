@@ -3,8 +3,8 @@ import "server-only";
 import { graphql, readFragment } from "@/lib/graphql";
 
 import { AttestationListFragment } from "./fragments/attestation-list.fragment";
-import { HYPERCERTS_API_URL } from "../configs/hypercerts";
 import request from "graphql-request";
+import { HYPERCERTS_API_URL_GRAPHQL } from "@/lib/constants";
 
 const query = graphql(
   `
@@ -17,11 +17,11 @@ const query = graphql(
       }
     }
   `,
-  [AttestationListFragment]
+  [AttestationListFragment],
 );
 
 export async function getEvaluatorAttestations(attester: string) {
-  const res = await request(HYPERCERTS_API_URL, query, {
+  const res = await request(HYPERCERTS_API_URL_GRAPHQL, query, {
     attester: attester,
   });
   const attestations = res.attestations?.data?.[0];

@@ -2,9 +2,9 @@ import "server-only";
 
 import { graphql, readFragment } from "@/lib/graphql";
 
-import { HYPERCERTS_API_URL } from "@/configs/hypercerts";
 import { CollectionFragment } from "./collection.fragment";
 import request from "graphql-request";
+import { HYPERCERTS_API_URL_GRAPHQL } from "@/lib/constants";
 
 const query = graphql(
   `
@@ -20,7 +20,7 @@ const query = graphql(
 );
 
 export async function getCollectionsByAdminAddress(adminAddress: string) {
-  const res = await request(HYPERCERTS_API_URL, query, {
+  const res = await request(HYPERCERTS_API_URL_GRAPHQL, query, {
     admin_address: adminAddress,
   });
 

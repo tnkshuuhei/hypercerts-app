@@ -1,8 +1,8 @@
 import { useMutation } from "@tanstack/react-query";
 
 import { AllowlistEntry } from "@hypercerts-org/sdk";
-import { HYPERCERTS_API_URL_REST } from "@/configs/hypercerts";
 import { StandardMerkleTree } from "@openzeppelin/merkle-tree";
+import { HYPERCERTS_API_URL_REST } from "@/lib/constants";
 
 export const useValidateAllowlist = () => {
   return useMutation({

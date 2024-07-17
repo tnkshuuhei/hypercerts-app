@@ -1,5 +1,6 @@
 import { base, baseSepolia, celo, optimism, sepolia } from "viem/chains";
 import { Chain } from "viem";
+import { CONSTANTS } from "@hypercerts-org/sdk";
 
 export const apiEnvironment: "test" | "production" = (process.env[
   "NEXT_PUBLIC_API_ENVIRONMENT"
@@ -16,3 +17,6 @@ const allChains = [
   ...prodNetChains.map((x) => x.id),
 ] as const;
 export type SupportedChainIdType = (typeof allChains)[number];
+
+export const HYPERCERTS_API_URL_REST = `${CONSTANTS.ENDPOINTS[apiEnvironment]}/v1`;
+export const HYPERCERTS_API_URL_GRAPHQL = `${CONSTANTS.ENDPOINTS[apiEnvironment]}/v1/graphql`;

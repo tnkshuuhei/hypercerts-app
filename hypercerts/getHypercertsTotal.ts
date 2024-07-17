@@ -1,8 +1,8 @@
 import "server-only";
 
-import { HYPERCERTS_API_URL } from "../configs/hypercerts";
 import { graphql } from "@/lib/graphql";
 import request from "graphql-request";
+import { HYPERCERTS_API_URL_GRAPHQL } from "@/lib/constants";
 
 const query = graphql(`
   query hypercertsTotal {
@@ -13,6 +13,6 @@ const query = graphql(`
 `);
 
 export async function getHypercertsTotal() {
-  const res = await request(HYPERCERTS_API_URL, query);
+  const res = await request(HYPERCERTS_API_URL_GRAPHQL, query);
   return res.hypercerts.count;
 }
