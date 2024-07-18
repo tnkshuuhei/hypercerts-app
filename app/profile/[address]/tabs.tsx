@@ -13,7 +13,8 @@ import { type SupportedChainIdType } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { Suspense } from "react";
-import { formatEther } from "viem";
+import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
+import { getPricePerPercent } from "@/marketplace/utils";
 
 const subTabs = [
   { key: "hypercerts-created", triggerLabel: "Created by me" },
@@ -134,7 +135,16 @@ const HypercertsTabContentInner = async ({
       {activeTab === "hypercerts-created" &&
         (showCreatedHypercerts ? (
           <div className="flex flex-wrap gap-3 justify-center lg:justify-start pt-3">
-            {createdHypercerts?.data.map((hypercert, index) => {
+            {createdHypercerts?.data.map((hypercert) => {
+              const percentAvailable = calculateBigIntPercentage(
+                hypercert.orders?.totalUnitsForSale,
+                hypercert.units,
+              );
+              const lowestPrice = getPricePerPercent(
+                hypercert.orders?.lowestAvailablePrice || "0",
+                BigInt(hypercert?.units || "0"),
+              );
+
               const props: HypercertMiniDisplayProps = {
                 hypercertId: hypercert.hypercert_id as string,
                 name: hypercert.metadata?.name as string,
@@ -142,8 +152,8 @@ const HypercertsTabContentInner = async ({
                   hypercert.contract?.chain_id,
                 ) as SupportedChainIdType,
                 attestations: hypercert.attestations,
-                lowestPrice: formatEther(BigInt(1_000_000_000)),
-                percentAvailable: 20,
+                lowestPrice,
+                percentAvailable,
               };
               return (
                 <HypercertWindow {...props} key={hypercert.hypercert_id} />
