@@ -290,7 +290,7 @@ export const useFetchMarketplaceOrdersForHypercert = (hypercertId: string) => {
           setCheckedValidity(true);
         }
       }
-      return orders.filter((order: MarketplaceOrder) =>
+      return (orders as MarketplaceOrder[]).filter((order: MarketplaceOrder) =>
         order.invalidated ? order.signer === address : true,
       );
     },
