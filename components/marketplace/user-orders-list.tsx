@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   SortingState,
   createColumnHelper,
@@ -25,17 +19,19 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import { ArrowUpDown, InfoIcon, RefreshCwIcon } from "lucide-react";
+import {
+  ArrowUpDown,
+  ExternalLink,
+  InfoIcon,
+  RefreshCwIcon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { BuyFractionalOrderForm } from "@/components/marketplace/buy-fractional-order-form";
-import EthAddress from "@/components/eth-address";
-import { StepProcessDialogProvider } from "@/components/global/step-process-dialog";
 import { cn } from "@/lib/utils";
 import { useHypercertClient } from "@/hooks/use-hypercert-client";
-import { HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
 import {
   decodeFractionalOrderParams,
   getPricePerPercent,
+  orderFragmentToHypercert,
   orderFragmentToMarketplaceOrder,
 } from "@/marketplace/utils";
 import { useAccount, useChainId } from "wagmi";
@@ -48,29 +44,42 @@ import {
 import { useHypercertExchangeClient } from "@/hooks/use-hypercert-exchange-client";
 import { OrderFragment } from "@/marketplace/fragments/order.fragment";
 import { FormattedUnits } from "@/components/formatted-units";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { StepProcessDialogProvider } from "@/components/global/step-process-dialog";
+import { BuyFractionalOrderForm } from "@/components/marketplace/buy-fractional-order-form";
+import { useRouter } from "next/navigation";
 
-export default function OrdersList({
+export default function UserOrdersList({
+  address,
   orders,
-  hypercert,
 }: {
-  orders?: OrderFragment[];
-  hypercert: HypercertFull;
+  address: string;
+  orders: OrderFragment[];
 }) {
+  console.log("orders", orders);
   const chainId = useChainId();
-  const { address } = useAccount();
+  const { address: currentUserAddress } = useAccount();
 
   const { client } = useHypercertClient();
   const { client: hypercertExchangeClient } = useHypercertExchangeClient();
 
-  const hypercertOnConnectedChain =
-    client?.isClaimOrFractionOnConnectedChain(hypercert?.hypercert_id!) ||
-    false;
-
   const columnHelper = createColumnHelper<OrderFragment>();
+  const { push } = useRouter();
 
   const hasInvalidatedOrdersForCurrentUser = (orders || []).some(
     (order) => order.invalidated && order.signer === address,
   );
+
+  const ordersVisibleToCurrentUser = useMemo(() => {
+    return orders.filter((order) =>
+      order.invalidated ? order.signer === currentUserAddress : true,
+    );
+  }, []);
 
   const refreshOrderValidity = async (tokenId: string) => {
     if (!hypercertExchangeClient) {
@@ -90,35 +99,47 @@ export default function OrdersList({
   };
 
   const columns = [
-    columnHelper.accessor("signer", {
-      cell: (row) => (
-        <div>
-          <EthAddress address={row.getValue()} />
-        </div>
-      ),
-      header: "Seller",
+    columnHelper.accessor("hypercert", {
+      cell: (row) => {
+        const hypercert = row.getValue();
+        const name = hypercert?.metadata?.name || "Hypercert";
+        return (
+          <div
+            onClick={(e) => {
+              e.stopPropagation();
+              push(`/hypercerts/${hypercert?.hypercert_id}`);
+            }}
+          >
+            <a className="flex items-center gap-2 content-center cursor-pointer px-1 py-0.5 bg-slate-100 rounded-md w-max text-sm">
+              <div>{name}</div>
+              <ExternalLink className="w-4 h-4" />
+            </a>
+          </div>
+        );
+      },
+      header: "Hypercert",
     }),
     columnHelper.accessor("price", {
       header: ({ column }) => {
         return (
-          <Button
-            variant="ghost"
+          <div
+            className="flex items-center cursor-pointer"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             Price per %
             <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
+          </div>
         );
       },
-      cell: (row) => (
-        <div>
-          {getPricePerPercent(
-            row.getValue(),
-            BigInt(hypercert.units || BigInt(0)),
-          )}{" "}
-          ETH
-        </div>
-      ),
+      cell: (row) => {
+        const hypercert = row.row.original.hypercert;
+        return (
+          <div>
+            {getPricePerPercent(row.getValue(), BigInt(hypercert?.units || 0))}{" "}
+            ETH
+          </div>
+        );
+      },
       sortingFn: (rowA, rowB) =>
         BigInt(rowA.getValue("price")) < BigInt(rowB.getValue("price"))
           ? 1
@@ -134,8 +155,8 @@ export default function OrdersList({
             params as `0x{string}`,
           );
           return <FormattedUnits>{minUnitAmount.toString()}</FormattedUnits>;
-        } catch (e) {
-          console.error(e);
+        } catch (error) {
+          console.error("Error decoding fractional order params", error);
           return <div>Invalid</div>;
         }
       },
@@ -150,8 +171,8 @@ export default function OrdersList({
             params as `0x{string}`,
           );
           return <FormattedUnits>{maxUnitAmount.toString()}</FormattedUnits>;
-        } catch (e) {
-          console.error(e);
+        } catch (error) {
+          console.error("Error decoding fractional order params", error);
           return <div>Invalid</div>;
         }
       },
@@ -163,7 +184,7 @@ export default function OrdersList({
             header: "Invalidated",
             cell: (row) => {
               const order = row.row.original;
-              if (order.signer !== address) {
+              if (order.signer !== address || !row.row.original.invalidated) {
                 return <div></div>;
               }
               return (
@@ -208,7 +229,7 @@ export default function OrdersList({
     pageSize: 10, //default page size
   });
   const table = useReactTable({
-    data: orders || [],
+    data: ordersVisibleToCurrentUser,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -232,10 +253,15 @@ export default function OrdersList({
     return <div>This Hypercert has not yet been listed for sale.</div>;
   }
 
-  const classes = cn({
-    "cursor-pointer": hypercertOnConnectedChain,
-    "opacity-50": !hypercertOnConnectedChain,
-  });
+  const classes = (onConnectedChain: boolean) =>
+    cn({
+      "cursor-pointer": onConnectedChain,
+      "opacity-50": !onConnectedChain,
+    });
+
+  const canGetPreviousPage = table.getCanPreviousPage();
+  const canGetNextPage = table.getCanNextPage();
+  const paginationDisplayed = canGetPreviousPage || canGetNextPage;
 
   return (
     <div className="w-full">
@@ -268,15 +294,24 @@ export default function OrdersList({
                     data-state={row.getIsSelected() && "selected"}
                     onClick={() => {
                       if (
-                        hypercertOnConnectedChain &&
+                        client?.isClaimOrFractionOnConnectedChain(
+                          row.original?.hypercert_id as string,
+                        ) &&
                         !row.original.invalidated
                       ) {
                         onRowClick(row.original);
                       }
                     }}
-                    className={cn(classes, {
-                      "bg-red-100": row.original.invalidated,
-                    })}
+                    className={cn(
+                      classes(
+                        !!client?.isClaimOrFractionOnConnectedChain(
+                          row.original?.hypercert_id as string,
+                        ),
+                      ),
+                      {
+                        "bg-red-100": row.original.invalidated,
+                      },
+                    )}
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>
@@ -302,26 +337,28 @@ export default function OrdersList({
           </Table>
         </div>
       </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
+      {paginationDisplayed && (
+        <div className="flex items-center justify-end space-x-2 py-4">
+          <div className="space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.previousPage()}
+              disabled={canGetPreviousPage}
+            >
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.nextPage()}
+              disabled={canGetNextPage}
+            >
+              Next
+            </Button>
+          </div>
         </div>
-      </div>
+      )}
       {selectedOrder && (
         <Dialog
           open={!!selectedOrder}
@@ -340,7 +377,7 @@ export default function OrdersList({
             <StepProcessDialogProvider>
               <BuyFractionalOrderForm
                 order={orderFragmentToMarketplaceOrder(selectedOrder)}
-                hypercert={hypercert}
+                hypercert={orderFragmentToHypercert(selectedOrder)}
               />
             </StepProcessDialogProvider>
           </DialogContent>
