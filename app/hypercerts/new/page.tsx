@@ -5,6 +5,7 @@ import StepProcessDialog from "@/components/global/step-process-dialog";
 import HypercertCard from "@/components/hypercert/hypercert-card";
 import { Form } from "@/components/ui/form";
 import { toast } from "@/components/ui/use-toast";
+import { useTransaction } from "@/contexts/TransactionProvider";
 import { mintSteps, useMintClaim } from "@/hooks/use-mint-claim";
 import useProcessDialog, { StepData } from "@/hooks/use-process-dialog";
 import { formatDate } from "@/lib/utils";
@@ -104,6 +105,7 @@ export default function NewHypercertForm() {
   const [currentStep, setCurrentStep] = useState(1);
   const [language, setLanguage] = useState("en-US");
   const { dialogSteps, setStep } = useProcessDialog(mintSteps);
+  const { sendTransaction, txnStatus, error, isProcessing } = useTransaction();
   const form = useForm<HypercertFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: formDefaultValues,
@@ -163,19 +165,21 @@ export default function NewHypercertForm() {
       return;
     }
 
-    await mintClaim(
-      formattedMetadata.data!,
-      DEFAULT_NUM_FRACTIONS,
-      TransferRestrictions.FromCreatorOnly,
-      values.allowlistURL ||
-        values.allowlistEntries?.map((entry) => ({
-          ...entry,
-          units: BigInt(entry.units),
-        })),
-    );
+    await sendTransaction(async () => {
+      await mintClaim(
+        formattedMetadata.data!,
+        DEFAULT_NUM_FRACTIONS,
+        TransferRestrictions.FromCreatorOnly,
+        values.allowlistURL ||
+          values.allowlistEntries?.map((entry) => ({
+            ...entry,
+            units: BigInt(entry.units),
+          })),
+      );
+    });
 
-    form.reset();
-    setCurrentStep(1);
+    // form.reset();
+    // setCurrentStep(1);
   }
 
   const onSubmitInvalid = (errors: FieldErrors) => {
@@ -231,7 +235,7 @@ export default function NewHypercertForm() {
           />
         </div>
       </section>
-      <StepProcessDialog
+      {/* <StepProcessDialog
         open={mintClaimPending}
         steps={dialogSteps}
         title="Mint your hypercert"
@@ -251,7 +255,7 @@ export default function NewHypercertForm() {
             </Link>
           )
         }
-      />
+      /> */}
     </main>
   );
 }
