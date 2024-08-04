@@ -20,39 +20,21 @@ const query = graphql(
     [HypercertListFragment],
 );
 
-export async function getHypercertsByCreator({
-                                                 creatorAddress,
-                                             }: {
-    creatorAddress: string;
-}) {
-    const res = {
-        count: null,
-        data: null
-    }
-
+export async function getHypercertsByCreator({creatorAddress}: { creatorAddress: string }) {
     try {
         const queryRes = await request(HYPERCERTS_API_URL, query, {
-            where: {
-                creator_address: {
-                    contains: creatorAddress,
-                },
-            },
+            where: {creator_address: {contains: creatorAddress}},
         });
 
-        // TODO: Throw error?
-        if (!queryRes.hypercerts?.data) {
-            return undefined;
+        if (!queryRes.hypercerts?.data) return undefined;
+
+        return {
+            count: queryRes.hypercerts.count ?? 0,
+            data: queryRes.hypercerts.data.map(hypercert => readFragment(HypercertListFragment, hypercert)) || [],
         }
-
-        res.count = queryRes.hypercerts.count;
-        res.data = queryRes.hypercerts.data.map((hypercert) => {
-            return readFragment(HypercertListFragment, hypercert);
-        })
-
-        return res;
     } catch (e) {
-        console.error(`[getHypercertsByCreator] Error fetching hypercerts by creator: ${(e as Error).message}`);
-        return undefined;
+        console.error(`[getHypercertsByCreator] Error: ${(e as Error).message}`);
+        return undefined
     }
 
 }
