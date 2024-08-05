@@ -1,8 +1,5 @@
 import {getHypercertsByCreator} from "@/hypercerts/getHypercertsByCreator";
 import {getAllowListRecordsForAddress} from "@/allowlists/getAllowListRecordsForAddress";
-import Link from "next/link";
-import {cn} from "@/lib/utils";
-import CountBadge from "@/components/count-badge";
 import {calculateBigIntPercentage} from "@/lib/calculateBigIntPercentage";
 import {getPricePerPercent} from "@/marketplace/utils";
 import {HypercertMiniDisplayProps} from "@/components/hypercert/hypercert-mini-display";
@@ -13,10 +10,11 @@ import UnclaimedHypercertsList from "@/components/profile/unclaimed-hypercerts-l
 import {Suspense} from "react";
 import ExploreListSkeleton from "@/components/explore/explore-list-skeleton";
 import {
-    createTabRoute,
     ProfileSubTabKey,
     subTabs,
 } from "@/app/profile/[address]/tabs";
+import {SubTabsWithCount} from "@/components/profile/sub-tabs-with-count";
+import {getHypercertsByOwner} from "@/hypercerts/getHypercertsByOwner";
 
 const HypercertsTabContentInner = async ({
                                              address,
@@ -28,6 +26,11 @@ const HypercertsTabContentInner = async ({
     const createdHypercerts = await getHypercertsByCreator({
         creatorAddress: address,
     });
+
+    const ownedHypercerts = await getHypercertsByOwner({
+        ownerAddress: address,
+    })
+
     const allowlist = await getAllowListRecordsForAddress(address);
 
     // TODO: Do this in the query. Currently it doesn't support multiple filters at the same time
@@ -41,6 +44,7 @@ const HypercertsTabContentInner = async ({
         !Array.isArray(allowlist.data);
 
     const showCreatedHypercerts = createdHypercerts?.data && createdHypercerts.data.length > 0;
+    const showOwnedHypercerts = ownedHypercerts?.data && ownedHypercerts.data.length > 0;
     const hypercertSubTabs = subTabs.filter(
         (tab) => tab.key.split("-")[0] === "hypercerts",
     );
@@ -49,38 +53,57 @@ const HypercertsTabContentInner = async ({
         Record<(typeof subTabs)[number]["key"], number>
     > = {
         "hypercerts-created": createdHypercerts?.count ?? 0,
+        "hypercerts-owned": ownedHypercerts?.count ?? 0,
         "hypercerts-claimable": unclaimedHypercerts.length,
     };
 
     return (
         <section>
-            <section className="bg-neutral-100 w-max flex rounded-sm p-1">
-                {hypercertSubTabs.map(({key, triggerLabel}) => (
-                    <Link href={createTabRoute(address, key)} key={key}>
-                        <button
-                            className={cn(
-                                "flex gap-1.5 px-3 py-2 text-sm rounded-md tracking-tight transition duration-300 border-[1.5px] shadow-sm font-semibold",
-                                key === activeTab
-                                    ? "bg-white border-neutral-300"
-                                    : "opacity-60 border-transparent",
-                            )}
-                        >
-                            {triggerLabel}
-                            {tabBadgeCounts[key] && (
-                                <CountBadge
-                                    count={tabBadgeCounts[key]}
-                                    variant={key === activeTab ? "default" : "secondary"}
-                                />
-                            )}
-                        </button>
-                    </Link>
-                ))}
-            </section>
+            < SubTabsWithCount
+                address={address}
+                activeTab={activeTab}
+                tabBadgeCounts={tabBadgeCounts}
+                tabs={hypercertSubTabs}
+            />
 
             {activeTab === "hypercerts-created" &&
                 (showCreatedHypercerts ? (
-                    <div className="grid grid-cols-[repeat(auto-fit,_minmax(270px,_1fr))] gap-4">
+                    <div className="grid grid-cols-[repeat(auto-fit,_minmax(270px,_1fr))] gap-4 py-4">
                         {createdHypercerts.data.map((hypercert) => {
+                            const percentAvailable = calculateBigIntPercentage(
+                                hypercert.orders?.totalUnitsForSale,
+                                hypercert.units,
+                            );
+                            const lowestPrice = getPricePerPercent(
+                                hypercert.orders?.lowestAvailablePrice || "0",
+                                BigInt(hypercert?.units || "0"),
+                            );
+
+                            const props: HypercertMiniDisplayProps = {
+                                hypercertId: hypercert.hypercert_id as string,
+                                name: hypercert.metadata?.name as string,
+                                chainId: Number(
+                                    hypercert.contract?.chain_id,
+                                ) as SupportedChainIdType,
+                                attestations: hypercert.attestations,
+                                lowestPrice,
+                                percentAvailable,
+                            };
+                            return (
+                                <HypercertWindow {...props} key={hypercert.hypercert_id}/>
+                            );
+                        })}
+                    </div>
+                ) : (
+                    <section className="pt-4">
+                        <EmptySection/>
+                    </section>
+                ))}
+
+            {activeTab === "hypercerts-owned" &&
+                (showOwnedHypercerts ? (
+                    <div className="grid grid-cols-[repeat(auto-fit,_minmax(270px,_1fr))] gap-4 py-4">
+                        {ownedHypercerts.data.map((hypercert) => {
                             const percentAvailable = calculateBigIntPercentage(
                                 hypercert.orders?.totalUnitsForSale,
                                 hypercert.units,
