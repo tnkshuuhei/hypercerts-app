@@ -1,5 +1,5 @@
 import Link from "next/link";
-import {createTabRoute, ProfileSubTabKey, subTabs} from "@/app/profile/[address]/tabs";
+import {createTabRoute, subTabs} from "@/app/profile/[address]/tabs";
 import {cn} from "@/lib/utils";
 import CountBadge from "@/components/count-badge";
 

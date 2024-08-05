@@ -118,7 +118,9 @@ export const useCreateFractionalMakerAsk = ({
   const { data: currentFractions } =
     useFetchHypercertFractionsByHypercertId(hypercertId);
 
-  const { setSteps, setStep, setOpen } = useStepProcessDialogContext();
+  const { setSteps, setStep, setOpen, setTitle } = useStepProcessDialogContext();
+
+  setTitle("Create marketplace listing")
 
   return useMutation({
     mutationKey: ["createFractionalMakerAsk"],
