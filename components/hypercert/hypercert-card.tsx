@@ -57,7 +57,7 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
         ref={ref}
         className="relative w-[275px] rounded-xl border-[1.5px] border-black overflow-clip bg-black"
       >
-        <header className="relative h-[135px] w-full flex items-center justify-center rounded-b-xl overflow-clip">
+        <header className="relative h-[125px] w-full flex items-center justify-center rounded-b-xl overflow-clip">
           {banner ? (
             <Image
               src={`https://cors-proxy.hypercerts.workers.dev/?url=${banner}`}
@@ -89,14 +89,14 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
             )}
           </div>
         </section>
-        <section className="p-3 pt-4 rounded-t-xl bg-white border-t-[1.5px] border-black space-y-2">
+        <section className="p-3 pt-4 rounded-t-xl bg-white border-t-[1.5px] border-black space-y-3">
           <div className="flex items-center">
             <span className="text-xs text-slate-600 uppercase">
               {formattedDateRange}
             </span>
           </div>
           <h5
-            className="text-base font-semibold text-slate-800 line-clamp-3 text-ellipsis tracking-tight leading-tight"
+            className="text-base font-semibold text-slate-800 line-clamp-3 text-ellipsis tracking-tight leading-tight h-16"
             title={title}
           >
             {title}
