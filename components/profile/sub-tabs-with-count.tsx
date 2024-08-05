@@ -1,5 +1,5 @@
 import Link from "next/link";
-import {createTabRoute, subTabs} from "@/app/profile/[address]/tabs";
+import {createTabRoute, ProfileSubTabKey, subTabs} from "@/app/profile/[address]/tabs";
 import {cn} from "@/lib/utils";
 import CountBadge from "@/components/count-badge";
 
@@ -10,7 +10,7 @@ interface SubTabsWithCountProps {
         Record<(typeof subTabs)[number]["key"], number>
     >;
     tabs: {
-        key: string;
+        key: (typeof subTabs)[number]["key"];
         triggerLabel: string;
     }[]
 }
