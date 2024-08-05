@@ -329,7 +329,7 @@ export default function OrdersList({
         >
           <DialogContent className="gap-5 max-w-2xl">
             <DialogHeader>
-              <div className="bg-yellow-500/10 p-3 mb-2 rounded-sm">
+              <div className="bg-orange-400/70 p-3 mb-2 rounded-sm">
                 Hypercerts marketplace features are in beta. Please use with
                 caution.
               </div>

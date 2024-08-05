@@ -120,10 +120,12 @@ export const StepProcessDialogContext = createContext<{
   setStep: (step: DialogStep["id"]) => void;
   setSteps: (steps: StepData[]) => void;
   setOpen: (open: boolean) => void;
+  setTitle: (title: string) => void;
 }>({
   setStep: () => {},
   setSteps: () => {},
   setOpen: () => {},
+    setTitle: () => {}
 });
 
 export const StepProcessDialogProvider = ({
@@ -134,16 +136,18 @@ export const StepProcessDialogProvider = ({
   const [steps, setSteps] = useState<StepData[]>([]);
   const { setStep, dialogSteps } = useProcessDialog(steps);
   const [open, setOpen] = useState(false);
+  const [title, setTitle] = useState("Test title");
   return (
     <StepProcessDialogContext.Provider
       value={{
         setStep,
         setSteps,
         setOpen,
+        setTitle,
       }}
     >
       {children}
-      <StepProcessModal open={open} steps={dialogSteps} title="Test title" />
+      <StepProcessModal open={open} steps={dialogSteps} title={title} />
     </StepProcessDialogContext.Provider>
   );
 };

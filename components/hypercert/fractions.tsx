@@ -70,7 +70,7 @@ export default function Fractions({ hypercert }: { hypercert: HypercertFull }) {
           <CommandGroup>
             {hypercert.fractions.data.map((fraction) => (
               <CommandItem
-                key={fraction.owner_address}
+                key={fraction.fraction_id}
                 title={fraction.owner_address || ""}
               >
                 <UserCircle2 className="mr-2 h-4 w-4" />
