@@ -54,7 +54,7 @@ import { StepProcessDialogProvider } from "@/components/global/step-process-dial
 import { BuyFractionalOrderForm } from "@/components/marketplace/buy-fractional-order-form";
 import { useRouter } from "next/navigation";
 
-export default function UserOrdersList({
+export default function UserListingsList({
   address,
   orders,
 }: {

@@ -21,8 +21,8 @@ importers:
         specifier: 0.3.23
         version: 0.3.23(@swc/helpers@0.5.5)(bufferutil@4.0.8)(ethers@6.13.1(bufferutil@4.0.8))(graphql@16.9.0)(rollup@4.18.0)(svelte@4.2.18)(typescript@5.5.2)
       '@hypercerts-org/sdk':
-        specifier: 2.0.0-alpha.30
-        version: 2.0.0-alpha.30(@swc/helpers@0.5.5)(bufferutil@4.0.8)(graphql@16.9.0)(rollup@4.18.0)(typescript@5.5.2)
+        specifier: 2.0.0-alpha.32
+        version: 2.0.0-alpha.32(@swc/helpers@0.5.5)(bufferutil@4.0.8)(graphql@16.9.0)(rollup@4.18.0)(typescript@5.5.2)
       '@openzeppelin/merkle-tree':
         specifier: ^1.0.6
         version: 1.0.6
@@ -1135,6 +1135,9 @@ packages:
   '@hypercerts-org/sdk@2.0.0-alpha.30':
     resolution: {integrity: sha512-xibQgoEb/xgqXGzlHibwruGqRbOu7khrzzd8Vht+aGHusJfL5GzOTZ+aVE+cw6g4yfVFV0Bpwk2pNGj/nH2LHQ==}
 
+  '@hypercerts-org/sdk@2.0.0-alpha.32':
+    resolution: {integrity: sha512-DsWTJUjVMDSf80dJL8bg0DaS78zJFEHqfSwGoxYdnmPA4yjJ/+sOm5e6cMSK6GSIgg90CFgD1u69L4OggSYH+w==}
+
   '@isaacs/cliui@8.0.2':
     resolution: {integrity: sha512-O8jcjabXaleOG9DQ0+ARXWZBTfnP4WNAqzuiJK7ll44AmxGKv/J2M4TPjxjY3znBCfvBXFzucm1twdyFybFqEA==}
     engines: {node: '>=12'}
@@ -1527,6 +1530,9 @@ packages:
 
   '@openzeppelin/merkle-tree@1.0.6':
     resolution: {integrity: sha512-cGWOb2WBWbJhqvupzxjnKAwGLxxAEYPg51sk76yZ5nVe5D03mw7Vx5yo8llaIEqYhP5O39M8QlrNWclgLfKVrA==}
+
+  '@openzeppelin/merkle-tree@1.0.7':
+    resolution: {integrity: sha512-i93t0YYv6ZxTCYU3CdO5Q+DXK0JH10A4dCBOMlzYbX+ujTXm+k1lXiEyVqmf94t3sqmv8sm/XT5zTa0+efnPgQ==}
 
   '@parcel/watcher-android-arm64@2.4.1':
     resolution: {integrity: sha512-LOi/WTbbh3aTn2RYddrO8pnapixAziFl6SMxHM69r3tvdSm94JtCenaKgk1GRg5FJ5wpMCpHeW+7yqPlvZv7kg==}
@@ -8234,6 +8240,30 @@ snapshots:
       - typescript
       - utf-8-validate
 
+  '@hypercerts-org/sdk@2.0.0-alpha.32(@swc/helpers@0.5.5)(bufferutil@4.0.8)(graphql@16.9.0)(rollup@4.18.0)(typescript@5.5.2)':
+    dependencies:
+      '@graphql-typed-document-node/core': 3.2.0(graphql@16.9.0)
+      '@hypercerts-org/contracts': 2.0.0-alpha.1(bufferutil@4.0.8)(typescript@5.5.2)
+      '@openzeppelin/merkle-tree': 1.0.7
+      '@swc/core': 1.6.5(@swc/helpers@0.5.5)
+      ajv: 8.16.0
+      axios: 1.7.2
+      dotenv: 16.4.5
+      rollup-plugin-swc3: 0.11.2(@swc/core@1.6.5(@swc/helpers@0.5.5))(rollup@4.18.0)
+      viem: 2.16.2(bufferutil@4.0.8)(typescript@5.5.2)(zod@3.23.8)
+      zod: 3.23.8
+    transitivePeerDependencies:
+      - '@swc/helpers'
+      - bufferutil
+      - c-kzg
+      - debug
+      - graphql
+      - rollup
+      - supports-color
+      - ts-node
+      - typescript
+      - utf-8-validate
+
   '@isaacs/cliui@8.0.2':
     dependencies:
       string-width: 5.1.2
@@ -8698,6 +8728,13 @@ snapshots:
     dependencies:
       '@ethersproject/abi': 5.7.0
       ethereum-cryptography: 1.2.0
+
+  '@openzeppelin/merkle-tree@1.0.7':
+    dependencies:
+      '@ethersproject/abi': 5.7.0
+      '@ethersproject/bytes': 5.7.0
+      '@ethersproject/constants': 5.7.0
+      '@ethersproject/keccak256': 5.7.0
 
   '@parcel/watcher-android-arm64@2.4.1':
     optional: true

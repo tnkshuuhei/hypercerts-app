@@ -20,10 +20,10 @@ const query = graphql(
     [HypercertListFragment],
 );
 
-export async function getHypercertsByCreator({creatorAddress}: { creatorAddress: string }) {
+export async function getHypercertsByOwner({ownerAddress}: { ownerAddress: string }) {
     try {
         const queryRes = await request(HYPERCERTS_API_URL, query, {
-            where: {creator_address: {contains: creatorAddress}},
+            where: {fractions: {owner_address: {eq: ownerAddress}}},
         });
 
         if (!queryRes.hypercerts?.data) return undefined;
@@ -33,7 +33,7 @@ export async function getHypercertsByCreator({creatorAddress}: { creatorAddress:
             data: queryRes.hypercerts.data.map(hypercert => readFragment(HypercertListFragment, hypercert)) || [],
         }
     } catch (e) {
-        console.error(`[getHypercertsByCreator] Error: ${(e as Error).message}`);
+        console.error(`[getHypercertsByOwner] Error: ${(e as Error).message}`);
         return undefined
     }
 
