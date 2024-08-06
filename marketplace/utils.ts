@@ -1,7 +1,7 @@
 import { currenciesByNetwork, Currency } from "@hypercerts-org/marketplace-sdk";
 import {
   decodeAbiParameters,
-  formatEther,
+  formatUnits,
   parseAbiParameters,
   parseEther,
 } from "viem";
@@ -40,12 +40,32 @@ export const getPricePerUnit = (
 ) => {
   const unitsPerPercent = totalUnits / BigInt(100);
   const pricePerPercentWei = parseEther(pricePerPercent);
-  return formatEther(pricePerPercentWei / unitsPerPercent);
+  return pricePerPercentWei / unitsPerPercent;
 };
 
 export const getPricePerPercent = (price: string, totalUnits: bigint) => {
   const unitsPerPercent = totalUnits / BigInt(100);
-  return formatEther(BigInt(price) * unitsPerPercent);
+  return BigInt(price) * unitsPerPercent;
+};
+
+export const formatPrice = (
+  units: bigint,
+  currency: string,
+  includeSymbol = false,
+) => {
+  const currencyData = getCurrencyByAddress(currency);
+
+  if (!currencyData) {
+    return "Unknown currency";
+  }
+
+  const formattedUnits = formatUnits(units, currencyData.decimals);
+
+  if (includeSymbol) {
+    return `${formattedUnits} ${currencyData.symbol}`;
+  }
+
+  return formattedUnits;
 };
 
 export const orderFragmentToMarketplaceOrder = (

@@ -35,6 +35,8 @@ import { useHypercertClient } from "@/hooks/use-hypercert-client";
 import { HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
 import {
   decodeFractionalOrderParams,
+  formatPrice,
+  getCurrencyByAddress,
   getPricePerPercent,
   orderFragmentToMarketplaceOrder,
 } from "@/marketplace/utils";
@@ -49,7 +51,7 @@ import { useHypercertExchangeClient } from "@/hooks/use-hypercert-exchange-clien
 import { OrderFragment } from "@/marketplace/fragments/order.fragment";
 import { FormattedUnits } from "@/components/formatted-units";
 
-export default function OrdersList({
+export default function HypercertListingsList({
   orders,
   hypercert,
 }: {
@@ -110,15 +112,25 @@ export default function OrdersList({
           </Button>
         );
       },
-      cell: (row) => (
-        <div>
-          {getPricePerPercent(
-            row.getValue(),
-            BigInt(hypercert.units || BigInt(0)),
-          )}{" "}
-          ETH
-        </div>
-      ),
+      cell: (row) => {
+        const currency = getCurrencyByAddress(row.row.original.currency);
+
+        if (!currency) {
+          return <div>Invalid currency</div>;
+        }
+        return (
+          <div>
+            {formatPrice(
+              getPricePerPercent(
+                row.getValue(),
+                BigInt(hypercert.units || BigInt(0)),
+              ),
+              row.row.original.currency,
+              true,
+            )}
+          </div>
+        );
+      },
       sortingFn: (rowA, rowB) =>
         BigInt(rowA.getValue("price")) < BigInt(rowB.getValue("price"))
           ? 1

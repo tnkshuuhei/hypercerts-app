@@ -1,162 +1,173 @@
-import {getHypercertsByCreator} from "@/hypercerts/getHypercertsByCreator";
-import {getAllowListRecordsForAddress} from "@/allowlists/getAllowListRecordsForAddress";
-import {calculateBigIntPercentage} from "@/lib/calculateBigIntPercentage";
-import {getPricePerPercent} from "@/marketplace/utils";
-import {HypercertMiniDisplayProps} from "@/components/hypercert/hypercert-mini-display";
-import type {SupportedChainIdType} from "@/lib/constants";
+import { getHypercertsByCreator } from "@/hypercerts/getHypercertsByCreator";
+import { getAllowListRecordsForAddress } from "@/allowlists/getAllowListRecordsForAddress";
+import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
+import { formatPrice, getPricePerPercent } from "@/marketplace/utils";
+import { HypercertMiniDisplayProps } from "@/components/hypercert/hypercert-mini-display";
+import type { SupportedChainIdType } from "@/lib/constants";
 import HypercertWindow from "@/components/hypercert/hypercert-window";
-import {EmptySection} from "@/app/profile/[address]/sections";
+import { EmptySection } from "@/app/profile/[address]/sections";
 import UnclaimedHypercertsList from "@/components/profile/unclaimed-hypercerts-list";
-import {Suspense} from "react";
+import { Suspense } from "react";
 import ExploreListSkeleton from "@/components/explore/explore-list-skeleton";
-import {
-    ProfileSubTabKey,
-    subTabs,
-} from "@/app/profile/[address]/tabs";
-import {SubTabsWithCount} from "@/components/profile/sub-tabs-with-count";
-import {getHypercertsByOwner} from "@/hypercerts/getHypercertsByOwner";
+import { ProfileSubTabKey, subTabs } from "@/app/profile/[address]/tabs";
+import { SubTabsWithCount } from "@/components/profile/sub-tabs-with-count";
+import { getHypercertsByOwner } from "@/hypercerts/getHypercertsByOwner";
 
 const HypercertsTabContentInner = async ({
-                                             address,
-                                             activeTab,
-                                         }: {
-    address: string;
-    activeTab: ProfileSubTabKey;
+  address,
+  activeTab,
+}: {
+  address: string;
+  activeTab: ProfileSubTabKey;
 }) => {
-    const createdHypercerts = await getHypercertsByCreator({
-        creatorAddress: address,
-    });
+  const createdHypercerts = await getHypercertsByCreator({
+    creatorAddress: address,
+  });
 
-    const ownedHypercerts = await getHypercertsByOwner({
-        ownerAddress: address,
-    })
+  const ownedHypercerts = await getHypercertsByOwner({
+    ownerAddress: address,
+  });
 
-    const allowlist = await getAllowListRecordsForAddress(address);
+  const allowlist = await getAllowListRecordsForAddress(address);
 
-    // TODO: Do this in the query. Currently it doesn't support multiple filters at the same time
-    const unclaimedHypercerts =
-        allowlist?.data.filter((item) => !item.claimed) || [];
+  // TODO: Do this in the query. Currently it doesn't support multiple filters at the same time
+  const unclaimedHypercerts =
+    allowlist?.data.filter((item) => !item.claimed) || [];
 
-    const isEmptyAllowlist =
-        !allowlist ||
-        allowlist.count === 0 ||
-        !allowlist.data ||
-        !Array.isArray(allowlist.data);
+  const isEmptyAllowlist =
+    !allowlist ||
+    allowlist.count === 0 ||
+    !allowlist.data ||
+    !Array.isArray(allowlist.data);
 
-    const showCreatedHypercerts = createdHypercerts?.data && createdHypercerts.data.length > 0;
-    const showOwnedHypercerts = ownedHypercerts?.data && ownedHypercerts.data.length > 0;
-    const hypercertSubTabs = subTabs.filter(
-        (tab) => tab.key.split("-")[0] === "hypercerts",
-    );
+  const showCreatedHypercerts =
+    createdHypercerts?.data && createdHypercerts.data.length > 0;
+  const showOwnedHypercerts =
+    ownedHypercerts?.data && ownedHypercerts.data.length > 0;
+  const hypercertSubTabs = subTabs.filter(
+    (tab) => tab.key.split("-")[0] === "hypercerts",
+  );
 
-    const tabBadgeCounts: Partial<
-        Record<(typeof subTabs)[number]["key"], number>
-    > = {
-        "hypercerts-created": createdHypercerts?.count ?? 0,
-        "hypercerts-owned": ownedHypercerts?.count ?? 0,
-        "hypercerts-claimable": unclaimedHypercerts.length,
-    };
+  const tabBadgeCounts: Partial<
+    Record<(typeof subTabs)[number]["key"], number>
+  > = {
+    "hypercerts-created": createdHypercerts?.count ?? 0,
+    "hypercerts-owned": ownedHypercerts?.count ?? 0,
+    "hypercerts-claimable": unclaimedHypercerts.length,
+  };
 
-    return (
-        <section>
-            < SubTabsWithCount
-                address={address}
-                activeTab={activeTab}
-                tabBadgeCounts={tabBadgeCounts}
-                tabs={hypercertSubTabs}
-            />
+  return (
+    <section>
+      <SubTabsWithCount
+        address={address}
+        activeTab={activeTab}
+        tabBadgeCounts={tabBadgeCounts}
+        tabs={hypercertSubTabs}
+      />
 
-            {activeTab === "hypercerts-created" &&
-                (showCreatedHypercerts ? (
-                    <div className="grid grid-cols-[repeat(auto-fit,_minmax(270px,_1fr))] gap-4 py-4">
-                        {createdHypercerts.data.map((hypercert) => {
-                            const percentAvailable = calculateBigIntPercentage(
-                                hypercert.orders?.totalUnitsForSale,
-                                hypercert.units,
-                            );
-                            const lowestPrice = getPricePerPercent(
-                                hypercert.orders?.lowestAvailablePrice || "0",
-                                BigInt(hypercert?.units || "0"),
-                            );
+      {activeTab === "hypercerts-created" &&
+        (showCreatedHypercerts ? (
+          <div className="grid grid-cols-[repeat(auto-fit,_minmax(270px,_1fr))] gap-4 py-4">
+            {createdHypercerts.data.map((hypercert) => {
+              const percentAvailable = calculateBigIntPercentage(
+                hypercert.orders?.totalUnitsForSale,
+                hypercert.units,
+              );
+              const lowestPrice =
+                hypercert?.orders?.cheapestOrder && hypercert
+                  ? formatPrice(
+                      getPricePerPercent(
+                        hypercert.orders.cheapestOrder.price,
+                        BigInt(hypercert.units || "0"),
+                      ),
+                      hypercert.orders.cheapestOrder.currency,
+                    )
+                  : "0";
 
-                            const props: HypercertMiniDisplayProps = {
-                                hypercertId: hypercert.hypercert_id as string,
-                                name: hypercert.metadata?.name as string,
-                                chainId: Number(
-                                    hypercert.contract?.chain_id,
-                                ) as SupportedChainIdType,
-                                attestations: hypercert.attestations,
-                                lowestPrice,
-                                percentAvailable,
-                            };
-                            return (
-                                <HypercertWindow {...props} key={hypercert.hypercert_id}/>
-                            );
-                        })}
-                    </div>
-                ) : (
-                    <section className="pt-4">
-                        <EmptySection/>
-                    </section>
-                ))}
+              const props: HypercertMiniDisplayProps = {
+                hypercertId: hypercert.hypercert_id as string,
+                name: hypercert.metadata?.name as string,
+                chainId: Number(
+                  hypercert.contract?.chain_id,
+                ) as SupportedChainIdType,
+                attestations: hypercert.attestations,
+                lowestPrice,
+                percentAvailable,
+              };
+              return (
+                <HypercertWindow {...props} key={hypercert.hypercert_id} />
+              );
+            })}
+          </div>
+        ) : (
+          <section className="pt-4">
+            <EmptySection />
+          </section>
+        ))}
 
-            {activeTab === "hypercerts-owned" &&
-                (showOwnedHypercerts ? (
-                    <div className="grid grid-cols-[repeat(auto-fit,_minmax(270px,_1fr))] gap-4 py-4">
-                        {ownedHypercerts.data.map((hypercert) => {
-                            const percentAvailable = calculateBigIntPercentage(
-                                hypercert.orders?.totalUnitsForSale,
-                                hypercert.units,
-                            );
-                            const lowestPrice = getPricePerPercent(
-                                hypercert.orders?.lowestAvailablePrice || "0",
-                                BigInt(hypercert?.units || "0"),
-                            );
+      {activeTab === "hypercerts-owned" &&
+        (showOwnedHypercerts ? (
+          <div className="grid grid-cols-[repeat(auto-fit,_minmax(270px,_1fr))] gap-4 py-4">
+            {ownedHypercerts.data.map((hypercert) => {
+              const percentAvailable = calculateBigIntPercentage(
+                hypercert.orders?.totalUnitsForSale,
+                hypercert.units,
+              );
+              const lowestPrice =
+                hypercert?.orders?.cheapestOrder && hypercert
+                  ? formatPrice(
+                      getPricePerPercent(
+                        hypercert.orders.cheapestOrder.price,
+                        BigInt(hypercert.units || "0"),
+                      ),
+                      hypercert.orders.cheapestOrder.currency,
+                    )
+                  : "0";
 
-                            const props: HypercertMiniDisplayProps = {
-                                hypercertId: hypercert.hypercert_id as string,
-                                name: hypercert.metadata?.name as string,
-                                chainId: Number(
-                                    hypercert.contract?.chain_id,
-                                ) as SupportedChainIdType,
-                                attestations: hypercert.attestations,
-                                lowestPrice,
-                                percentAvailable,
-                            };
-                            return (
-                                <HypercertWindow {...props} key={hypercert.hypercert_id}/>
-                            );
-                        })}
-                    </div>
-                ) : (
-                    <section className="pt-4">
-                        <EmptySection/>
-                    </section>
-                ))}
+              const props: HypercertMiniDisplayProps = {
+                hypercertId: hypercert.hypercert_id as string,
+                name: hypercert.metadata?.name as string,
+                chainId: Number(
+                  hypercert.contract?.chain_id,
+                ) as SupportedChainIdType,
+                attestations: hypercert.attestations,
+                lowestPrice,
+                percentAvailable,
+              };
+              return (
+                <HypercertWindow {...props} key={hypercert.hypercert_id} />
+              );
+            })}
+          </div>
+        ) : (
+          <section className="pt-4">
+            <EmptySection />
+          </section>
+        ))}
 
-            {activeTab === "hypercerts-claimable" && (
-                <section className="pt-4">
-                    <UnclaimedHypercertsList
-                        unclaimedHypercerts={unclaimedHypercerts}
-                        isEmptyAllowlist={isEmptyAllowlist}
-                    />
-                </section>
-            )}
+      {activeTab === "hypercerts-claimable" && (
+        <section className="pt-4">
+          <UnclaimedHypercertsList
+            unclaimedHypercerts={unclaimedHypercerts}
+            isEmptyAllowlist={isEmptyAllowlist}
+          />
         </section>
-    );
+      )}
+    </section>
+  );
 };
 
 const HypercertsTabContent = ({
-                                  address,
-                                  activeTab,
-                              }: {
-    address: string;
-    activeTab: ProfileSubTabKey;
+  address,
+  activeTab,
+}: {
+  address: string;
+  activeTab: ProfileSubTabKey;
 }) => {
-    return (
-        <Suspense fallback={<ExploreListSkeleton length={4}/>}>
-            <HypercertsTabContentInner address={address} activeTab={activeTab}/>
-        </Suspense>
-    );
+  return (
+    <Suspense fallback={<ExploreListSkeleton length={4} />}>
+      <HypercertsTabContentInner address={address} activeTab={activeTab} />
+    </Suspense>
+  );
 };
-export {HypercertsTabContent};
+export { HypercertsTabContent };

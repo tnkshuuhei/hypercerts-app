@@ -9,7 +9,7 @@ import ExternalUrl from "@/components/hypercert/external-url";
 import Fractions from "@/components/hypercert/fractions";
 import Image from "next/image";
 import { ListForSaleButton } from "@/components/marketplace/list-for-sale-button";
-import OrdersList from "@/components/marketplace/orders-list";
+import HypercertListingsList from "@/components/marketplace/hypercert-listings-list";
 import PageSkeleton from "@/components/hypercert/page-skeleton";
 import ReadMore from "@/components/read-more";
 import { Separator } from "@/components/ui/separator";
@@ -129,7 +129,7 @@ async function HypercertPageInner({
           <ListForSaleButton hypercert={hypercert} />
         </div>
       </div>
-      <OrdersList hypercert={hypercert} orders={orders?.data} />
+      <HypercertListingsList hypercert={hypercert} orders={orders?.data} />
     </section>
   );
 }

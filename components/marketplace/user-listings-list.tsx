@@ -30,6 +30,8 @@ import { cn } from "@/lib/utils";
 import { useHypercertClient } from "@/hooks/use-hypercert-client";
 import {
   decodeFractionalOrderParams,
+  formatPrice,
+  getCurrencyByAddress,
   getPricePerPercent,
   orderFragmentToHypercert,
   orderFragmentToMarketplaceOrder,
@@ -132,11 +134,20 @@ export default function UserListingsList({
         );
       },
       cell: (row) => {
+        const currency = getCurrencyByAddress(row.row.original.currency);
+
+        if (!currency) {
+          return <div>Invalid currency</div>;
+        }
+
         const hypercert = row.row.original.hypercert;
         return (
           <div>
-            {getPricePerPercent(row.getValue(), BigInt(hypercert?.units || 0))}{" "}
-            ETH
+            {formatPrice(
+              getPricePerPercent(row.getValue(), BigInt(hypercert?.units || 0)),
+              row.row.original.currency,
+              true,
+            )}
           </div>
         );
       },

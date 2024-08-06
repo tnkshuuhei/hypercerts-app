@@ -14,7 +14,7 @@ import { Suspense } from "react";
 import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
 import { type SupportedChainIdType } from "@/lib/constants";
 import HypercertWindow from "@/components/hypercert/hypercert-window";
-import { getPricePerPercent } from "@/marketplace/utils";
+import { formatPrice, getPricePerPercent } from "@/marketplace/utils";
 
 function HypercertsListNoResults() {
   return "No results found";
@@ -73,10 +73,17 @@ async function ExploreListInner({
             hypercert.orders?.totalUnitsForSale,
             hypercert.units,
           );
-          const lowestPrice = getPricePerPercent(
-            hypercert.orders?.lowestAvailablePrice || "0",
-            BigInt(hypercert?.units || "0"),
-          );
+          const lowestPrice =
+            hypercert?.orders?.cheapestOrder && hypercert
+              ? formatPrice(
+                  getPricePerPercent(
+                    hypercert.orders.cheapestOrder.price,
+                    BigInt(hypercert.units || "0"),
+                  ),
+                  hypercert.orders.cheapestOrder.currency,
+                )
+              : "0";
+
           const props: HypercertMiniDisplayProps = {
             hypercertId: hypercert.hypercert_id as string,
             name: hypercert.metadata?.name as string,
