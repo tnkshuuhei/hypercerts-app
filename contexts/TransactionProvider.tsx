@@ -1,5 +1,5 @@
 "use client";
-import { Drawer, DrawerContent } from "@/components/ui/drawer";
+import TransactionProcessingDialog from "@/components/transaction-processing-dialog";
 import React, {
   createContext,
   type ReactNode,
@@ -9,11 +9,23 @@ import React, {
 import { toast } from "sonner";
 import { useAccount, useConfig } from "wagmi";
 
-type TransactionStatus = "pending" | "processing" | "success" | "failed" | null;
+export type TransactionStatus =
+  | "pending"
+  | "processing"
+  | "success"
+  | "failed"
+  | null;
 
 interface TransactionContextType {
-  sendTransaction: (transactionFunction: () => Promise<any>) => Promise<void>;
+  sendTransaction: ({
+    txnTitle,
+    txnFn,
+  }: {
+    txnTitle: string;
+    txnFn: () => Promise<any>;
+  }) => Promise<void>;
   txnStatus: TransactionStatus;
+  txnLabel: string;
   isProcessing: boolean;
   error: string | null;
 }
@@ -40,6 +52,7 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({
   const [txnStatus, setTxnStatus] = useState<TransactionStatus>(null);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [txnLabel, setTxnLabel] = useState("Transaction");
 
   const { isConnected, chain } = useAccount();
   const { chains } = useConfig();
@@ -82,8 +95,12 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({
     toast.error("Transaction error", { description: error });
 
   const contextValue: TransactionContextType = {
-    sendTransaction,
+    sendTransaction: ({ txnTitle, txnFn }) => {
+      setTxnLabel(txnTitle);
+      return sendTransaction(txnFn);
+    },
     txnStatus,
+    txnLabel,
     isProcessing,
     error,
   };
@@ -92,16 +109,11 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({
     <TransactionContext.Provider value={contextValue}>
       {children}
       {error && emitToastError(error)}
-      <Drawer open={isProcessing} onClose={() => {}}>
-        <DrawerContent className="p-4">
-          <h2 className="text-lg font-semibold">
-            Transaction Status: {txnStatus}
-          </h2>
-          {txnStatus === "pending" && <p>Waiting for confirmation...</p>}
-          {txnStatus === "processing" && <p>Processing transaction...</p>}
-          {txnStatus === "success" && <p>Transaction successful!</p>}
-        </DrawerContent>
-      </Drawer>
+      <TransactionProcessingDialog
+        isProcessing={isProcessing}
+        txnStatus={txnStatus}
+        txnLabel={txnLabel}
+      />
     </TransactionContext.Provider>
   );
 };

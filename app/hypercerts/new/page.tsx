@@ -165,17 +165,20 @@ export default function NewHypercertForm() {
       return;
     }
 
-    await sendTransaction(async () => {
-      await mintClaim(
-        formattedMetadata.data!,
-        DEFAULT_NUM_FRACTIONS,
-        TransferRestrictions.FromCreatorOnly,
-        values.allowlistURL ||
-          values.allowlistEntries?.map((entry) => ({
-            ...entry,
-            units: BigInt(entry.units),
-          })),
-      );
+    await sendTransaction({
+      txnTitle: "Mint hypercert",
+      txnFn: async () => {
+        await mintClaim(
+          formattedMetadata.data!,
+          DEFAULT_NUM_FRACTIONS,
+          TransferRestrictions.FromCreatorOnly,
+          values.allowlistURL ||
+            values.allowlistEntries?.map((entry) => ({
+              ...entry,
+              units: BigInt(entry.units),
+            })),
+        );
+      },
     });
 
     // form.reset();
