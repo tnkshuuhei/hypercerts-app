@@ -1,4 +1,8 @@
-import { currenciesByNetwork, Currency } from "@hypercerts-org/marketplace-sdk";
+import {
+  ChainId,
+  currenciesByNetwork,
+  Currency,
+} from "@hypercerts-org/marketplace-sdk";
 import {
   decodeAbiParameters,
   formatUnits,
@@ -9,10 +13,9 @@ import { OrderFragment } from "@/marketplace/fragments/order.fragment";
 import { MarketplaceOrder } from "@/marketplace/types";
 import { HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
 
-export const getCurrencyByAddress = (address: string) => {
-  const allCurrencies = Object.values(currenciesByNetwork).flatMap(
-    (currencies) => Object.values(currencies),
-  ) as Currency[];
+export const getCurrencyByAddress = (chain: ChainId, address: string) => {
+  const currenciesForNetwork = currenciesByNetwork[chain];
+  const allCurrencies = Object.values(currenciesForNetwork) as Currency[];
 
   return allCurrencies.find((currency) => currency.address === address);
 };
@@ -49,11 +52,19 @@ export const getPricePerPercent = (price: string, totalUnits: bigint) => {
 };
 
 export const formatPrice = (
+  chainId: number | string | null | undefined,
   units: bigint,
   currency: string,
   includeSymbol = false,
 ) => {
-  const currencyData = getCurrencyByAddress(currency);
+  if (!chainId) {
+    return "Unknown chain";
+  }
+
+  const parsedChainId =
+    typeof chainId === "number" ? chainId : parseInt(chainId, 10);
+
+  const currencyData = getCurrencyByAddress(parsedChainId, currency);
 
   if (!currencyData) {
     return "Unknown currency";

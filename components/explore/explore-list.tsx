@@ -76,6 +76,7 @@ async function ExploreListInner({
           const lowestPrice =
             hypercert?.orders?.cheapestOrder && hypercert
               ? formatPrice(
+                  hypercert.orders.cheapestOrder.chainId,
                   getPricePerPercent(
                     hypercert.orders.cheapestOrder.price,
                     BigInt(hypercert.units || "0"),

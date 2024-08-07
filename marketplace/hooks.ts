@@ -28,7 +28,7 @@ import { useHypercertExchangeClient } from "@/hooks/use-hypercert-exchange-clien
 import { toast } from "@/components/ui/use-toast";
 import { useState } from "react";
 import { getFractionsByHypercert } from "@/hypercerts/getFractionsByHypercert";
-import { formatPrice, getCurrencyByAddress } from "@/marketplace/utils";
+import { getCurrencyByAddress } from "@/marketplace/utils";
 
 export const useCreateOrderInSupabase = () => {
   const chainId = useChainId();
@@ -190,7 +190,12 @@ export const useCreateFractionalMakerAsk = ({
 
       setStep("Create");
 
-      const currency = getCurrencyByAddress(values.currency);
+      const { chainId: chainIdFromHypercertId } =
+        parseClaimOrFractionId(hypercertId);
+      const currency = getCurrencyByAddress(
+        chainIdFromHypercertId,
+        values.currency,
+      );
 
       if (!currency) {
         throw new Error("Invalid currency");
@@ -418,7 +423,7 @@ export const useBuyFractionalMakerAsk = () => {
       setOpen(true);
 
       setStep("Setting up order execution");
-      const currency = getCurrencyByAddress(order.currency);
+      const currency = getCurrencyByAddress(order.chainId, order.currency);
 
       if (!currency) {
         throw new Error("Invalid currency");

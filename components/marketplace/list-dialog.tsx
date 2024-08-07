@@ -20,6 +20,7 @@ import { useHypercertExchangeClient } from "@/hooks/use-hypercert-exchange-clien
 import { toast } from "@/components/ui/use-toast";
 import { getCurrencyByAddress } from "@/marketplace/utils";
 import type { HypercertExchangeClient } from "@hypercerts-org/marketplace-sdk";
+import { parseClaimOrFractionId } from "@hypercerts-org/sdk";
 
 type State = {
   fractionId: string;
@@ -113,6 +114,10 @@ function ListDialogInner({
     }
   };
 
+  if (!hypercert?.hypercert_id) return null;
+
+  const { chainId } = parseClaimOrFractionId(hypercert.hypercert_id);
+
   return (
     <DialogContent className="gap-5 max-w-2xl">
       <DialogHeader>
@@ -176,7 +181,8 @@ function ListDialogInner({
             </b>{" "}
             units for sale at a total price of{" "}
             <b>
-              {floatPrice} {getCurrencyByAddress(state.currency)?.symbol}
+              {floatPrice}{" "}
+              {getCurrencyByAddress(chainId, state.currency)?.symbol}
             </b>
             .
           </div>

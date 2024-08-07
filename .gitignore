@@ -44,3 +44,4 @@ next-env.d.ts
 /.env
 /.idea/codeStyles/codeStyleConfig.xml
 /.idea/codeStyles/Project.xml
+/.idea/csv-editor.xml

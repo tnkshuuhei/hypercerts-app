@@ -113,7 +113,20 @@ export default function HypercertListingsList({
         );
       },
       cell: (row) => {
-        const currency = getCurrencyByAddress(row.row.original.currency);
+        const { hypercert, chainId } = row.row.original;
+
+        if (!chainId) {
+          return <div>Invalid chain ID</div>;
+        }
+
+        const currency = getCurrencyByAddress(
+          Number(chainId),
+          row.row.original.currency,
+        );
+
+        if (!hypercert) {
+          return <div>Invalid hypercert</div>;
+        }
 
         if (!currency) {
           return <div>Invalid currency</div>;
@@ -121,6 +134,7 @@ export default function HypercertListingsList({
         return (
           <div>
             {formatPrice(
+              row.row.original.chainId,
               getPricePerPercent(
                 row.getValue(),
                 BigInt(hypercert.units || BigInt(0)),

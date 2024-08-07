@@ -134,16 +134,25 @@ export default function UserListingsList({
         );
       },
       cell: (row) => {
-        const currency = getCurrencyByAddress(row.row.original.currency);
+        const { chainId, hypercert } = row.row.original;
+
+        if (!chainId) {
+          return <div>Invalid chain ID</div>;
+        }
+
+        const currency = getCurrencyByAddress(
+          Number(chainId),
+          row.row.original.currency,
+        );
 
         if (!currency) {
           return <div>Invalid currency</div>;
         }
 
-        const hypercert = row.row.original.hypercert;
         return (
           <div>
             {formatPrice(
+              row.row.original.chainId,
               getPricePerPercent(row.getValue(), BigInt(hypercert?.units || 0)),
               row.row.original.currency,
               true,

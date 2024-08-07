@@ -76,6 +76,7 @@ const HypercertsTabContentInner = async ({
               const lowestPrice =
                 hypercert?.orders?.cheapestOrder && hypercert
                   ? formatPrice(
+                      hypercert.orders.cheapestOrder.chainId,
                       getPricePerPercent(
                         hypercert.orders.cheapestOrder.price,
                         BigInt(hypercert.units || "0"),
@@ -116,6 +117,7 @@ const HypercertsTabContentInner = async ({
               const lowestPrice =
                 hypercert?.orders?.cheapestOrder && hypercert
                   ? formatPrice(
+                      hypercert.orders.cheapestOrder.chainId,
                       getPricePerPercent(
                         hypercert.orders.cheapestOrder.price,
                         BigInt(hypercert.units || "0"),

@@ -95,7 +95,7 @@ export const BuyFractionalOrderForm = ({
     return (units * BigInt(100)) / BigInt(hypercert?.units || 0);
   };
 
-  const currency = getCurrencyByAddress(order.currency);
+  const currency = getCurrencyByAddress(order.chainId, order.currency);
 
   if (!currency) {
     throw new Error("Currency not supported");
@@ -142,6 +142,7 @@ export const BuyFractionalOrderForm = ({
   const pricePerPercent = form.watch("pricePerPercent");
 
   const totalPrice = formatPrice(
+    order.chainId,
     (BigInt(pricePerPercent) * BigInt(Number(percentageAmount) * 100)) /
       BigInt(100),
     currency.address,
@@ -149,6 +150,7 @@ export const BuyFractionalOrderForm = ({
   );
 
   const formattedMinPrice = formatPrice(
+    order.chainId,
     BigInt(minPricePerPercent),
     currency.address,
   );
@@ -192,7 +194,11 @@ export const BuyFractionalOrderForm = ({
             </h5>
             <FormControl>
               <Input
-                value={formatPrice(BigInt(pricePerPercent), currency.address)}
+                value={formatPrice(
+                  order.chainId,
+                  BigInt(pricePerPercent),
+                  currency.address,
+                )}
                 onChange={(e) => {
                   const value = e.target.value;
                   form.setValue(
