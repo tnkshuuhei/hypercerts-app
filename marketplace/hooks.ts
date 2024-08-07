@@ -16,7 +16,7 @@ import {
 import { useHypercertClient } from "@/hooks/use-hypercert-client";
 import { useStepProcessDialogContext } from "@/components/global/step-process-dialog";
 import { parseClaimOrFractionId } from "@hypercerts-org/sdk";
-import { isAddress, parseEther } from "viem";
+import { isAddress, parseUnits } from "viem";
 import { readContract, waitForTransactionReceipt } from "viem/actions";
 import {
   CreateFractionalOfferFormValues,
@@ -28,6 +28,7 @@ import { useHypercertExchangeClient } from "@/hooks/use-hypercert-exchange-clien
 import { toast } from "@/components/ui/use-toast";
 import { useState } from "react";
 import { getFractionsByHypercert } from "@/hypercerts/getFractionsByHypercert";
+import { formatPrice, getCurrencyByAddress } from "@/marketplace/utils";
 
 export const useCreateOrderInSupabase = () => {
   const chainId = useChainId();
@@ -118,9 +119,10 @@ export const useCreateFractionalMakerAsk = ({
   const { data: currentFractions } =
     useFetchHypercertFractionsByHypercertId(hypercertId);
 
-  const { setSteps, setStep, setOpen, setTitle } = useStepProcessDialogContext();
+  const { setSteps, setStep, setOpen, setTitle } =
+    useStepProcessDialogContext();
 
-  setTitle("Create marketplace listing")
+  setTitle("Create marketplace listing");
 
   return useMutation({
     mutationKey: ["createFractionalMakerAsk"],
@@ -143,6 +145,10 @@ export const useCreateFractionalMakerAsk = ({
 
       if (!hypercertExchangeClient) {
         throw new Error("Hypercert exchange client not initialized");
+      }
+
+      if (!values.currency) {
+        throw new Error("Currency not selected");
       }
 
       const { contractAddress, id: fractionTokenId } = parseClaimOrFractionId(
@@ -184,11 +190,21 @@ export const useCreateFractionalMakerAsk = ({
 
       setStep("Create");
 
+      const currency = getCurrencyByAddress(values.currency);
+
+      if (!currency) {
+        throw new Error("Invalid currency");
+      }
+
+      const pricePerUnit =
+        parseUnits(values.price, currency.decimals) /
+        BigInt(values.unitsForSale);
+
       const { maker, isCollectionApproved, isTransferManagerApproved } =
         await hypercertExchangeClient.createFractionalSaleMakerAsk({
           startTime: Math.floor(Date.now() / 1000), // Use it to create an order that will be valid in the future (Optional, Default to now)
           endTime: Math.floor(Date.now() / 1000) + 86400, // If you use a timestamp in ms, the function will revert
-          price: parseEther(values.price), // Be careful to use a price in wei, this example is for 1 ETH
+          price: pricePerUnit.toString(), // Be careful to use a price in wei, this example is for 1 ETH
           itemIds: [fractionTokenId.toString()], // Token id of the NFT(s) you want to sell, add several ids to create a bundle
           minUnitAmount: BigInt(values.minUnitAmount), // Minimum amount of units to keep after the sale
           maxUnitAmount: BigInt(values.maxUnitAmount), // Maximum amount of units to sell
@@ -402,11 +418,17 @@ export const useBuyFractionalMakerAsk = () => {
       setOpen(true);
 
       setStep("Setting up order execution");
+      const currency = getCurrencyByAddress(order.currency);
+
+      if (!currency) {
+        throw new Error("Invalid currency");
+      }
+
       const takerOrder = hypercertExchangeClient.createFractionalSaleTakerBid(
         order,
         address,
         unitAmount,
-        parseEther(pricePerUnit),
+        pricePerUnit,
       );
 
       try {
@@ -414,10 +436,12 @@ export const useBuyFractionalMakerAsk = () => {
         const currentAllowance = await getCurrentERC20Allowance(
           order.currency as `0x${string}`,
         );
-        if (currentAllowance < BigInt(order.price) * BigInt(unitAmount)) {
+
+        const totalPrice = BigInt(order.price) * BigInt(unitAmount);
+        if (currentAllowance < totalPrice) {
           const approveTx = await hypercertExchangeClient.approveErc20(
             order.currency,
-            BigInt(order.price) * BigInt(unitAmount),
+            totalPrice,
           );
           await waitForTransactionReceipt(walletClientData, {
             hash: approveTx.hash as `0x${string}`,
