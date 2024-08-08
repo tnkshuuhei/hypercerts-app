@@ -6,7 +6,6 @@ import { forwardRef } from "react";
 /**
  * HypercertCard component
  * @param {string} name - The name of the hypercert
- * @param {string} description - The description of the hypercert
  * @param {string} banner - The banner image of the hypercert
  * @param {string} logo - The logo image of the hypercert
  * @param {string} link - The link of the hypercert
@@ -15,7 +14,6 @@ import { forwardRef } from "react";
  */
 export interface HypercertCardProps {
   name?: string;
-  description?: string;
   banner?: string;
   logo?: string;
   fromDateDisplay?: string | null;
@@ -25,7 +23,6 @@ export interface HypercertCardProps {
 
 const defaultValues: HypercertCardProps = {
   name: "Your title here",
-  description: "Your description here",
   scopes: [],
 };
 
@@ -33,7 +30,6 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
   (
     {
       name: title,
-      description,
       banner,
       fromDateDisplay,
       toDateDisplay,
@@ -43,7 +39,6 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
     ref,
   ) => {
     title = title ?? defaultValues.name;
-    description = description ?? defaultValues.description;
 
     const formattedDateRange =
       fromDateDisplay && toDateDisplay
