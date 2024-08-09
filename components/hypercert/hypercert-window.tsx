@@ -3,38 +3,40 @@ import { getEvaluationStatus } from "@/hypercerts/getEvaluationStatus";
 import { supportedChains, type SupportedChainIdType } from "@/lib/constants";
 import Image from "next/image";
 import Link from "next/link";
-
-export type HypercertMiniDisplayProps = {
-  hypercertId: string;
-  name: string;
-  chainId: SupportedChainIdType;
-  fromDateDisplay?: string | null;
-  toDateDisplay?: string | null;
-  attestations: {
-    data:
-      | {
-          data: unknown;
-        }[]
-      | null;
-    count: number | null;
-  } | null;
-  hasTrustedEvaluator?: boolean;
-  percentAvailable?: number;
-  lowestPrice?: string;
-};
+import { HypercertListFragment } from "@/hypercerts/fragments/hypercert-list.fragment";
+import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
+import { formatPrice, getPricePerPercent } from "@/marketplace/utils";
 
 const HypercertWindow = ({
   hasTrustedEvaluator,
-  percentAvailable,
-  lowestPrice,
-  hypercertId,
-  name,
-  chainId,
-  attestations,
-}: HypercertMiniDisplayProps) => {
+  hypercert,
+}: {
+  hypercert: HypercertListFragment;
+  hasTrustedEvaluator?: boolean;
+}) => {
+  const hypercertId = hypercert.hypercert_id as string;
+  const name = hypercert.metadata?.name as string;
+  const chainId = Number(hypercert.contract?.chain_id) as SupportedChainIdType;
+  const attestations = hypercert.attestations;
   const cardChain = (chainId: SupportedChainIdType) => {
     return supportedChains.find((x) => x.id === chainId)?.name;
   };
+
+  const percentAvailable = calculateBigIntPercentage(
+    hypercert.orders?.totalUnitsForSale,
+    hypercert.units,
+  );
+  const lowestPrice =
+    hypercert?.orders?.cheapestOrder && hypercert
+      ? formatPrice(
+          hypercert.orders.cheapestOrder.chainId,
+          getPricePerPercent(
+            hypercert.orders.cheapestOrder.price,
+            BigInt(hypercert.units || "0"),
+          ),
+          hypercert.orders.cheapestOrder.currency,
+        )
+      : null;
 
   const evaluationStatus = getEvaluationStatus(attestations);
 

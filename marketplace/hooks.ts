@@ -426,7 +426,9 @@ export const useBuyFractionalMakerAsk = () => {
       const currency = getCurrencyByAddress(order.chainId, order.currency);
 
       if (!currency) {
-        throw new Error("Invalid currency");
+        throw new Error(
+          `Invalid currency ${order.currency} on chain ${order.chainId}`,
+        );
       }
 
       const takerOrder = hypercertExchangeClient.createFractionalSaleTakerBid(

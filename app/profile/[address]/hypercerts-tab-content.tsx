@@ -1,9 +1,5 @@
 import { getHypercertsByCreator } from "@/hypercerts/getHypercertsByCreator";
 import { getAllowListRecordsForAddress } from "@/allowlists/getAllowListRecordsForAddress";
-import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
-import { formatPrice, getPricePerPercent } from "@/marketplace/utils";
-import { HypercertMiniDisplayProps } from "@/components/hypercert/hypercert-mini-display";
-import type { SupportedChainIdType } from "@/lib/constants";
 import HypercertWindow from "@/components/hypercert/hypercert-window";
 import { EmptySection } from "@/app/profile/[address]/sections";
 import UnclaimedHypercertsList from "@/components/profile/unclaimed-hypercerts-list";
@@ -69,34 +65,11 @@ const HypercertsTabContentInner = async ({
         (showCreatedHypercerts ? (
           <div className="grid grid-cols-[repeat(auto-fit,_minmax(270px,_1fr))] gap-4 py-4">
             {createdHypercerts.data.map((hypercert) => {
-              const percentAvailable = calculateBigIntPercentage(
-                hypercert.orders?.totalUnitsForSale,
-                hypercert.units,
-              );
-              const lowestPrice =
-                hypercert?.orders?.cheapestOrder && hypercert
-                  ? formatPrice(
-                      hypercert.orders.cheapestOrder.chainId,
-                      getPricePerPercent(
-                        hypercert.orders.cheapestOrder.price,
-                        BigInt(hypercert.units || "0"),
-                      ),
-                      hypercert.orders.cheapestOrder.currency,
-                    )
-                  : "0";
-
-              const props: HypercertMiniDisplayProps = {
-                hypercertId: hypercert.hypercert_id as string,
-                name: hypercert.metadata?.name as string,
-                chainId: Number(
-                  hypercert.contract?.chain_id,
-                ) as SupportedChainIdType,
-                attestations: hypercert.attestations,
-                lowestPrice,
-                percentAvailable,
-              };
               return (
-                <HypercertWindow {...props} key={hypercert.hypercert_id} />
+                <HypercertWindow
+                  key={hypercert.hypercert_id}
+                  hypercert={hypercert}
+                />
               );
             })}
           </div>
@@ -110,34 +83,11 @@ const HypercertsTabContentInner = async ({
         (showOwnedHypercerts ? (
           <div className="grid grid-cols-[repeat(auto-fit,_minmax(270px,_1fr))] gap-4 py-4">
             {ownedHypercerts.data.map((hypercert) => {
-              const percentAvailable = calculateBigIntPercentage(
-                hypercert.orders?.totalUnitsForSale,
-                hypercert.units,
-              );
-              const lowestPrice =
-                hypercert?.orders?.cheapestOrder && hypercert
-                  ? formatPrice(
-                      hypercert.orders.cheapestOrder.chainId,
-                      getPricePerPercent(
-                        hypercert.orders.cheapestOrder.price,
-                        BigInt(hypercert.units || "0"),
-                      ),
-                      hypercert.orders.cheapestOrder.currency,
-                    )
-                  : "0";
-
-              const props: HypercertMiniDisplayProps = {
-                hypercertId: hypercert.hypercert_id as string,
-                name: hypercert.metadata?.name as string,
-                chainId: Number(
-                  hypercert.contract?.chain_id,
-                ) as SupportedChainIdType,
-                attestations: hypercert.attestations,
-                lowestPrice,
-                percentAvailable,
-              };
               return (
-                <HypercertWindow {...props} key={hypercert.hypercert_id} />
+                <HypercertWindow
+                  key={hypercert.hypercert_id}
+                  hypercert={hypercert}
+                />
               );
             })}
           </div>
