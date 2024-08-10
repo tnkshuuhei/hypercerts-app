@@ -1,22 +1,17 @@
 "use client";
 
 import FormSteps from "@/app/hypercerts/new/form-steps";
-import StepProcessDialog from "@/components/global/step-process-dialog";
 import HypercertCard from "@/components/hypercert/hypercert-card";
 import { Form } from "@/components/ui/form";
 import { toast } from "@/components/ui/use-toast";
-import { useTransaction } from "@/contexts/TransactionProvider";
-import { mintSteps, useMintClaim } from "@/hooks/use-mint-claim";
-import useProcessDialog, { StepData } from "@/hooks/use-process-dialog";
+import { useMintHypercertFlow } from "@/hooks/transaction-flows/mint-hypercert";
 import { formatDate } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
+  formatHypercertData,
   HypercertMetadata,
   TransferRestrictions,
-  formatHypercertData,
 } from "@hypercerts-org/sdk";
-import { ArrowUpRightIcon } from "lucide-react";
-import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { FieldErrors, useForm } from "react-hook-form";
 import { parseEther, TransactionReceipt } from "viem";
@@ -104,8 +99,7 @@ const formDefaultValues: HypercertFormValues = {
 export default function NewHypercertForm() {
   const [currentStep, setCurrentStep] = useState(1);
   const [language, setLanguage] = useState("en-US");
-  const { dialogSteps, setStep } = useProcessDialog(mintSteps);
-  const { sendTransaction, txnStatus, error, isProcessing } = useTransaction();
+
   const form = useForm<HypercertFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: formDefaultValues,
@@ -118,21 +112,11 @@ export default function NewHypercertForm() {
     setTxReceipt(receipt);
   };
 
-  const {
-    write: mintClaim,
-    txPending: mintClaimPending,
-    currentStep: mintStep,
-  } = useMintClaim({
-    onComplete: onMintComplete,
-  });
+  const { write: mintClaim, ...mintClaimProps } = useMintHypercertFlow();
 
   useEffect(() => {
     setLanguage(window.navigator.language);
   }, []);
-
-  useEffect(() => {
-    setStep(mintStep as StepData["id"]);
-  }, [mintStep]);
 
   async function onSubmit(values: HypercertFormValues) {
     const metadata: HypercertMetadata = {
@@ -164,25 +148,16 @@ export default function NewHypercertForm() {
       console.error("Invalid metadata", { errors: formattedMetadata.errors });
       return;
     }
-
-    await sendTransaction({
-      txnTitle: "Mint hypercert",
-      txnFn: async () => {
-        await mintClaim(
-          formattedMetadata.data!,
-          DEFAULT_NUM_FRACTIONS,
-          TransferRestrictions.FromCreatorOnly,
-          values.allowlistURL ||
-            values.allowlistEntries?.map((entry) => ({
-              ...entry,
-              units: BigInt(entry.units),
-            })),
-        );
-      },
-    });
-
-    // form.reset();
-    // setCurrentStep(1);
+    await mintClaim(
+      formattedMetadata.data!,
+      DEFAULT_NUM_FRACTIONS,
+      TransferRestrictions.FromCreatorOnly,
+      values.allowlistURL ||
+        values.allowlistEntries?.map((entry) => ({
+          ...entry,
+          units: BigInt(entry.units),
+        })),
+    );
   }
 
   const onSubmitInvalid = (errors: FieldErrors) => {
@@ -238,27 +213,6 @@ export default function NewHypercertForm() {
           />
         </div>
       </section>
-      {/* <StepProcessDialog
-        open={mintClaimPending}
-        steps={dialogSteps}
-        title="Mint your hypercert"
-        triggerLabel="See progress"
-        extraContent={
-          txReceipt && (
-            <Link
-              href={`https://sepolia.etherscan.io/tx/${txReceipt.transactionHash}`}
-              className="flex items-center underline underline-offset-2 hover:opacity-70 font-medium text-blue-700 tracking-tight group"
-              target="_blank"
-            >
-              View transaction on etherscan
-              <ArrowUpRightIcon
-                size={16}
-                className="ml-1 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-200"
-              />
-            </Link>
-          )
-        }
-      /> */}
     </main>
   );
 }
