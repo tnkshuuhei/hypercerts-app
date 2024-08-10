@@ -1,5 +1,10 @@
 "use client";
-import TransactionProcessingDialog from "@/components/transaction-processing-dialog";
+import {
+  type DialogStep,
+  type StepData,
+  StepProcessDialogProvider,
+  useStepProcessDialogContext,
+} from "@/components/global/step-process-dialog";
 import React, {
   createContext,
   type ReactNode,
@@ -28,6 +33,8 @@ interface TransactionContextType {
   txnLabel: string;
   isProcessing: boolean;
   error: string | null;
+  setTransactionSteps: (steps: StepData[]) => void;
+  setCurrentStep: (step: DialogStep["id"]) => void;
 }
 
 const TransactionContext = createContext<TransactionContextType | undefined>(
@@ -53,6 +60,11 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [txnLabel, setTxnLabel] = useState("Transaction");
+  const {
+    setSteps,
+    setDialogStep: setStep,
+    setOpen,
+  } = useStepProcessDialogContext();
 
   const { isConnected, chain } = useAccount();
   const { chains } = useConfig();
@@ -103,17 +115,21 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({
     txnLabel,
     isProcessing,
     error,
+    setTransactionSteps: (steps: StepData[]) => {
+      setSteps(steps);
+      setOpen(true);
+    },
+    setCurrentStep: (step: DialogStep["id"]) => {
+      setStep(step);
+    },
   };
 
   return (
     <TransactionContext.Provider value={contextValue}>
-      {children}
-      {error && emitToastError(error)}
-      <TransactionProcessingDialog
-        isProcessing={isProcessing}
-        txnStatus={txnStatus}
-        txnLabel={txnLabel}
-      />
+      <StepProcessDialogProvider>
+        {children}
+        {error && <div>Error: {error}</div>}
+      </StepProcessDialogProvider>
     </TransactionContext.Provider>
   );
 };
