@@ -1,6 +1,6 @@
 "use client";
+import { type StepData } from "@/components/global/step-process-dialog";
 import { useHypercertClient } from "@/hooks/use-hypercert-client";
-import { type StepData } from "@/hooks/use-process-dialog";
 import {
   TransferRestrictions,
   type HypercertMetadata,
@@ -30,15 +30,12 @@ export const mintSteps: StepData[] = [
   },
 ];
 
-export const useMintClaim = ({
-  onComplete,
-}: {
+interface IuseMintClaim {
   onComplete?: (receipt: TransactionReceipt) => void;
-}) => {
+  setCurrentStep?: (step: StepData["id"], errorMessage?: string) => void;
+}
+export const useMintClaim = ({ onComplete, setCurrentStep }: IuseMintClaim) => {
   const [txPending, setTxPending] = useState(false);
-  const [currentStep, setCurrentStep] = useState<StepData["id"]>(
-    mintSteps[0].id,
-  );
 
   const { client } = useHypercertClient();
   const { data: walletClient } = useWalletClient();
@@ -49,60 +46,60 @@ export const useMintClaim = ({
     transferRestrictions: TransferRestrictions,
     allowlistRecords?: AllowlistEntry[] | string,
   ) => {
-    setCurrentStep("minting");
     try {
       setTxPending(true);
 
       if (!client) {
-        // toast("No client found", {
-        //   type: "error",
-        // });
+        setCurrentStep?.("preparing", "No client found");
         console.error("No client found");
         return;
       }
 
-      const hash = await client.mintHypercert({
-        metaData,
-        totalUnits: units,
-        transferRestriction: transferRestrictions,
-        allowList: allowlistRecords,
-      });
+      setCurrentStep?.("minting");
+      let hash;
+      try {
+        hash = await client.mintHypercert({
+          metaData,
+          totalUnits: units,
+          transferRestriction: transferRestrictions,
+          allowList: allowlistRecords,
+        });
+      } catch (error) {
+        console.error("Error minting hypercert:", error);
+        // setCurrentStep?.("minting", `Error minting hypercert: ${error.message}`);
+        throw error; // Re-throw the error to be caught by the outer try-catch
+      }
 
       if (!hash) {
-        // toast("No tx hash returned", {
-        //   type: "error",
-        // });
+        setCurrentStep?.("minting", "No transaction hash returned");
         console.error("No tx hash returned");
         return;
       }
 
-      setCurrentStep("confirming");
+      setCurrentStep?.("confirming");
       const receipt = await waitForTransactionReceipt(walletClient!, {
         confirmations: 3,
         hash,
       });
 
       if (receipt?.status === "reverted") {
-        // toast("Minting failed", {
-        //   type: "error",
-        // });
+        setCurrentStep?.("confirming", "Minting failed");
         console.error("Minting failed");
         console.error(receipt);
       }
       if (receipt?.status === "success") {
-        // toast(mintInteractionLabels.toastSuccess, { type: "success" });
         console.log("Minting succeeded");
-
-        setCurrentStep("done");
+        setCurrentStep?.("done");
         onComplete?.(receipt);
       }
-    } catch (error) {
-      // toast(parseError(error, mintInteractionLabels.toastError), {
-      //   type: "error",
-      // });
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setCurrentStep?.("minting", `Error: ${error.message}`);
+      } else {
+        setCurrentStep?.("minting", "An unknown error occurred");
+      }
       console.error(error);
     } finally {
-      // hideModal();
       setTxPending(false);
     }
   };
@@ -114,7 +111,6 @@ export const useMintClaim = ({
       transferRestrictions: TransferRestrictions = TransferRestrictions.FromCreatorOnly,
       allowlistRecords?: AllowlistEntry[] | string,
     ) => {
-      console.log("Minting hypercert");
       await initializeWrite(
         metaData,
         units,
@@ -124,7 +120,6 @@ export const useMintClaim = ({
     },
     txPending,
     mintSteps,
-    currentStep,
     readOnly: !client || client.readOnly,
   };
 };
