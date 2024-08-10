@@ -118,9 +118,14 @@ export const useCreateFractionalMakerAsk = ({
   const { data: currentFractions } =
     useFetchHypercertFractionsByHypercertId(hypercertId);
 
-  const { setSteps, setStep, setOpen, setTitle } = useStepProcessDialogContext();
+  const {
+    setSteps,
+    setDialogStep: setStep,
+    setOpen,
+    setTitle,
+  } = useStepProcessDialogContext();
 
-  setTitle("Create marketplace listing")
+  setTitle("Create marketplace listing");
 
   return useMutation({
     mutationKey: ["createFractionalMakerAsk"],
@@ -338,7 +343,11 @@ export const useBuyFractionalMakerAsk = () => {
   const { client: hypercertExchangeClient } = useHypercertExchangeClient();
 
   const chainId = useChainId();
-  const { setStep, setSteps, setOpen } = useStepProcessDialogContext();
+  const {
+    setDialogStep: setStep,
+    setSteps,
+    setOpen,
+  } = useStepProcessDialogContext();
   const { data: walletClientData } = useWalletClient();
   const { address } = useAccount();
   const getCurrentERC20Allowance = useGetCurrentERC20Allowance();
