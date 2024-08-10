@@ -6,19 +6,110 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import useProcessDialog, {
-  type DialogStep,
-  type StepData,
-  type StepState,
-} from "@/hooks/use-process-dialog";
 import { cn } from "@/lib/utils";
-import { Badge, BadgeCheck, Loader } from "lucide-react";
+import { Badge, BadgeCheck, Loader, AlertCircle } from "lucide-react";
 import React, {
   createContext,
   createElement,
   useContext,
   useState,
+  useCallback,
+  useEffect,
 } from "react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+
+export type StepState = "idle" | "active" | "completed" | "error";
+
+export type DialogStep = {
+  id: string;
+  description: string;
+  state: StepState;
+  errorMessage?: string;
+};
+
+export type StepData = Pick<DialogStep, "id" | "description">;
+
+export const StepProcessDialogContext = createContext<{
+  setDialogStep: (step: DialogStep["id"], errorMessage?: string) => void;
+  setDialogSteps: React.Dispatch<React.SetStateAction<DialogStep[]>>;
+  setSteps: React.Dispatch<React.SetStateAction<StepData[]>>;
+  setOpen: (open: boolean) => void;
+  setTitle: (title: string) => void;
+  dialogSteps: DialogStep[];
+}>({
+  setDialogStep: () => {},
+  setDialogSteps: () => {},
+  setSteps: () => {},
+  setOpen: () => {},
+  setTitle: () => {},
+  dialogSteps: [],
+});
+
+export const StepProcessDialogProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
+  const [steps, setSteps] = useState<StepData[]>([]);
+  const [dialogSteps, setDialogSteps] = useState<DialogStep[]>([]);
+  const [open, setOpen] = useState(false);
+  const [title, setTitle] = useState("Transaction in progress...");
+
+  useEffect(() => {
+    setDialogSteps(
+      steps.map((step) => ({
+        ...step,
+        state: "idle" as StepState,
+        errorMessage: "",
+      })),
+    );
+  }, [steps]);
+  const setDialogStep = useCallback(
+    (stepId: DialogStep["id"], errorMessage?: string) => {
+      setDialogSteps((prevSteps) => {
+        const stepIndex = prevSteps.findIndex((step) => step.id === stepId);
+        if (stepIndex === -1) return prevSteps;
+
+        return prevSteps.map((step, index) => {
+          if (index !== stepIndex) {
+            return {
+              ...step,
+              state: index < stepIndex ? "completed" : "idle",
+            };
+          }
+
+          const newState: StepState = errorMessage ? "error" : "active";
+          return {
+            ...step,
+            state: newState,
+            errorMessage: errorMessage || "",
+          };
+        });
+      });
+    },
+    [],
+  );
+
+  return (
+    <StepProcessDialogContext.Provider
+      value={{
+        setDialogStep: (step: string, errorMessage?: string) =>
+          setDialogStep(step, errorMessage || ""),
+        setDialogSteps,
+        setSteps,
+        setOpen,
+        setTitle,
+        dialogSteps,
+      }}
+    >
+      {children}
+      <StepProcessModal open={open} steps={dialogSteps} title={title} />
+    </StepProcessDialogContext.Provider>
+  );
+};
+
+export const useStepProcessDialogContext = () =>
+  useContext(StepProcessDialogContext);
 
 interface DialogProps {
   steps: DialogStep[];
@@ -32,18 +123,21 @@ const stepStateIcons: Record<StepState, React.ElementType> = {
   idle: Badge,
   active: Loader,
   completed: BadgeCheck,
+  error: AlertCircle,
 };
 
 const stateSpecificIconClasses: Record<StepState, string> = {
   idle: "text-slate-600",
   active: "text-slate-700 animate-spin bg-white rounded-full",
   completed: "text-slate-400",
+  error: "text-red-500",
 };
 
 const stateSpecificTextClasses: Record<StepState, string> = {
   idle: "text-slate-600 font-medium",
   active: "text-slate-700 animate-pulse font-semibold",
   completed: "text-slate-400 font-medium",
+  error: "text-red-500 font-medium",
 };
 
 const StepProcessModal = ({
@@ -69,7 +163,7 @@ const StepProcessModal = ({
           {triggerLabel}
         </DialogTrigger>
       )}
-      <DialogContent>
+      <DialogContent className="max-w-[500px]">
         <DialogHeader>
           <DialogTitle className="font-serif text-3xl font-normal">
             {title}
@@ -106,6 +200,13 @@ const StepProcessModal = ({
                 >
                   {step.description}
                 </p>
+                {step.state === "error" && step.errorMessage && (
+                  <ScrollArea className="w-96 h-16 rounded p-2 bg-red-50">
+                    <p className="text-red-500 text-xs font-mono">
+                      ({step.errorMessage})
+                    </p>
+                  </ScrollArea>
+                )}
               </div>
             </div>
           ))}
@@ -115,44 +216,5 @@ const StepProcessModal = ({
     </Dialog>
   );
 };
-
-export const StepProcessDialogContext = createContext<{
-  setStep: (step: DialogStep["id"]) => void;
-  setSteps: (steps: StepData[]) => void;
-  setOpen: (open: boolean) => void;
-  setTitle: (title: string) => void;
-}>({
-  setStep: () => {},
-  setSteps: () => {},
-  setOpen: () => {},
-    setTitle: () => {}
-});
-
-export const StepProcessDialogProvider = ({
-  children,
-}: {
-  children: React.ReactNode;
-}) => {
-  const [steps, setSteps] = useState<StepData[]>([]);
-  const { setStep, dialogSteps } = useProcessDialog(steps);
-  const [open, setOpen] = useState(false);
-  const [title, setTitle] = useState("Test title");
-  return (
-    <StepProcessDialogContext.Provider
-      value={{
-        setStep,
-        setSteps,
-        setOpen,
-        setTitle,
-      }}
-    >
-      {children}
-      <StepProcessModal open={open} steps={dialogSteps} title={title} />
-    </StepProcessDialogContext.Provider>
-  );
-};
-
-export const useStepProcessDialogContext = () =>
-  useContext(StepProcessDialogContext);
 
 export { StepProcessModal as default };
