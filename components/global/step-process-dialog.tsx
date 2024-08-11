@@ -6,17 +6,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
-import { Badge, BadgeCheck, Loader, AlertCircle } from "lucide-react";
+import { AlertCircle, Badge, BadgeCheck, Loader } from "lucide-react";
 import React, {
   createContext,
   createElement,
-  useContext,
-  useState,
   useCallback,
+  useContext,
   useEffect,
+  useState,
 } from "react";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
 export type StepState = "idle" | "active" | "completed" | "error";
 
@@ -103,7 +103,12 @@ export const StepProcessDialogProvider = ({
       }}
     >
       {children}
-      <StepProcessModal open={open} steps={dialogSteps} title={title} />
+      <StepProcessModal
+        open={open}
+        onOpenChange={setOpen}
+        steps={dialogSteps}
+        title={title}
+      />
     </StepProcessDialogContext.Provider>
   );
 };
@@ -116,7 +121,7 @@ interface DialogProps {
   title: string;
   triggerLabel?: string;
   extraContent?: React.ReactNode;
-  open?: boolean;
+  open: boolean;
 }
 
 const stepStateIcons: Record<StepState, React.ElementType> = {
@@ -145,16 +150,14 @@ const StepProcessModal = ({
   title,
   triggerLabel,
   extraContent,
-  open: openProp,
-}: DialogProps) => {
+  open,
+  onOpenChange,
+}: DialogProps & { onOpenChange: (open: boolean) => void }) => {
   const lastStep = steps[steps.length - 1];
   const isLastStepCompleted = lastStep?.state === "completed";
-  const [open, setOpen] = useState(true);
-
-  const defOpen = openProp ?? open;
 
   return (
-    <Dialog open={defOpen} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={onOpenChange} modal>
       {triggerLabel && (
         <DialogTrigger
           asChild
@@ -199,12 +202,18 @@ const StepProcessModal = ({
                   )}
                 >
                   {step.description}
+                  {step.state === "error" && step.errorMessage && (
+                    <span className="text-red-500 text-sm ml-2">
+                      ({step.errorMessage})
+                    </span>
+                  )}
                 </p>
                 {step.state === "error" && step.errorMessage && (
                   <ScrollArea className="w-96 h-16 rounded p-2 bg-red-50">
                     <p className="text-red-500 text-xs font-mono">
                       ({step.errorMessage})
                     </p>
+                    <ScrollBar orientation="horizontal" />
                   </ScrollArea>
                 )}
               </div>
