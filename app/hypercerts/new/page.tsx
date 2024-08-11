@@ -1,10 +1,16 @@
 "use client";
 
 import FormSteps from "@/app/hypercerts/new/form-steps";
+import {
+  DialogStep,
+  TransactionDialog,
+} from "@/components/global/transaction-dialog";
 import HypercertCard from "@/components/hypercert/hypercert-card";
 import { Form } from "@/components/ui/form";
 import { toast } from "@/components/ui/use-toast";
+import { useMintHypercert } from "@/hooks/mutations/useMintHypercert";
 import { useMintHypercertFlow } from "@/hooks/transaction-flows/mint-hypercert";
+import { useTransactionSteps } from "@/hooks/useTransactionSteps";
 import { formatDate } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -100,6 +106,27 @@ export default function NewHypercertForm() {
   const [currentStep, setCurrentStep] = useState(1);
   const [language, setLanguage] = useState("en-US");
 
+  const initialSteps: DialogStep[] = [
+    {
+      id: "preparing",
+      description: "Preparing to mint hypercert...",
+      state: "idle",
+    },
+    {
+      id: "minting",
+      description: "Minting hypercert on-chain...",
+      state: "idle",
+    },
+    { id: "done", description: "Minting complete!", state: "idle" },
+  ];
+
+  const { txnSteps, resetTxnSteps, updateTxnStep } =
+    useTransactionSteps(initialSteps);
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  const mintHypercert = useMintHypercert();
+
   const form = useForm<HypercertFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: formDefaultValues,
@@ -107,18 +134,21 @@ export default function NewHypercertForm() {
   });
   const cardRef = useRef<HTMLDivElement>(null);
 
-  const [txReceipt, setTxReceipt] = useState<TransactionReceipt | null>(null);
-  const onMintComplete = (receipt: TransactionReceipt) => {
-    setTxReceipt(receipt);
-  };
+  // const [txReceipt, setTxReceipt] = useState<TransactionReceipt | null>(null);
+  // const onMintComplete = (receipt: TransactionReceipt) => {
+  //   setTxReceipt(receipt);
+  // };
 
-  const { write: mintClaim, ...mintClaimProps } = useMintHypercertFlow();
+  // const { write: mintClaim, ...mintClaimProps } = useMintHypercertFlow();
 
   useEffect(() => {
     setLanguage(window.navigator.language);
   }, []);
 
   async function onSubmit(values: HypercertFormValues) {
+    setDialogOpen(true);
+    updateTxnStep("preparing");
+
     const metadata: HypercertMetadata = {
       name: values.title,
       description: values.description,
@@ -148,15 +178,48 @@ export default function NewHypercertForm() {
       console.error("Invalid metadata", { errors: formattedMetadata.errors });
       return;
     }
-    await mintClaim(
-      formattedMetadata.data!,
-      DEFAULT_NUM_FRACTIONS,
-      TransferRestrictions.FromCreatorOnly,
-      values.allowlistURL ||
-        values.allowlistEntries?.map((entry) => ({
-          ...entry,
-          units: BigInt(entry.units),
-        })),
+    // await mintClaim(
+    //   formattedMetadata.data!,
+    //   DEFAULT_NUM_FRACTIONS,
+    //   TransferRestrictions.FromCreatorOnly,
+    //   values.allowlistURL ||
+    //     values.allowlistEntries?.map((entry) => ({
+    //       ...entry,
+    //       units: BigInt(entry.units),
+    //     })),
+    // );
+    updateTxnStep("minting");
+    mintHypercert.mutate(
+      {
+        metaData: formattedMetadata.data!,
+        units: DEFAULT_NUM_FRACTIONS,
+        transferRestrictions: TransferRestrictions.FromCreatorOnly,
+        allowlistRecords:
+          values.allowlistURL ||
+          values.allowlistEntries?.map((entry) => ({
+            ...entry,
+            units: BigInt(entry.units),
+          })),
+      },
+      {
+        onSuccess: (receipt) => {
+          updateTxnStep("done", "", "completed");
+          console.log(receipt);
+          toast({
+            title: "Success",
+            description: "Hypercert minted successfully!",
+          });
+          // Handle success (e.g., redirect, update UI?)
+        },
+        onError: (error) => {
+          updateTxnStep("minting", error.message);
+          toast({
+            title: "Error",
+            description: error.message,
+            variant: "destructive",
+          });
+        },
+      },
     );
   }
 
@@ -176,43 +239,51 @@ export default function NewHypercertForm() {
   };
 
   return (
-    <main className="flex flex-col p-8 md:px-24 pt-8 pb-24 space-y-4 flex-1 container max-w-screen-lg">
-      <h1 className="font-serif text-3xl lg:text-5xl tracking-tight w-full">
-        New hypercert
-      </h1>
-      <div className="p-3"></div>
-      <section className="flex flex-col-reverse lg:flex-row space-x-4 items-stretch md:justify-start">
-        <section className="flex flex-col space-y-4 flex-1 md:pr-5 md:border-r-[1.5px] md:border-slate-200">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit, onSubmitInvalid)}>
-              <FormSteps
-                form={form}
-                currentStep={currentStep}
-                setCurrentStep={setCurrentStep}
-                cardRef={cardRef}
-              />
-            </form>
-          </Form>
+    <>
+      <main className="flex flex-col p-8 md:px-24 pt-8 pb-24 space-y-4 flex-1 container max-w-screen-lg">
+        <h1 className="font-serif text-3xl lg:text-5xl tracking-tight w-full">
+          New hypercert
+        </h1>
+        <div className="p-3"></div>
+        <section className="flex flex-col-reverse lg:flex-row space-x-4 items-stretch md:justify-start">
+          <section className="flex flex-col space-y-4 flex-1 md:pr-5 md:border-r-[1.5px] md:border-slate-200">
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit, onSubmitInvalid)}>
+                <FormSteps
+                  form={form}
+                  currentStep={currentStep}
+                  setCurrentStep={setCurrentStep}
+                  cardRef={cardRef}
+                />
+              </form>
+            </Form>
+          </section>
+          <div className="flex flex-col p-6 items-center">
+            <HypercertCard
+              name={form.getValues().title || undefined}
+              description={form.getValues().description || undefined}
+              banner={form.getValues().banner || undefined}
+              logo={form.getValues().logo || undefined}
+              scopes={form.getValues().tags}
+              fromDateDisplay={formatDate(
+                form.getValues().projectDates?.from?.toISOString(),
+                language,
+              )}
+              toDateDisplay={formatDate(
+                form.getValues().projectDates?.to?.toISOString(),
+                language,
+              )}
+              ref={cardRef}
+            />
+          </div>
         </section>
-        <div className="flex flex-col p-6 items-center">
-          <HypercertCard
-            name={form.getValues().title || undefined}
-            description={form.getValues().description || undefined}
-            banner={form.getValues().banner || undefined}
-            logo={form.getValues().logo || undefined}
-            scopes={form.getValues().tags}
-            fromDateDisplay={formatDate(
-              form.getValues().projectDates?.from?.toISOString(),
-              language,
-            )}
-            toDateDisplay={formatDate(
-              form.getValues().projectDates?.to?.toISOString(),
-              language,
-            )}
-            ref={cardRef}
-          />
-        </div>
-      </section>
-    </main>
+      </main>
+      <TransactionDialog
+        steps={txnSteps}
+        title="Minting Hypercert"
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+      />
+    </>
   );
 }
