@@ -197,6 +197,10 @@ export const useCreateFractionalMakerAsk = ({
         parseUnits(values.price, currency.decimals) /
         BigInt(values.unitsForSale);
 
+      if (pricePerUnit === BigInt(0)) {
+        throw new Error("Price per unit is 0");
+      }
+
       const { maker, isCollectionApproved, isTransferManagerApproved } =
         await hypercertExchangeClient.createFractionalSaleMakerAsk({
           startTime: Math.floor(Date.now() / 1000), // Use it to create an order that will be valid in the future (Optional, Default to now)

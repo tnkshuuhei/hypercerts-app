@@ -12,4 +12,6 @@ export interface CreateFractionalOfferFormValues {
   price: string;
   sellLeftoverFraction: boolean;
   currency?: string;
+  startDateTime: number;
+  endDateTime: number;
 }

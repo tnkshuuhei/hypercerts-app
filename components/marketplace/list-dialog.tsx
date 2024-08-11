@@ -30,6 +30,8 @@ type State = {
   unitsMinPerOrder?: string;
   unitsMaxPerOrder?: string;
   formIsValid: boolean;
+  startDateTime?: Date;
+  endDateTime?: Date;
 };
 
 function ListDialogInner({
@@ -83,7 +85,9 @@ function ListDialogInner({
       !state.formIsValid ||
       !state.fractionId ||
       !state.unitsMinPerOrder ||
-      !state.unitsForSale
+      !state.unitsForSale ||
+      !state.startDateTime ||
+      !state.endDateTime
     ) {
       return;
     }
@@ -98,6 +102,8 @@ function ListDialogInner({
         sellLeftoverFraction: false,
         currency: state.currency,
         unitsForSale: state.unitsForSale,
+        startDateTime: Math.floor(state.startDateTime.getTime() / 1000),
+        endDateTime: Math.floor(state.endDateTime.getTime() / 1000),
       });
 
       setIsOpen(false);
@@ -119,7 +125,7 @@ function ListDialogInner({
   const { chainId } = parseClaimOrFractionId(hypercert.hypercert_id);
 
   return (
-    <DialogContent className="gap-5 max-w-2xl">
+    <DialogContent className="gap-5 max-w-2xl max-h-full overflow-auto">
       <DialogHeader>
         <div className="bg-orange-400/70 p-2 mb-2 rounded-sm">
           Hypercerts marketplace features are in beta. Please use with caution.
@@ -200,6 +206,14 @@ function ListDialogInner({
                 unitsForSale={state.unitsForSale}
                 unitsMinPerOrder={state.unitsMinPerOrder}
                 unitsMaxPerOrder={state.unitsMaxPerOrder}
+                startDateTime={state.startDateTime}
+                endDateTime={state.endDateTime}
+                setEndDateTime={(endDateTime) =>
+                  setState({ ...state, endDateTime })
+                }
+                setStartDateTime={(startDateTime) =>
+                  setState({ ...state, startDateTime })
+                }
                 setUnitsForSale={(unitsForSale) =>
                   setState({ ...state, unitsForSale })
                 }

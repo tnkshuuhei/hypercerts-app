@@ -3,6 +3,7 @@ import { useEffect, useRef } from "react";
 import { FormattedUnits } from "../formatted-units";
 import { Input } from "../ui/input";
 import { round } from "remeda";
+import { DateTimePicker } from "@/components/ui/datetime-picker";
 
 export type ListSettingsFormRef = {
   formIsValid: boolean;
@@ -17,6 +18,10 @@ export default function ListDialogSettingsForm({
   setUnitsMinPerOrder,
   setUnitsMaxPerOrder,
   setFormIsValid,
+  startDateTime,
+  setStartDateTime,
+  endDateTime,
+  setEndDateTime,
 }: {
   selectedFractionUnits?: string;
   unitsForSale?: string;
@@ -26,21 +31,22 @@ export default function ListDialogSettingsForm({
   setUnitsMinPerOrder: (unitsMinPerOrder: string) => void;
   setUnitsMaxPerOrder: (unitsMaxPerOrder: string) => void;
   setFormIsValid: (formIsValid: boolean) => void;
+  startDateTime?: Date;
+  setStartDateTime?: (startDateTime?: Date) => void;
+  endDateTime?: Date;
+  setEndDateTime?: (endDateTime?: Date) => void;
 }) {
-  const _selectedFractionUnits = Number.parseInt(
-    selectedFractionUnits || "0",
-    10,
-  );
-  const _unitsForSale = Number.parseFloat(unitsForSale || "0");
-  const _unitsMinPerOrder = Number.parseFloat(unitsMinPerOrder || "0");
-  const _unitsMaxPerOrder = Number.parseFloat(unitsMaxPerOrder || "0");
+  const _selectedFractionUnits = BigInt(selectedFractionUnits || "0");
+  const _unitsForSale = BigInt(unitsForSale || "0");
+  const _unitsMinPerOrder = BigInt(unitsMinPerOrder || "0");
+  const _unitsMaxPerOrder = BigInt(unitsMaxPerOrder || "0");
 
   const validateUnitsForSale = (): [boolean, React.ReactNode] => {
-    if (isNaN(_unitsForSale)) {
-      return [false, "Must be a valid number."];
+    if (_unitsForSale === BigInt(0)) {
+      return [false, "Must be more than 0."];
     }
 
-    if (_unitsForSale % 1 !== 0) {
+    if (_unitsForSale % BigInt(1) !== BigInt(0)) {
       return [false, "Must be an integer."];
     }
 
@@ -48,6 +54,7 @@ export default function ListDialogSettingsForm({
       return [false, "Must be more than 0."];
     }
 
+    console.log(_unitsForSale, _selectedFractionUnits);
     if (_unitsForSale > _selectedFractionUnits) {
       return [false, "Must be no more than the fraction's total units."];
     }
@@ -64,7 +71,7 @@ export default function ListDialogSettingsForm({
     return [
       true,
       <>
-        <FormattedUnits>{_unitsForSale}</FormattedUnits> units (
+        <FormattedUnits>{_unitsForSale.toString()}</FormattedUnits> units (
         {unitsForSalePercentageOfFraction}% of fraction) will be offered for
         sale.
       </>,
@@ -72,11 +79,11 @@ export default function ListDialogSettingsForm({
   };
 
   const validateUnitsMinPerOrder = (): [boolean, React.ReactNode] => {
-    if (isNaN(_unitsMinPerOrder)) {
-      return [false, "Must be a valid number."];
+    if (_unitsMinPerOrder === BigInt(0)) {
+      return [false, "Must be more than 0."];
     }
 
-    if (_unitsMinPerOrder % 1 !== 0) {
+    if (_unitsMinPerOrder % BigInt(1) !== BigInt(0)) {
       return [false, "Must be an integer."];
     }
 
@@ -88,7 +95,7 @@ export default function ListDialogSettingsForm({
       return [false, "Must be no more than the units for sale."];
     }
 
-    if (_unitsForSale % _unitsMinPerOrder !== 0) {
+    if (_unitsForSale % _unitsMinPerOrder !== BigInt(0)) {
       return [false, "Must divide evenly into the units for sale."];
     }
 
@@ -96,17 +103,18 @@ export default function ListDialogSettingsForm({
       true,
       <>
         Units from this fraction can be purchased for at least{" "}
-        <FormattedUnits>{_unitsMinPerOrder}</FormattedUnits> units per order.
+        <FormattedUnits>{_unitsMinPerOrder.toString()}</FormattedUnits> units
+        per order.
       </>,
     ];
   };
 
   const validateUnitsMaxPerOrder = (): [boolean, React.ReactNode] => {
-    if (isNaN(_unitsMaxPerOrder)) {
-      return [false, "Must be a valid number."];
+    if (_unitsMaxPerOrder === BigInt(0)) {
+      return [false, "Must be more than 0."];
     }
 
-    if (_unitsMaxPerOrder % 1 !== 0) {
+    if (_unitsMaxPerOrder % BigInt(1) !== BigInt(0)) {
       return [false, "Must be an integer."];
     }
 
@@ -118,7 +126,7 @@ export default function ListDialogSettingsForm({
       return [false, "Must be no more than the units for sale."];
     }
 
-    if (_unitsForSale % _unitsMaxPerOrder !== 0) {
+    if (_unitsForSale % _unitsMaxPerOrder !== BigInt(0)) {
       return [false, "Must divide evenly into the units for sale."];
     }
 
@@ -126,7 +134,7 @@ export default function ListDialogSettingsForm({
       return [false, "Must be at least the minimum units per order."];
     }
 
-    if (_unitsMaxPerOrder % _unitsMinPerOrder !== 0) {
+    if (_unitsMaxPerOrder % _unitsMinPerOrder !== BigInt(0)) {
       return [false, "Must be a multiple of the minimum units per order."];
     }
 
@@ -134,19 +142,52 @@ export default function ListDialogSettingsForm({
       true,
       <>
         Units from this fraction can be purchased for at most{" "}
-        <FormattedUnits>{_unitsMaxPerOrder}</FormattedUnits> units per order.
+        <FormattedUnits>{_unitsMaxPerOrder.toString()}</FormattedUnits> units
+        per order.
       </>,
     ];
+  };
+
+  const validateStartDateTime = (): [boolean, React.ReactNode] => {
+    if (!startDateTime) {
+      return [false, "Must be a valid date and time."];
+    }
+
+    if (startDateTime <= new Date()) {
+      return [false, "Must be in the future."];
+    }
+
+    return [true, "Sale will start at the selected moment."];
+  };
+
+  const validateEndDateTime = (): [boolean, React.ReactNode] => {
+    if (!endDateTime) {
+      return [false, "Must be a valid date and time."];
+    }
+
+    if (endDateTime <= new Date()) {
+      return [false, "Must be in the future."];
+    }
+
+    if (startDateTime && endDateTime <= startDateTime) {
+      return [false, "Must be after the start of the sale."];
+    }
+
+    return [true, "Sale will end at the selected moment."];
   };
 
   const unitsForSaleValidation = validateUnitsForSale();
   const unitsMinPerOrderValidation = validateUnitsMinPerOrder();
   const unitsMaxPerOrderValidation = validateUnitsMaxPerOrder();
+  const startDateTimeValidation = validateStartDateTime();
+  const endDateTimeValidation = validateEndDateTime();
 
   const formIsValid =
     unitsForSaleValidation[0] &&
     unitsMinPerOrderValidation[0] &&
-    unitsMaxPerOrderValidation[0];
+    unitsMaxPerOrderValidation[0] &&
+    startDateTimeValidation[0] &&
+    endDateTimeValidation[0];
 
   const formIsValidRef = useRef(formIsValid);
   useEffect(() => {
@@ -216,6 +257,36 @@ export default function ListDialogSettingsForm({
           <div className="text-sm text-red-500">
             {unitsMaxPerOrderValidation[1]}
           </div>
+        )}{" "}
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <h5 className="uppercase text-sm text-gray-500 font-medium tracking-wider">
+          SALE STARTING TIME
+        </h5>
+        <DateTimePicker onChange={setStartDateTime} value={startDateTime} />
+        {startDateTimeValidation[0] ? (
+          <div className="text-sm text-gray-500">
+            {startDateTimeValidation[1]}
+          </div>
+        ) : (
+          <div className="text-sm text-red-500">
+            {startDateTimeValidation[1]}
+          </div>
+        )}{" "}
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <h5 className="uppercase text-sm text-gray-500 font-medium tracking-wider">
+          SALE ENDING TIME
+        </h5>
+        <DateTimePicker onChange={setEndDateTime} value={endDateTime} />
+        {endDateTimeValidation[0] ? (
+          <div className="text-sm text-gray-500">
+            {endDateTimeValidation[1]}
+          </div>
+        ) : (
+          <div className="text-sm text-red-500">{endDateTimeValidation[1]}</div>
         )}{" "}
       </div>
     </div>
