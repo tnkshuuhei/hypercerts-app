@@ -69,6 +69,7 @@ const HypercertsTabContentInner = async ({
                 <HypercertWindow
                   key={hypercert.hypercert_id}
                   hypercert={hypercert}
+                  priceDisplayCurrency="USD"
                 />
               );
             })}
@@ -87,6 +88,7 @@ const HypercertsTabContentInner = async ({
                 <HypercertWindow
                   key={hypercert.hypercert_id}
                   hypercert={hypercert}
+                  priceDisplayCurrency="USD"
                 />
               );
             })}

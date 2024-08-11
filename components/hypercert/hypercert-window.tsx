@@ -5,14 +5,15 @@ import Image from "next/image";
 import Link from "next/link";
 import { HypercertListFragment } from "@/hypercerts/fragments/hypercert-list.fragment";
 import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
-import { formatPrice, getPricePerPercent } from "@/marketplace/utils";
+import { getCurrencyByAddress } from "@/marketplace/utils";
 
 const HypercertWindow = ({
-  hasTrustedEvaluator,
   hypercert,
+  priceDisplayCurrency = "usd",
 }: {
   hypercert: HypercertListFragment;
   hasTrustedEvaluator?: boolean;
+  priceDisplayCurrency?: string;
 }) => {
   const hypercertId = hypercert.hypercert_id as string;
   const name = hypercert.metadata?.name as string;
@@ -26,17 +27,28 @@ const HypercertWindow = ({
     hypercert.orders?.totalUnitsForSale,
     hypercert.units,
   );
-  const lowestPrice =
-    hypercert?.orders?.cheapestOrder && hypercert
-      ? formatPrice(
-          hypercert.orders.cheapestOrder.chainId,
-          getPricePerPercent(
-            hypercert.orders.cheapestOrder.price,
-            BigInt(hypercert.units || "0"),
-          ),
-          hypercert.orders.cheapestOrder.currency,
-        )
-      : null;
+
+  let lowestPrice: string | null = null;
+
+  const cheapestOrder = hypercert.orders?.cheapestOrder;
+
+  if (priceDisplayCurrency === "usd" && cheapestOrder?.pricePerPercentInUSD) {
+    lowestPrice = `$${cheapestOrder.pricePerPercentInUSD}`;
+  }
+
+  if (
+    priceDisplayCurrency === "token" &&
+    cheapestOrder?.pricePerPercentInToken
+  ) {
+    const currency = getCurrencyByAddress(
+      Number(cheapestOrder.chainId),
+      cheapestOrder.currency,
+    );
+    if (!currency) {
+      throw new Error(`Currency not found for ${cheapestOrder.currency}`);
+    }
+    lowestPrice = `${cheapestOrder.pricePerPercentInToken} ${currency.symbol}`;
+  }
 
   const evaluationStatus = getEvaluationStatus(attestations);
 
@@ -77,9 +89,7 @@ const HypercertWindow = ({
             <section>
               <h6 className="text-end opacity-70">lowest per %</h6>
               <p className="font-medium">
-                {lowestPrice && lowestPrice !== "0"
-                  ? `${lowestPrice} ETH`
-                  : "--"}
+                {lowestPrice && lowestPrice !== "0" ? `${lowestPrice}` : "--"}
               </p>
             </section>
           </section>

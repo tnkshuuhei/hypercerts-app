@@ -27,6 +27,8 @@ export const HypercertListFragment = graphql(`
         additionalParameters
         currency
         chainId
+        pricePerPercentInUSD
+        pricePerPercentInToken
       }
       totalUnitsForSale
       data {

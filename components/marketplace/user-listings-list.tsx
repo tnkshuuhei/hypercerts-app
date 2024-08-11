@@ -30,9 +30,6 @@ import { cn } from "@/lib/utils";
 import { useHypercertClient } from "@/hooks/use-hypercert-client";
 import {
   decodeFractionalOrderParams,
-  formatPrice,
-  getCurrencyByAddress,
-  getPricePerPercent,
   orderFragmentToHypercert,
   orderFragmentToMarketplaceOrder,
 } from "@/marketplace/utils";
@@ -63,7 +60,6 @@ export default function UserListingsList({
   address: string;
   orders: OrderFragment[];
 }) {
-  console.log("orders", orders);
   const chainId = useChainId();
   const { address: currentUserAddress } = useAccount();
 
@@ -121,7 +117,7 @@ export default function UserListingsList({
       },
       header: "Hypercert",
     }),
-    columnHelper.accessor("price", {
+    columnHelper.accessor("pricePerPercentInUSD", {
       header: ({ column }) => {
         return (
           <div
@@ -134,31 +130,13 @@ export default function UserListingsList({
         );
       },
       cell: (row) => {
-        const { chainId, hypercert } = row.row.original;
+        const { chainId } = row.row.original;
 
         if (!chainId) {
           return <div>Invalid chain ID</div>;
         }
 
-        const currency = getCurrencyByAddress(
-          Number(chainId),
-          row.row.original.currency,
-        );
-
-        if (!currency) {
-          return <div>Invalid currency</div>;
-        }
-
-        return (
-          <div>
-            {formatPrice(
-              row.row.original.chainId,
-              getPricePerPercent(row.getValue(), BigInt(hypercert?.units || 0)),
-              row.row.original.currency,
-              true,
-            )}
-          </div>
-        );
+        return <div>${row.getValue()}</div>;
       },
       sortingFn: (rowA, rowB) =>
         BigInt(rowA.getValue("price")) < BigInt(rowB.getValue("price"))

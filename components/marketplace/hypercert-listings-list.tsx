@@ -35,9 +35,6 @@ import { useHypercertClient } from "@/hooks/use-hypercert-client";
 import { HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
 import {
   decodeFractionalOrderParams,
-  formatPrice,
-  getCurrencyByAddress,
-  getPricePerPercent,
   orderFragmentToMarketplaceOrder,
 } from "@/marketplace/utils";
 import { useAccount, useChainId } from "wagmi";
@@ -81,7 +78,9 @@ export default function HypercertListingsList({
     }
 
     if (!chainId) {
-      console.log("No chain ID");
+      console.log(
+        `Invalid chain ID: ${chainId} for order with tokenId ${tokenId}`,
+      );
       return;
     }
 
@@ -100,44 +99,26 @@ export default function HypercertListingsList({
       ),
       header: "Seller",
     }),
-    columnHelper.accessor("price", {
+    columnHelper.accessor("pricePerPercentInUSD", {
       header: ({ column }) => {
         return (
-          <Button
-            variant="ghost"
+          <div
+            className="flex items-center cursor-pointer"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             Price per %
             <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
+          </div>
         );
       },
       cell: (row) => {
-        const { chainId, hypercert } = row.row.original;
+        const { chainId } = row.row.original;
 
         if (!chainId) {
           return <div>Invalid chain ID</div>;
         }
 
-        const currency = getCurrencyByAddress(
-          Number(chainId),
-          row.row.original.currency,
-        );
-
-        if (!currency) {
-          return <div>Invalid currency</div>;
-        }
-
-        return (
-          <div>
-            {formatPrice(
-              row.row.original.chainId,
-              getPricePerPercent(row.getValue(), BigInt(hypercert?.units || 0)),
-              row.row.original.currency,
-              true,
-            )}
-          </div>
-        );
+        return <div>${row.getValue()}</div>;
       },
       sortingFn: (rowA, rowB) =>
         BigInt(rowA.getValue("price")) < BigInt(rowB.getValue("price"))

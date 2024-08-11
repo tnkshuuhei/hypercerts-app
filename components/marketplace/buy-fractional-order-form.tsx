@@ -22,7 +22,7 @@ import {
 } from "@/marketplace/utils";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { formatEther, parseUnits } from "viem";
+import { formatUnits, parseUnits } from "viem";
 
 const formSchema = z
   .object({
@@ -133,7 +133,7 @@ export const BuyFractionalOrderForm = ({
     await buyFractionalMakerAsk({
       order,
       unitAmount,
-      pricePerUnit: formatEther(pricePerUnit),
+      pricePerUnit: formatUnits(pricePerUnit, currency.decimals),
     });
     onCompleted?.();
   };

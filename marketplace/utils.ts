@@ -6,6 +6,7 @@ import {
 import {
   decodeAbiParameters,
   formatUnits,
+  getAddress,
   parseAbiParameters,
   parseEther,
 } from "viem";
@@ -17,7 +18,9 @@ export const getCurrencyByAddress = (chain: ChainId, address: string) => {
   const currenciesForNetwork = currenciesByNetwork[chain];
   const allCurrencies = Object.values(currenciesForNetwork) as Currency[];
 
-  return allCurrencies.find((currency) => currency.address === address);
+  return allCurrencies.find(
+    (currency) => getAddress(currency.address) === getAddress(address),
+  );
 };
 
 export const decodeFractionalOrderParams = (params: string) => {

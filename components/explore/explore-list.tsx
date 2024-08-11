@@ -47,6 +47,7 @@ async function ExploreListInner({
     params.orderBy = orderBy;
   }
   const hypercerts = await getAllHypercerts(params);
+  const displayCurrency = searchParams?.currency;
 
   if (!hypercerts) {
     return <HypercertsListLoadError />;
@@ -69,6 +70,7 @@ async function ExploreListInner({
             <HypercertWindow
               key={hypercert.hypercert_id}
               hypercert={hypercert}
+              priceDisplayCurrency={displayCurrency}
             />
           );
         })}

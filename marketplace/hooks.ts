@@ -1,13 +1,7 @@
-import {
-  useAccount,
-  useChainId,
-  usePublicClient,
-  useWalletClient,
-} from "wagmi";
+import { useAccount, useChainId, useWalletClient } from "wagmi";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   addressesByNetwork,
-  ApiClient,
   Maker,
   QuoteType,
   utils,
@@ -23,10 +17,8 @@ import {
   MarketplaceOrder,
 } from "@/marketplace/types";
 import { decodeContractError } from "@/lib/decodeContractError";
-import { apiEnvironment } from "@/lib/constants";
 import { useHypercertExchangeClient } from "@/hooks/use-hypercert-exchange-client";
 import { toast } from "@/components/ui/use-toast";
-import { useState } from "react";
 import { getFractionsByHypercert } from "@/hypercerts/getFractionsByHypercert";
 import { getCurrencyByAddress } from "@/marketplace/utils";
 
@@ -272,62 +264,6 @@ export const useCreateFractionalMakerAsk = ({
         duration: 5000,
       });
     },
-  });
-};
-
-export const useFetchMarketplaceOrdersForHypercert = (hypercertId: string) => {
-  const chainId = useChainId();
-  const provider = usePublicClient();
-  const { client: hypercertExchangeClient } = useHypercertExchangeClient();
-  const { address } = useAccount();
-  const [checkedValidity, setCheckedValidity] = useState(false);
-
-  return useQuery({
-    queryKey: ["hypercert", "id", hypercertId, "chain", chainId, "orders"],
-    queryFn: async () => {
-      if (!provider) {
-        return null;
-      }
-
-      if (!hypercertExchangeClient) {
-        return null;
-      }
-
-      const apiClient = new ApiClient(apiEnvironment);
-      let { data: orders } = await apiClient.fetchOrdersByHypercertId({
-        hypercertId,
-      });
-
-      if (!orders) {
-        return null;
-      }
-
-      if (!checkedValidity) {
-        const validityResults =
-          await hypercertExchangeClient.checkOrdersValidity(
-            orders.filter((order: MarketplaceOrder) => !order.invalidated),
-          );
-        const tokenIdsWithInvalidOrder = validityResults
-          .filter((result) => !result.valid)
-          .map((result) => BigInt(result.order.itemIds[0]));
-        if (tokenIdsWithInvalidOrder.length) {
-          console.error("Invalid orders", tokenIdsWithInvalidOrder);
-          orders = orders.map((order: MarketplaceOrder) => {
-            if (tokenIdsWithInvalidOrder.includes(BigInt(order.itemIds[0]))) {
-              return { ...order, invalidated: true };
-            }
-            return order;
-          });
-          // Do not await but update validity in the background
-          apiClient.updateOrderValidity(tokenIdsWithInvalidOrder, chainId);
-          setCheckedValidity(true);
-        }
-      }
-      return (orders as MarketplaceOrder[]).filter((order: MarketplaceOrder) =>
-        order.invalidated ? order.signer === address : true,
-      );
-    },
-    enabled: !!chainId,
   });
 };
 
