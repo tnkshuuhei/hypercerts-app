@@ -84,7 +84,6 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
             )}
           </div>
         </section>
-        , aai
         <section className="p-3 pt-4 rounded-t-xl bg-white border-t-[1.5px] border-black space-y-3">
           <div className="flex items-center">
             <span className="text-xs text-slate-600 uppercase">
