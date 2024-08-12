@@ -23,6 +23,7 @@ import type { HypercertExchangeClient } from "@hypercerts-org/marketplace-sdk";
 import { parseClaimOrFractionId } from "@hypercerts-org/sdk";
 import { formatUnits, parseUnits } from "viem";
 import { cn } from "@/lib/utils";
+import { DateTimePicker } from "@/components/ui/datetime-picker";
 
 type State = {
   fractionId: string;
@@ -79,6 +80,8 @@ function ListDialogInner({
           : "",
       formIsValid: true,
       minimumPrice,
+      startDateTime: new Date(Date.now()),
+      endDateTime: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
     };
   });
 
@@ -170,6 +173,33 @@ function ListDialogInner({
   const createButtonEnabled =
     isPriceValid && state.formIsValid && isCorrectPrice;
 
+  const validateStartDateTime = (): [boolean, React.ReactNode] => {
+    if (!state.startDateTime) {
+      return [false, "Must be a valid date and time."];
+    }
+
+    return [true, "Sale will start at the selected moment."];
+  };
+
+  const validateEndDateTime = (): [boolean, React.ReactNode] => {
+    if (!state.endDateTime) {
+      return [false, "Must be a valid date and time."];
+    }
+
+    if (state.endDateTime <= new Date()) {
+      return [false, "Must be in the future."];
+    }
+
+    if (state.startDateTime && state.endDateTime <= state.startDateTime) {
+      return [false, "Must be after the start of the sale."];
+    }
+
+    return [true, "Sale will end at the selected moment."];
+  };
+
+  const startDateTimeValidation = validateStartDateTime();
+  const endDateTimeValidation = validateEndDateTime();
+
   return (
     <DialogContent className="gap-5 max-w-2xl max-h-full overflow-auto">
       <DialogHeader>
@@ -248,6 +278,49 @@ function ListDialogInner({
           </div>
         )}
       </div>
+
+      <div className="flex flex-col gap-3">
+        <h5 className="uppercase text-sm text-gray-500 font-medium tracking-wider">
+          SALE STARTING TIME
+        </h5>
+        <DateTimePicker
+          onChange={(startDateTime) =>
+            setState((currentState) => ({
+              ...currentState,
+              startDateTime,
+            }))
+          }
+          value={state.startDateTime}
+        />
+        {startDateTimeValidation[0] ? (
+          <div className="text-sm text-gray-500">
+            {startDateTimeValidation[1]}
+          </div>
+        ) : (
+          <div className="text-sm text-red-500">
+            {startDateTimeValidation[1]}
+          </div>
+        )}{" "}
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <h5 className="uppercase text-sm text-gray-500 font-medium tracking-wider">
+          SALE ENDING TIME
+        </h5>
+        <DateTimePicker
+          onChange={(endDateTime) =>
+            setState((currentState) => ({ ...currentState, endDateTime }))
+          }
+          value={state.endDateTime}
+        />
+        {endDateTimeValidation[0] ? (
+          <div className="text-sm text-gray-500">
+            {endDateTimeValidation[1]}
+          </div>
+        ) : (
+          <div className="text-sm text-red-500">{endDateTimeValidation[1]}</div>
+        )}{" "}
+      </div>
       <div className="flex flex-col gap-2">
         <Accordion type="single" collapsible className="w-full">
           <AccordionItem value="item-1" className="data-[state=open]:border-0">
@@ -260,14 +333,6 @@ function ListDialogInner({
                 unitsForSale={state.unitsForSale}
                 unitsMinPerOrder={state.unitsMinPerOrder}
                 unitsMaxPerOrder={state.unitsMaxPerOrder}
-                startDateTime={state.startDateTime}
-                endDateTime={state.endDateTime}
-                setEndDateTime={(endDateTime) =>
-                  setState({ ...state, endDateTime })
-                }
-                setStartDateTime={(startDateTime) =>
-                  setState({ ...state, startDateTime })
-                }
                 setUnitsForSale={(unitsForSale) =>
                   setState({ ...state, unitsForSale })
                 }

@@ -3,7 +3,6 @@ import { useEffect, useRef } from "react";
 import { FormattedUnits } from "../formatted-units";
 import { Input } from "../ui/input";
 import { round } from "remeda";
-import { DateTimePicker } from "@/components/ui/datetime-picker";
 
 export type ListSettingsFormRef = {
   formIsValid: boolean;
@@ -18,10 +17,6 @@ export default function ListDialogSettingsForm({
   setUnitsMinPerOrder,
   setUnitsMaxPerOrder,
   setFormIsValid,
-  startDateTime,
-  setStartDateTime,
-  endDateTime,
-  setEndDateTime,
 }: {
   selectedFractionUnits?: string;
   unitsForSale?: string;
@@ -31,10 +26,6 @@ export default function ListDialogSettingsForm({
   setUnitsMinPerOrder: (unitsMinPerOrder: string) => void;
   setUnitsMaxPerOrder: (unitsMaxPerOrder: string) => void;
   setFormIsValid: (formIsValid: boolean) => void;
-  startDateTime?: Date;
-  setStartDateTime?: (startDateTime?: Date) => void;
-  endDateTime?: Date;
-  setEndDateTime?: (endDateTime?: Date) => void;
 }) {
   const _selectedFractionUnits = BigInt(selectedFractionUnits || "0");
   const _unitsForSale = BigInt(unitsForSale || "0");
@@ -148,46 +139,14 @@ export default function ListDialogSettingsForm({
     ];
   };
 
-  const validateStartDateTime = (): [boolean, React.ReactNode] => {
-    if (!startDateTime) {
-      return [false, "Must be a valid date and time."];
-    }
-
-    if (startDateTime <= new Date()) {
-      return [false, "Must be in the future."];
-    }
-
-    return [true, "Sale will start at the selected moment."];
-  };
-
-  const validateEndDateTime = (): [boolean, React.ReactNode] => {
-    if (!endDateTime) {
-      return [false, "Must be a valid date and time."];
-    }
-
-    if (endDateTime <= new Date()) {
-      return [false, "Must be in the future."];
-    }
-
-    if (startDateTime && endDateTime <= startDateTime) {
-      return [false, "Must be after the start of the sale."];
-    }
-
-    return [true, "Sale will end at the selected moment."];
-  };
-
   const unitsForSaleValidation = validateUnitsForSale();
   const unitsMinPerOrderValidation = validateUnitsMinPerOrder();
   const unitsMaxPerOrderValidation = validateUnitsMaxPerOrder();
-  const startDateTimeValidation = validateStartDateTime();
-  const endDateTimeValidation = validateEndDateTime();
 
   const formIsValid =
     unitsForSaleValidation[0] &&
     unitsMinPerOrderValidation[0] &&
-    unitsMaxPerOrderValidation[0] &&
-    startDateTimeValidation[0] &&
-    endDateTimeValidation[0];
+    unitsMaxPerOrderValidation[0];
 
   const formIsValidRef = useRef(formIsValid);
   useEffect(() => {
@@ -257,36 +216,6 @@ export default function ListDialogSettingsForm({
           <div className="text-sm text-red-500">
             {unitsMaxPerOrderValidation[1]}
           </div>
-        )}{" "}
-      </div>
-
-      <div className="flex flex-col gap-3">
-        <h5 className="uppercase text-sm text-gray-500 font-medium tracking-wider">
-          SALE STARTING TIME
-        </h5>
-        <DateTimePicker onChange={setStartDateTime} value={startDateTime} />
-        {startDateTimeValidation[0] ? (
-          <div className="text-sm text-gray-500">
-            {startDateTimeValidation[1]}
-          </div>
-        ) : (
-          <div className="text-sm text-red-500">
-            {startDateTimeValidation[1]}
-          </div>
-        )}{" "}
-      </div>
-
-      <div className="flex flex-col gap-3">
-        <h5 className="uppercase text-sm text-gray-500 font-medium tracking-wider">
-          SALE ENDING TIME
-        </h5>
-        <DateTimePicker onChange={setEndDateTime} value={endDateTime} />
-        {endDateTimeValidation[0] ? (
-          <div className="text-sm text-gray-500">
-            {endDateTimeValidation[1]}
-          </div>
-        ) : (
-          <div className="text-sm text-red-500">{endDateTimeValidation[1]}</div>
         )}{" "}
       </div>
     </div>
