@@ -91,7 +91,7 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
             </span>
           </div>
           <h5
-            className="text-base font-semibold text-slate-800 line-clamp-3 text-ellipsis tracking-tight leading-tight h-16"
+            className="text-lg font-semibold text-slate-800 line-clamp-3 text-ellipsis tracking-tight leading-tight h-[70px]"
             title={title}
           >
             {title}
