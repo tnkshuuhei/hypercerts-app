@@ -84,6 +84,7 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
             )}
           </div>
         </section>
+        , aai
         <section className="p-3 pt-4 rounded-t-xl bg-white border-t-[1.5px] border-black space-y-3">
           <div className="flex items-center">
             <span className="text-xs text-slate-600 uppercase">
@@ -91,7 +92,7 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
             </span>
           </div>
           <h5
-            className="text-lg font-semibold text-slate-800 line-clamp-3 text-ellipsis tracking-tight leading-tight h-[70px]"
+            className="text-lg font-bold text-slate-800 line-clamp-3 text-ellipsis tracking-tight leading-tight h-[70px]"
             title={title}
           >
             {title}
