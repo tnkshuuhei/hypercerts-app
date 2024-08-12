@@ -5,5 +5,11 @@ export const calculateBigIntPercentage = (
   if (!numerator || !denominator) {
     return undefined;
   }
-  return Number((BigInt(numerator) * BigInt(100)) / BigInt(denominator));
+  const numeratorBigInt = BigInt(numerator);
+  const denominatorBigInt = BigInt(denominator);
+  const precision = 10 ** 4;
+  const unCorrected = Number(
+    (numeratorBigInt * BigInt(100) * BigInt(precision)) / denominatorBigInt,
+  );
+  return unCorrected / precision;
 };

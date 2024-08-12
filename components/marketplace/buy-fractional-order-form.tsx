@@ -22,7 +22,8 @@ import {
 } from "@/marketplace/utils";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { formatUnits, parseUnits } from "viem";
+import { parseUnits } from "viem";
+import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
 
 const formSchema = z
   .object({
@@ -102,8 +103,10 @@ export const BuyFractionalOrderForm = ({
   }
 
   const minPercentageAmount = getPercentageForUnits(minUnitAmount).toString();
-  const maxPercentageAmount =
-    getPercentageForUnits(maxUnitAmountToBuy).toString();
+  const maxPercentageAmount = calculateBigIntPercentage(
+    maxUnitAmountToBuy,
+    BigInt(hypercert.units || 0),
+  )?.toString();
   const minPricePerPercent = getPricePerPercent(
     order.price,
     BigInt(hypercert.units || 0),
@@ -124,16 +127,22 @@ export const BuyFractionalOrderForm = ({
   const { mutateAsync: buyFractionalMakerAsk } = useBuyFractionalMakerAsk();
 
   const onSubmit = async (values: BuyFractionalOrderFormValues) => {
+    const hypercertUnits = BigInt(hypercert.units || 0);
+
+    if (!hypercertUnits) {
+      throw new Error("Invalid hypercert units");
+    }
+
     const unitAmount = getUnitsToBuy(values.percentageAmount);
     const pricePerUnit = getPricePerUnit(
       values.pricePerPercent,
-      BigInt(hypercert.units || 0),
-    );
+      hypercertUnits,
+    ).toString();
 
     await buyFractionalMakerAsk({
       order,
       unitAmount,
-      pricePerUnit: formatUnits(pricePerUnit, currency.decimals),
+      pricePerUnit,
     });
     onCompleted?.();
   };

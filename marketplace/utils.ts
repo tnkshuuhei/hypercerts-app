@@ -8,7 +8,6 @@ import {
   formatUnits,
   getAddress,
   parseAbiParameters,
-  parseEther,
 } from "viem";
 import { OrderFragment } from "@/marketplace/fragments/order.fragment";
 import { MarketplaceOrder } from "@/marketplace/types";
@@ -41,12 +40,11 @@ export const decodeFractionalOrderParams = (params: string) => {
 };
 
 export const getPricePerUnit = (
-  pricePerPercent: string,
+  pricePerPercentWei: string,
   totalUnits: bigint,
 ) => {
   const unitsPerPercent = totalUnits / BigInt(100);
-  const pricePerPercentWei = parseEther(pricePerPercent);
-  return pricePerPercentWei / unitsPerPercent;
+  return BigInt(pricePerPercentWei) / unitsPerPercent;
 };
 
 export const getPricePerPercent = (price: string, totalUnits: bigint) => {
