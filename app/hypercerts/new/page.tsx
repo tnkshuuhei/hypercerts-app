@@ -10,17 +10,17 @@ import useProcessDialog, { StepData } from "@/hooks/use-process-dialog";
 import { formatDate } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
+  formatHypercertData,
   HypercertMetadata,
   TransferRestrictions,
-  formatHypercertData,
 } from "@hypercerts-org/sdk";
 import { ArrowUpRightIcon } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { FieldErrors, useForm } from "react-hook-form";
-import { parseEther, TransactionReceipt } from "viem";
+import { TransactionReceipt } from "viem";
 import { z } from "zod";
-const DEFAULT_NUM_FRACTIONS = parseEther("1");
+import { DEFAULT_NUM_FRACTIONS } from "@/configs/hypercerts";
 
 const formSchema = z.object({
   title: z.string().trim().min(1, "We need a title for your hypercert"),

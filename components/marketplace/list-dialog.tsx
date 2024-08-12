@@ -15,12 +15,14 @@ import ListFractionSelect from "./list-fraction-select";
 import { LoaderCircle } from "lucide-react";
 import { useAccount } from "wagmi";
 import { useCreateFractionalMakerAsk } from "@/marketplace/hooks";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useHypercertExchangeClient } from "@/hooks/use-hypercert-exchange-client";
 import { toast } from "@/components/ui/use-toast";
 import { getCurrencyByAddress } from "@/marketplace/utils";
 import type { HypercertExchangeClient } from "@hypercerts-org/marketplace-sdk";
 import { parseClaimOrFractionId } from "@hypercerts-org/sdk";
+import { formatUnits, parseUnits } from "viem";
+import { cn } from "@/lib/utils";
 
 type State = {
   fractionId: string;
@@ -55,14 +57,23 @@ function ListDialogInner({
     (fraction) => fraction.owner_address === address,
   );
 
-  const [state, setState] = useState<State>({
-    fractionId: fractions.length === 1 ? fractions[0].fraction_id || "" : "",
-    price: "",
-    currency: Object.values(client.currencies)[0].address,
-    unitsForSale: fractions.length === 1 ? fractions[0].units || "" : "",
-    unitsMinPerOrder: "1",
-    unitsMaxPerOrder: fractions.length === 1 ? fractions[0].units || "" : "",
-    formIsValid: true,
+  const [state, setState] = useState<State>(() => {
+    const currency = Object.values(client.currencies)[0];
+    const unitsForSale = fractions[0]?.units || "0";
+    const minimumPrice = formatUnits(
+      BigInt(unitsForSale),
+      currency?.decimals || 0,
+    );
+    return {
+      fractionId: fractions.length === 1 ? fractions[0].fraction_id || "" : "",
+      price: "",
+      currency: currency.address,
+      unitsForSale,
+      unitsMinPerOrder: "1",
+      unitsMaxPerOrder: fractions.length === 1 ? fractions[0].units || "" : "",
+      formIsValid: true,
+      minimumPrice,
+    };
   });
 
   const selectedFraction = fractions.find(
@@ -75,8 +86,6 @@ function ListDialogInner({
     state.price !== undefined &&
     !isNaN(floatPrice) &&
     state.currency !== undefined;
-
-  const createButtonEnabled = isPriceValid && state.formIsValid;
 
   const handleListButtonClick = async () => {
     if (
@@ -120,9 +129,40 @@ function ListDialogInner({
     }
   };
 
-  if (!hypercert?.hypercert_id) return null;
+  const { chainId } = parseClaimOrFractionId(hypercert?.hypercert_id!);
 
-  const { chainId } = parseClaimOrFractionId(hypercert.hypercert_id);
+  useEffect(() => {
+    // Update the minimum price when the currency changes
+    const currency = getCurrencyByAddress(chainId, state.currency);
+    const minimumPrice = formatUnits(
+      BigInt(state.unitsForSale || "0"),
+      currency?.decimals || 0,
+    );
+
+    setState((currentState) => ({
+      ...currentState,
+      price:
+        currentState.price < minimumPrice ? minimumPrice : currentState.price,
+    }));
+  }, [state.currency, state.unitsForSale]);
+
+  const currency = getCurrencyByAddress(chainId, state.currency);
+
+  if (!currency) {
+    return null;
+  }
+
+  const minimumPrice = formatUnits(
+    BigInt(state.unitsForSale || "0"),
+    currency?.decimals || 0,
+  );
+  const remainder =
+    parseUnits(state.price, currency.decimals) %
+    (parseUnits(minimumPrice || "1", currency.decimals) || BigInt(1));
+
+  const isCorrectPrice = remainder === BigInt(0);
+  const createButtonEnabled =
+    isPriceValid && state.formIsValid && isCorrectPrice;
 
   return (
     <DialogContent className="gap-5 max-w-2xl max-h-full overflow-auto">
@@ -190,7 +230,15 @@ function ListDialogInner({
               {floatPrice}{" "}
               {getCurrencyByAddress(chainId, state.currency)?.symbol}
             </b>
-            .
+            .{" "}
+            <span className={cn([!isCorrectPrice && "text-red-600"])}>
+              Price should be a multiple of{" "}
+              <b>
+                {minimumPrice}{" "}
+                {getCurrencyByAddress(chainId, state.currency)?.symbol}
+              </b>
+              .
+            </span>
           </div>
         )}
       </div>
