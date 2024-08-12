@@ -59,18 +59,24 @@ function ListDialogInner({
 
   const [state, setState] = useState<State>(() => {
     const currency = Object.values(client.currencies)[0];
-    const unitsForSale = fractions[0]?.units || "0";
+    const unitsForSale = fractionsOwnedByUser[0]?.units || "0";
     const minimumPrice = formatUnits(
       BigInt(unitsForSale),
       currency?.decimals || 0,
     );
     return {
-      fractionId: fractions.length === 1 ? fractions[0].fraction_id || "" : "",
+      fractionId:
+        fractionsOwnedByUser.length === 1
+          ? fractionsOwnedByUser[0].fraction_id || ""
+          : "",
       price: "",
       currency: currency.address,
       unitsForSale,
       unitsMinPerOrder: "1",
-      unitsMaxPerOrder: fractions.length === 1 ? fractions[0].units || "" : "",
+      unitsMaxPerOrder:
+        fractionsOwnedByUser.length === 1
+          ? fractionsOwnedByUser[0].units || ""
+          : "",
       formIsValid: true,
       minimumPrice,
     };
