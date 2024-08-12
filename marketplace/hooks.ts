@@ -10,7 +10,7 @@ import {
 import { useHypercertClient } from "@/hooks/use-hypercert-client";
 import { useStepProcessDialogContext } from "@/components/global/step-process-dialog";
 import { parseClaimOrFractionId } from "@hypercerts-org/sdk";
-import { isAddress, parseUnits } from "viem";
+import { isAddress, parseUnits, zeroAddress } from "viem";
 import { readContract, waitForTransactionReceipt } from "viem/actions";
 import {
   CreateFractionalOfferFormValues,
@@ -381,19 +381,21 @@ export const useBuyFractionalMakerAsk = () => {
 
       try {
         setStep("ERC20");
-        const currentAllowance = await getCurrentERC20Allowance(
-          order.currency as `0x${string}`,
-        );
-
-        const totalPrice = BigInt(order.price) * BigInt(unitAmount);
-        if (currentAllowance < totalPrice) {
-          const approveTx = await hypercertExchangeClient.approveErc20(
-            order.currency,
-            totalPrice,
+        if (currency.address !== zeroAddress) {
+          const currentAllowance = await getCurrentERC20Allowance(
+            order.currency as `0x${string}`,
           );
-          await waitForTransactionReceipt(walletClientData, {
-            hash: approveTx.hash as `0x${string}`,
-          });
+
+          const totalPrice = BigInt(order.price) * BigInt(unitAmount);
+          if (currentAllowance < totalPrice) {
+            const approveTx = await hypercertExchangeClient.approveErc20(
+              order.currency,
+              totalPrice,
+            );
+            await waitForTransactionReceipt(walletClientData, {
+              hash: approveTx.hash as `0x${string}`,
+            });
+          }
         }
 
         setStep("Transfer manager");

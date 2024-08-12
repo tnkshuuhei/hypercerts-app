@@ -6,7 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   SortingState,
   createColumnHelper,
@@ -82,6 +82,12 @@ export default function HypercertListingsList({
   const hasOrdersForCurrentUser = (orders || []).some(
     (order) => order.signer === address,
   );
+
+  const ordersVisibleToCurrentUser = useMemo(() => {
+    return orders.filter((order) =>
+      order.invalidated ? order.signer === currentUserAddress : true,
+    );
+  }, []);
 
   const refreshOrderValidity = async (tokenId: string) => {
     if (!hypercertExchangeClient) {
@@ -303,7 +309,7 @@ export default function HypercertListingsList({
     pageSize: 10, //default page size
   });
   const table = useReactTable({
-    data: orders || [],
+    data: ordersVisibleToCurrentUser || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
