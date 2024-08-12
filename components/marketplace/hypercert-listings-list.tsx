@@ -25,7 +25,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import { ArrowUpDown, InfoIcon, RefreshCwIcon } from "lucide-react";
+import {
+  ArrowUpDown,
+  InfoIcon,
+  RefreshCwIcon,
+  TrashIcon,
+  XIcon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BuyFractionalOrderForm } from "@/components/marketplace/buy-fractional-order-form";
 import EthAddress from "@/components/eth-address";
@@ -47,6 +53,8 @@ import {
 import { useHypercertExchangeClient } from "@/hooks/use-hypercert-exchange-client";
 import { OrderFragment } from "@/marketplace/fragments/order.fragment";
 import { FormattedUnits } from "@/components/formatted-units";
+import { OrderValidatorCode } from "@hypercerts-org/marketplace-sdk";
+import { useCancelOrder, useDeleteOrder } from "@/marketplace/hooks";
 
 export default function HypercertListingsList({
   orders,
@@ -71,6 +79,10 @@ export default function HypercertListingsList({
     (order) => order.invalidated && order.signer === address,
   );
 
+  const hasOrdersForCurrentUser = (orders || []).some(
+    (order) => order.signer === address,
+  );
+
   const refreshOrderValidity = async (tokenId: string) => {
     if (!hypercertExchangeClient) {
       console.log("No hypercert exchange client");
@@ -89,6 +101,9 @@ export default function HypercertListingsList({
       chainId,
     );
   };
+
+  const { mutateAsync: cancelOrder } = useCancelOrder();
+  const { mutateAsync: deleteOrder } = useDeleteOrder();
 
   const columns = [
     columnHelper.accessor("signer", {
@@ -201,6 +216,85 @@ export default function HypercertListingsList({
           }),
         ]
       : []),
+    ...(hasOrdersForCurrentUser
+      ? [
+          columnHelper.accessor("orderNonce", {
+            id: "cancel-order",
+            header: "Cancel",
+            cell: (row) => {
+              const nonce = BigInt(row.getValue());
+              const order = row.row.original;
+              if (order.signer !== address) {
+                return <div></div>;
+              }
+
+              const cancelDisabled = Number(order.chainId) !== chainId;
+              const isCancelled = order.validator_codes?.includes(
+                OrderValidatorCode.USER_ORDER_NONCE_EXECUTED_OR_CANCELLED.toString(),
+              );
+
+              if (!isCancelled) {
+                return (
+                  <div className="flex">
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            disabled={cancelDisabled}
+                            className="ml-2"
+                            onClick={async (e) => {
+                              e.preventDefault();
+                              await cancelOrder({
+                                nonce,
+                                chainId: Number(order.chainId),
+                                tokenId: order.itemIds[0],
+                              });
+                            }}
+                            size={"sm"}
+                          >
+                            <XIcon />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-[300px]">
+                          {cancelDisabled
+                            ? "Connect to the correct chain to invalidate the listing."
+                            : "Invalidate the listing permanently."}
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
+                );
+              }
+
+              return (
+                <div className="flex">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          className="ml-2"
+                          onClick={async (e) => {
+                            e.preventDefault();
+                            await deleteOrder({
+                              orderId: order.id,
+                            });
+                          }}
+                          size={"sm"}
+                        >
+                          <TrashIcon />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-[300px]">
+                        Click to permanently remove listing.
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
+              );
+            },
+          }),
+        ]
+      : []),
   ];
 
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -267,26 +361,43 @@ export default function HypercertListingsList({
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
-                    onClick={() => {
-                      if (
-                        hypercertOnConnectedChain &&
-                        !row.original.invalidated
-                      ) {
-                        onRowClick(row.original);
-                      }
-                    }}
                     className={cn(classes, {
                       "bg-red-100": row.original.invalidated,
                     })}
                   >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
-                        )}
-                      </TableCell>
-                    ))}
+                    {row.getVisibleCells().map((cell) => {
+                      if (
+                        cell.column.columnDef.id !== "invalidated" &&
+                        cell.column.columnDef.id !== "cancel-order"
+                      ) {
+                        return (
+                          <TableCell
+                            key={cell.id}
+                            onClick={() => {
+                              if (
+                                hypercertOnConnectedChain &&
+                                !row.original.invalidated
+                              ) {
+                                onRowClick(row.original);
+                              }
+                            }}
+                          >
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext(),
+                            )}
+                          </TableCell>
+                        );
+                      }
+                      return (
+                        <TableCell key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </TableCell>
+                      );
+                    })}
                   </TableRow>
                 ))
               ) : (

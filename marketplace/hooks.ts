@@ -256,6 +256,7 @@ export const useCreateFractionalMakerAsk = ({
         console.error(e);
         throw new Error("Error registering order");
       }
+      window.location.reload();
     },
     onSuccess: () => {
       setOpen(false);
@@ -433,6 +434,69 @@ export const useBuyFractionalMakerAsk = () => {
       } finally {
         setOpen(false);
       }
+    },
+  });
+};
+
+export const useCancelOrder = () => {
+  const { client: hec } = useHypercertExchangeClient();
+
+  return useMutation({
+    mutationKey: ["cancelOrder"],
+    mutationFn: async ({
+      nonce,
+      tokenId,
+      chainId,
+    }: {
+      nonce: bigint;
+      tokenId: string;
+      chainId: number;
+    }) => {
+      if (!hec) {
+        throw new Error("No client");
+      }
+
+      const tx = await hec.cancelOrders([BigInt(nonce)]).call();
+      await tx.wait();
+
+      await hec.api.updateOrderValidity([BigInt(tokenId)], chainId);
+      document.location.reload();
+    },
+    onError: (e) => {
+      console.error(e);
+      toast({
+        title: "Error",
+        description: e.message,
+        duration: 5000,
+      });
+    },
+  });
+};
+
+export const useDeleteOrder = () => {
+  const { client: hec } = useHypercertExchangeClient();
+
+  return useMutation({
+    mutationKey: ["deleteOrder"],
+    mutationFn: async ({ orderId }: { orderId: string }) => {
+      if (!hec) {
+        throw new Error("No client");
+      }
+
+      const success = await hec.deleteOrder(orderId);
+      if (success) {
+        document.location.reload();
+      } else {
+        throw new Error(`Could not delete listing ${orderId}`);
+      }
+    },
+    onError: (e) => {
+      console.error(e);
+      toast({
+        title: "Error",
+        description: e.message,
+        duration: 5000,
+      });
     },
   });
 };

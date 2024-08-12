@@ -22,8 +22,9 @@ import {
 import {
   ArrowUpDown,
   ExternalLink,
-  InfoIcon,
   RefreshCwIcon,
+  TrashIcon,
+  XIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -52,6 +53,8 @@ import {
 import { StepProcessDialogProvider } from "@/components/global/step-process-dialog";
 import { BuyFractionalOrderForm } from "@/components/marketplace/buy-fractional-order-form";
 import { useRouter } from "next/navigation";
+import { useCancelOrder, useDeleteOrder } from "@/marketplace/hooks";
+import { OrderValidatorCode } from "@hypercerts-org/marketplace-sdk";
 
 export default function UserListingsList({
   address,
@@ -95,6 +98,9 @@ export default function UserListingsList({
       chainId,
     );
   };
+
+  const { mutateAsync: cancelOrder } = useCancelOrder();
+  const { mutateAsync: deleteOrder } = useDeleteOrder();
 
   const columns = [
     columnHelper.accessor("hypercert", {
@@ -185,31 +191,23 @@ export default function UserListingsList({
               if (order.signer !== address || !row.row.original.invalidated) {
                 return <div></div>;
               }
+
               return (
                 <div className="flex">
                   <TooltipProvider>
                     <Tooltip>
-                      <TooltipTrigger>
-                        <InfoIcon className="cursor-default" />
-                      </TooltipTrigger>
-                      <TooltipContent className="max-w-[300px]">
-                        This order has been evaluated to be invalid. You can
-                        refresh the order status by clicking the refresh icon.
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <div
+                      <TooltipTrigger asChild>
+                        <Button
                           className="ml-2"
+                          size={"sm"}
                           onClick={() => refreshOrderValidity(order.itemIds[0])}
                         >
                           <RefreshCwIcon />
-                        </div>
+                        </Button>
                       </TooltipTrigger>
                       <TooltipContent className="max-w-[300px]">
-                        Refresh the order status.
+                        This listing has been evaluated to be invalid. You can
+                        refresh the listing status by clicking the refresh icon.
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
@@ -219,6 +217,81 @@ export default function UserListingsList({
           }),
         ]
       : []),
+    columnHelper.accessor("orderNonce", {
+      id: "cancel-order",
+      header: "Cancel",
+      cell: (row) => {
+        const nonce = BigInt(row.getValue());
+        const order = row.row.original;
+        if (order.signer !== address) {
+          return <div></div>;
+        }
+
+        const cancelDisabled = Number(order.chainId) !== chainId;
+        const isCancelled = order.validator_codes?.includes(
+          OrderValidatorCode.USER_ORDER_NONCE_EXECUTED_OR_CANCELLED.toString(),
+        );
+
+        if (!isCancelled) {
+          return (
+            <div className="flex">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      disabled={cancelDisabled}
+                      className="ml-2"
+                      onClick={async (e) => {
+                        e.preventDefault();
+                        await cancelOrder({
+                          nonce,
+                          chainId: Number(order.chainId),
+                          tokenId: order.itemIds[0],
+                        });
+                      }}
+                      size={"sm"}
+                    >
+                      <XIcon />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-[300px]">
+                    {cancelDisabled
+                      ? "Connect to the correct chain to invalidate the listing."
+                      : "Invalidate the listing permanently."}
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+          );
+        }
+
+        return (
+          <div className="flex">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    className="ml-2"
+                    onClick={async (e) => {
+                      e.preventDefault();
+                      await deleteOrder({
+                        orderId: order.id,
+                      });
+                    }}
+                    size={"sm"}
+                  >
+                    <TrashIcon />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-[300px]">
+                  Click to permanently remove listing.
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+        );
+      },
+    }),
   ];
 
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -290,16 +363,6 @@ export default function UserListingsList({
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
-                    onClick={() => {
-                      if (
-                        client?.isClaimOrFractionOnConnectedChain(
-                          row.original?.hypercert_id as string,
-                        ) &&
-                        !row.original.invalidated
-                      ) {
-                        onRowClick(row.original);
-                      }
-                    }}
                     className={cn(
                       classes(
                         !!client?.isClaimOrFractionOnConnectedChain(
@@ -311,14 +374,39 @@ export default function UserListingsList({
                       },
                     )}
                   >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
-                        )}
-                      </TableCell>
-                    ))}
+                    {row.getVisibleCells().map((cell) => {
+                      if (
+                        client?.isClaimOrFractionOnConnectedChain(
+                          row.original?.hypercert_id as string,
+                        ) &&
+                        cell.column.columnDef.id !== "invalidated" &&
+                        cell.column.columnDef.id !== "cancel-order"
+                      ) {
+                        return (
+                          <TableCell
+                            key={cell.id}
+                            onClick={() => {
+                              if (!row.original.invalidated) {
+                                onRowClick(row.original);
+                              }
+                            }}
+                          >
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext(),
+                            )}
+                          </TableCell>
+                        );
+                      }
+                      return (
+                        <TableCell key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </TableCell>
+                      );
+                    })}
                   </TableRow>
                 ))
               ) : (

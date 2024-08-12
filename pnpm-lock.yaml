@@ -18,8 +18,8 @@ importers:
         specifier: 2.0.0-alpha.1
         version: 2.0.0-alpha.1(bufferutil@4.0.8)(typescript@5.5.2)
       '@hypercerts-org/marketplace-sdk':
-        specifier: 0.3.23
-        version: 0.3.23(@swc/helpers@0.5.5)(bufferutil@4.0.8)(ethers@6.13.1(bufferutil@4.0.8))(graphql@16.9.0)(rollup@4.18.0)(svelte@4.2.18)(typescript@5.5.2)
+        specifier: 0.3.25
+        version: 0.3.25(@swc/helpers@0.5.5)(bufferutil@4.0.8)(ethers@6.13.1(bufferutil@4.0.8))(graphql@16.9.0)(rollup@4.18.0)(svelte@4.2.18)(typescript@5.5.2)
       '@hypercerts-org/sdk':
         specifier: 2.0.0-alpha.32
         version: 2.0.0-alpha.32(@swc/helpers@0.5.5)(bufferutil@4.0.8)(graphql@16.9.0)(rollup@4.18.0)(typescript@5.5.2)
@@ -1120,8 +1120,8 @@ packages:
   '@hypercerts-org/contracts@2.0.0-alpha.1':
     resolution: {integrity: sha512-t+2eYorMC7GjFJCmwqIQzqbxBMATG+/zXJL6BFwJQPRCQEAcQhh4tuwcBhIvPz1kQj2capetZyAPO6gKmgtzig==}
 
-  '@hypercerts-org/marketplace-sdk@0.3.23':
-    resolution: {integrity: sha512-tWdJdnnvM10wdbN6vvdU/n1XfsuoZazzyn4qjUtTQna8LgwVMdDPiBdiSER/PJMfrOUpBB1HcTmzYJXMbOfkug==}
+  '@hypercerts-org/marketplace-sdk@0.3.25':
+    resolution: {integrity: sha512-mjsv2hMqaQKXDAfg8SLAypZ69MrnyIfhl2fKF1BHBi1qrmsbn5zm8/GhoSPgHILgo0wt6NduVli5woNIVDlhJQ==}
     engines: {node: '>= 16.15.1 <= 20.x'}
     peerDependencies:
       ethers: ^6.6.2
@@ -8177,7 +8177,7 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@hypercerts-org/marketplace-sdk@0.3.23(@swc/helpers@0.5.5)(bufferutil@4.0.8)(ethers@6.13.1(bufferutil@4.0.8))(graphql@16.9.0)(rollup@4.18.0)(svelte@4.2.18)(typescript@5.5.2)':
+  '@hypercerts-org/marketplace-sdk@0.3.25(@swc/helpers@0.5.5)(bufferutil@4.0.8)(ethers@6.13.1(bufferutil@4.0.8))(graphql@16.9.0)(rollup@4.18.0)(svelte@4.2.18)(typescript@5.5.2)':
     dependencies:
       '@hypercerts-org/sdk': 2.0.0-alpha.30(@swc/helpers@0.5.5)(bufferutil@4.0.8)(graphql@16.9.0)(rollup@4.18.0)(typescript@5.5.2)
       '@supabase/supabase-js': 2.45.0(bufferutil@4.0.8)
@@ -8202,7 +8202,7 @@ snapshots:
     dependencies:
       '@graphql-typed-document-node/core': 3.2.0(graphql@16.9.0)
       '@hypercerts-org/contracts': 2.0.0-alpha.1(bufferutil@4.0.8)(typescript@5.5.2)
-      '@openzeppelin/merkle-tree': 1.0.6
+      '@openzeppelin/merkle-tree': 1.0.7
       '@swc/core': 1.6.5(@swc/helpers@0.5.5)
       ajv: 8.16.0
       axios: 1.7.2
