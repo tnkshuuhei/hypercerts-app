@@ -84,10 +84,12 @@ export default function HypercertListingsList({
   );
 
   const ordersVisibleToCurrentUser = useMemo(() => {
-    return orders.filter((order) =>
-      order.invalidated ? order.signer === currentUserAddress : true,
+    return (
+      orders?.filter((order) =>
+        order.invalidated ? order.signer === address : true,
+      ) || []
     );
-  }, []);
+  }, [address]);
 
   const refreshOrderValidity = async (tokenId: string) => {
     if (!hypercertExchangeClient) {
