@@ -218,11 +218,6 @@ const StepProcessModal = ({
                   )}
                 >
                   {step.description}
-                  {step.state === "error" && step.errorMessage && (
-                    <span className="text-red-500 text-sm ml-2">
-                      ({step.errorMessage})
-                    </span>
-                  )}
                 </p>
                 {step.state === "error" && step.errorMessage && (
                   <ScrollArea className="w-96 h-16 rounded p-2 bg-red-50">
