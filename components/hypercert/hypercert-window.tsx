@@ -3,38 +3,52 @@ import { getEvaluationStatus } from "@/hypercerts/getEvaluationStatus";
 import { supportedChains, type SupportedChainIdType } from "@/lib/constants";
 import Image from "next/image";
 import Link from "next/link";
-
-export type HypercertMiniDisplayProps = {
-  hypercertId: string;
-  name: string;
-  chainId: SupportedChainIdType;
-  fromDateDisplay?: string | null;
-  toDateDisplay?: string | null;
-  attestations: {
-    data:
-      | {
-          data: unknown;
-        }[]
-      | null;
-    count: number | null;
-  } | null;
-  hasTrustedEvaluator?: boolean;
-  percentAvailable?: number;
-  lowestPrice?: string;
-};
+import { HypercertListFragment } from "@/hypercerts/fragments/hypercert-list.fragment";
+import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
+import { getCurrencyByAddress } from "@/marketplace/utils";
 
 const HypercertWindow = ({
-  hasTrustedEvaluator,
-  percentAvailable,
-  lowestPrice,
-  hypercertId,
-  name,
-  chainId,
-  attestations,
-}: HypercertMiniDisplayProps) => {
+  hypercert,
+  priceDisplayCurrency = "usd",
+}: {
+  hypercert: HypercertListFragment;
+  hasTrustedEvaluator?: boolean;
+  priceDisplayCurrency?: string;
+}) => {
+  const hypercertId = hypercert.hypercert_id as string;
+  const name = hypercert.metadata?.name as string;
+  const chainId = Number(hypercert.contract?.chain_id) as SupportedChainIdType;
+  const attestations = hypercert.attestations;
   const cardChain = (chainId: SupportedChainIdType) => {
     return supportedChains.find((x) => x.id === chainId)?.name;
   };
+
+  const percentAvailable = calculateBigIntPercentage(
+    hypercert.orders?.totalUnitsForSale,
+    hypercert.units,
+  );
+
+  let lowestPrice: string | null = null;
+
+  const cheapestOrder = hypercert.orders?.cheapestOrder;
+
+  if (priceDisplayCurrency === "usd" && cheapestOrder?.pricePerPercentInUSD) {
+    lowestPrice = `$${cheapestOrder.pricePerPercentInUSD}`;
+  }
+
+  if (
+    priceDisplayCurrency === "token" &&
+    cheapestOrder?.pricePerPercentInToken
+  ) {
+    const currency = getCurrencyByAddress(
+      Number(cheapestOrder.chainId),
+      cheapestOrder.currency,
+    );
+    if (!currency) {
+      throw new Error(`Currency not found for ${cheapestOrder.currency}`);
+    }
+    lowestPrice = `${cheapestOrder.pricePerPercentInToken} ${currency.symbol}`;
+  }
 
   const evaluationStatus = getEvaluationStatus(attestations);
 
@@ -75,9 +89,7 @@ const HypercertWindow = ({
             <section>
               <h6 className="text-end opacity-70">lowest per %</h6>
               <p className="font-medium">
-                {lowestPrice && lowestPrice !== "0"
-                  ? `${lowestPrice} ETH`
-                  : "--"}
+                {lowestPrice && lowestPrice !== "0" ? `${lowestPrice}` : "--"}
               </p>
             </section>
           </section>

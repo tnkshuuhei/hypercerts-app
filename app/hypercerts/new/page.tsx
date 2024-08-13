@@ -18,9 +18,9 @@ import { ArrowUpRightIcon } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { FieldErrors, useForm, useWatch } from "react-hook-form";
-import { parseEther, TransactionReceipt } from "viem";
+import { TransactionReceipt } from "viem";
 import { z } from "zod";
-const DEFAULT_NUM_FRACTIONS = parseEther("1");
+import { DEFAULT_NUM_FRACTIONS } from "@/configs/hypercerts";
 
 const formSchema = z.object({
   title: z.string().trim().min(1, "We need a title for your hypercert"),

@@ -2,7 +2,7 @@ import { Circle, CircleCheck } from "lucide-react";
 
 import { FormattedUnits } from "../formatted-units";
 import { cn } from "@/lib/utils";
-import { round } from "remeda";
+import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
 
 type Fraction = {
   units: string | null | undefined;
@@ -25,7 +25,7 @@ export default function ListFractionSelect({
   const fractionUnits = BigInt(fraction.units || "0");
   const fractionId =
     fraction.fraction_id.slice(0, 3) + "..." + fraction.fraction_id.slice(-3);
-  const fractionShare = round(Number((fractionUnits / units) * BigInt(100)), 2);
+  const fractionShare = calculateBigIntPercentage(fractionUnits, units);
 
   return (
     <tr

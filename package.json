@@ -6,14 +6,15 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "vitest"
   },
   "packageManager": "pnpm@9.2.0",
   "dependencies": {
     "@ethereum-attestation-service/eas-sdk": "^2.2.0",
     "@hookform/resolvers": "^3.3.4",
     "@hypercerts-org/contracts": "2.0.0-alpha.1",
-    "@hypercerts-org/marketplace-sdk": "0.3.23",
+    "@hypercerts-org/marketplace-sdk": "0.3.29",
     "@hypercerts-org/sdk": "2.0.0-alpha.32",
     "@openzeppelin/merkle-tree": "^1.0.6",
     "@radix-ui/react-accordion": "^1.1.2",
@@ -66,15 +67,19 @@
   },
   "devDependencies": {
     "@0no-co/graphqlsp": "^1.12.5",
+    "@testing-library/react": "^16.0.0",
     "@types/node": "^20",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@types/yaireo__tagify": "^4.18.0",
+    "@vitejs/plugin-react": "^4.3.1",
     "eslint": "^8.56.0",
     "eslint-config-next": "14.2.3",
+    "jsdom": "^24.1.1",
     "postcss": "^8.4.38",
     "prettier": "3.3.2",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "vitest": "^2.0.5"
   }
 }

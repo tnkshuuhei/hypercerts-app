@@ -6,7 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   SortingState,
   createColumnHelper,
@@ -25,7 +25,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import { ArrowUpDown, InfoIcon, RefreshCwIcon } from "lucide-react";
+import { ArrowUpDown, RefreshCwIcon, TrashIcon, XIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BuyFractionalOrderForm } from "@/components/marketplace/buy-fractional-order-form";
 import EthAddress from "@/components/eth-address";
@@ -35,7 +35,7 @@ import { useHypercertClient } from "@/hooks/use-hypercert-client";
 import { HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
 import {
   decodeFractionalOrderParams,
-  getPricePerPercent,
+  getCurrencyByAddress,
   orderFragmentToMarketplaceOrder,
 } from "@/marketplace/utils";
 import { useAccount, useChainId } from "wagmi";
@@ -48,8 +48,12 @@ import {
 import { useHypercertExchangeClient } from "@/hooks/use-hypercert-exchange-client";
 import { OrderFragment } from "@/marketplace/fragments/order.fragment";
 import { FormattedUnits } from "@/components/formatted-units";
+import { OrderValidatorCode } from "@hypercerts-org/marketplace-sdk";
+import { useCancelOrder, useDeleteOrder } from "@/marketplace/hooks";
+import { useSearchParams } from "next/navigation";
+import { DEFAULT_DISPLAY_CURRENCY } from "@/configs/hypercerts";
 
-export default function OrdersList({
+export default function HypercertListingsList({
   orders,
   hypercert,
 }: {
@@ -62,6 +66,12 @@ export default function OrdersList({
   const { client } = useHypercertClient();
   const { client: hypercertExchangeClient } = useHypercertExchangeClient();
 
+  const searchParams = useSearchParams();
+
+  const urlSearchParams = new URLSearchParams(searchParams);
+  const displayCurrency =
+    urlSearchParams.get("currency") || DEFAULT_DISPLAY_CURRENCY;
+
   const hypercertOnConnectedChain =
     client?.isClaimOrFractionOnConnectedChain(hypercert?.hypercert_id!) ||
     false;
@@ -72,6 +82,18 @@ export default function OrdersList({
     (order) => order.invalidated && order.signer === address,
   );
 
+  const hasOrdersForCurrentUser = (orders || []).some(
+    (order) => order.signer === address,
+  );
+
+  const ordersVisibleToCurrentUser = useMemo(() => {
+    return (
+      orders?.filter((order) =>
+        order.invalidated ? order.signer === address : true,
+      ) || []
+    );
+  }, [address]);
+
   const refreshOrderValidity = async (tokenId: string) => {
     if (!hypercertExchangeClient) {
       console.log("No hypercert exchange client");
@@ -79,7 +101,9 @@ export default function OrdersList({
     }
 
     if (!chainId) {
-      console.log("No chain ID");
+      console.log(
+        `Invalid chain ID: ${chainId} for order with tokenId ${tokenId}`,
+      );
       return;
     }
 
@@ -88,6 +112,9 @@ export default function OrdersList({
       chainId,
     );
   };
+
+  const { mutateAsync: cancelOrder } = useCancelOrder();
+  const { mutateAsync: deleteOrder } = useDeleteOrder();
 
   const columns = [
     columnHelper.accessor("signer", {
@@ -98,29 +125,44 @@ export default function OrdersList({
       ),
       header: "Seller",
     }),
-    columnHelper.accessor("price", {
+    columnHelper.accessor("pricePerPercentInUSD", {
       header: ({ column }) => {
         return (
-          <Button
-            variant="ghost"
+          <div
+            className="flex items-center cursor-pointer"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             Price per %
             <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
+          </div>
         );
       },
-      cell: (row) => (
-        <div>
-          {getPricePerPercent(
-            row.getValue(),
-            BigInt(hypercert.units || BigInt(0)),
-          )}{" "}
-          ETH
-        </div>
-      ),
+      cell: (row) => {
+        if (displayCurrency === "token") {
+          const { pricePerPercentInToken, currency, chainId } =
+            row.row.original;
+          const currencyData = getCurrencyByAddress(Number(chainId), currency);
+
+          if (!currencyData) {
+            return <div>Unknown currency</div>;
+          }
+
+          return (
+            <div>
+              {pricePerPercentInToken} {currencyData.symbol}
+            </div>
+          );
+        }
+
+        const price = Number(row.getValue());
+        if (price < 0.01) {
+          return <div>{"<"} $0.01</div>;
+        }
+        return <div>${price.toFixed(2)}</div>;
+      },
       sortingFn: (rowA, rowB) =>
-        BigInt(rowA.getValue("price")) < BigInt(rowB.getValue("price"))
+        Number(rowA.getValue("pricePerPercentInUSD")) <
+        Number(rowB.getValue("pricePerPercentInUSD"))
           ? 1
           : -1,
     }),
@@ -170,27 +212,97 @@ export default function OrdersList({
                 <div className="flex">
                   <TooltipProvider>
                     <Tooltip>
-                      <TooltipTrigger>
-                        <InfoIcon className="cursor-default" />
-                      </TooltipTrigger>
-                      <TooltipContent className="max-w-[300px]">
-                        This order has been evaluated to be invalid. You can
-                        refresh the order status by clicking the refresh icon.
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <div
+                      <TooltipTrigger asChild>
+                        <Button
                           className="ml-2"
+                          size={"sm"}
                           onClick={() => refreshOrderValidity(order.itemIds[0])}
                         >
                           <RefreshCwIcon />
-                        </div>
+                        </Button>
                       </TooltipTrigger>
                       <TooltipContent className="max-w-[300px]">
-                        Refresh the order status.
+                        This listing has been evaluated to be invalid. You can
+                        refresh the listing status by clicking the refresh icon.
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
+              );
+            },
+          }),
+        ]
+      : []),
+    ...(hasOrdersForCurrentUser
+      ? [
+          columnHelper.accessor("orderNonce", {
+            id: "cancel-order",
+            header: "Cancel",
+            cell: (row) => {
+              const nonce = BigInt(row.getValue());
+              const order = row.row.original;
+              if (order.signer !== address) {
+                return <div></div>;
+              }
+
+              const cancelDisabled = Number(order.chainId) !== chainId;
+              const isCancelled = order.validator_codes?.includes(
+                OrderValidatorCode.USER_ORDER_NONCE_EXECUTED_OR_CANCELLED.toString(),
+              );
+
+              if (!isCancelled) {
+                return (
+                  <div className="flex">
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            disabled={cancelDisabled}
+                            className="ml-2"
+                            onClick={async (e) => {
+                              e.preventDefault();
+                              await cancelOrder({
+                                nonce,
+                                chainId: Number(order.chainId),
+                                tokenId: order.itemIds[0],
+                              });
+                            }}
+                            size={"sm"}
+                          >
+                            <XIcon />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-[300px]">
+                          {cancelDisabled
+                            ? "Connect to the correct chain to invalidate the listing."
+                            : "Invalidate the listing permanently."}
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
+                );
+              }
+
+              return (
+                <div className="flex">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          className="ml-2"
+                          onClick={async (e) => {
+                            e.preventDefault();
+                            await deleteOrder({
+                              orderId: order.id,
+                            });
+                          }}
+                          size={"sm"}
+                        >
+                          <TrashIcon />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-[300px]">
+                        Click to permanently remove listing.
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
@@ -208,7 +320,7 @@ export default function OrdersList({
     pageSize: 10, //default page size
   });
   const table = useReactTable({
-    data: orders || [],
+    data: ordersVisibleToCurrentUser || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -266,26 +378,43 @@ export default function OrdersList({
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
-                    onClick={() => {
-                      if (
-                        hypercertOnConnectedChain &&
-                        !row.original.invalidated
-                      ) {
-                        onRowClick(row.original);
-                      }
-                    }}
                     className={cn(classes, {
                       "bg-red-100": row.original.invalidated,
                     })}
                   >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
-                        )}
-                      </TableCell>
-                    ))}
+                    {row.getVisibleCells().map((cell) => {
+                      if (
+                        cell.column.columnDef.id !== "invalidated" &&
+                        cell.column.columnDef.id !== "cancel-order"
+                      ) {
+                        return (
+                          <TableCell
+                            key={cell.id}
+                            onClick={() => {
+                              if (
+                                hypercertOnConnectedChain &&
+                                !row.original.invalidated
+                              ) {
+                                onRowClick(row.original);
+                              }
+                            }}
+                          >
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext(),
+                            )}
+                          </TableCell>
+                        );
+                      }
+                      return (
+                        <TableCell key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </TableCell>
+                      );
+                    })}
                   </TableRow>
                 ))
               ) : (

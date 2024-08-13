@@ -8,7 +8,10 @@ export interface CreateFractionalOfferFormValues {
   minUnitAmount: string;
   maxUnitAmount: string;
   minUnitsToKeep: string;
+  unitsForSale: string;
   price: string;
   sellLeftoverFraction: boolean;
   currency?: string;
+  startDateTime: number;
+  endDateTime: number;
 }

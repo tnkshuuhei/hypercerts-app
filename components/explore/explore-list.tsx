@@ -4,17 +4,13 @@ import {
   isClaimsFilter,
   isClaimsOrderBy,
 } from "@/hypercerts/getAllHypercerts";
-import { HypercertMiniDisplayProps } from "@/components/hypercert/hypercert-mini-display";
 
 import ExploreListSkeleton from "./explore-list-skeleton";
 import ExplorePagination from "./explore-pagination";
 import { HYPERCERTS_PER_PAGE } from "@/configs/ui";
 import { InfoSection } from "@/app/profile/[address]/sections";
 import { Suspense } from "react";
-import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
-import { type SupportedChainIdType } from "@/lib/constants";
 import HypercertWindow from "@/components/hypercert/hypercert-window";
-import { getPricePerPercent } from "@/marketplace/utils";
 
 function HypercertsListNoResults() {
   return "No results found";
@@ -51,6 +47,7 @@ async function ExploreListInner({
     params.orderBy = orderBy;
   }
   const hypercerts = await getAllHypercerts(params);
+  const displayCurrency = searchParams?.currency;
 
   if (!hypercerts) {
     return <HypercertsListLoadError />;
@@ -69,25 +66,13 @@ async function ExploreListInner({
       )}
       <div className="grid grid-cols-[repeat(auto-fit,_minmax(270px,_1fr))] gap-4">
         {hypercerts?.data?.map((hypercert) => {
-          const percentAvailable = calculateBigIntPercentage(
-            hypercert.orders?.totalUnitsForSale,
-            hypercert.units,
+          return (
+            <HypercertWindow
+              key={hypercert.hypercert_id}
+              hypercert={hypercert}
+              priceDisplayCurrency={displayCurrency}
+            />
           );
-          const lowestPrice = getPricePerPercent(
-            hypercert.orders?.lowestAvailablePrice || "0",
-            BigInt(hypercert?.units || "0"),
-          );
-          const props: HypercertMiniDisplayProps = {
-            hypercertId: hypercert.hypercert_id as string,
-            name: hypercert.metadata?.name as string,
-            chainId: Number(
-              hypercert.contract?.chain_id,
-            ) as SupportedChainIdType,
-            attestations: hypercert.attestations,
-            lowestPrice,
-            percentAvailable,
-          };
-          return <HypercertWindow {...props} key={hypercert.hypercert_id} />;
         })}
       </div>
       <ExplorePagination
