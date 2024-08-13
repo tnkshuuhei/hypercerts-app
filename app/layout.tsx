@@ -13,7 +13,7 @@ import { cookieToInitialState } from "wagmi";
 import { headers } from "next/headers";
 import { siteConfig } from "@/configs/site";
 import Footer from "@/components/global/footer";
-import { TransactionProvider } from "@/contexts/TransactionProvider";
+import { StepProcessDialogProvider } from "@/components/global/step-process-dialog";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -53,11 +53,11 @@ export default function RootLayout({
         )}
       >
         <Web3ModalProvider initialState={initialState}>
-          <TransactionProvider>
+          <StepProcessDialogProvider>
             <Navbar />
             {children}
             <MobileNav />
-          </TransactionProvider>
+          </StepProcessDialogProvider>
         </Web3ModalProvider>
         <Toaster />
         <Footer />
