@@ -21,6 +21,7 @@ export const useMintHypercert = () => {
     scope: { id: "MINT_HYPERCERT" }, // Ensure only one instance runs
     onError: (e) => {
       console.error(e);
+      setDialogStep("minting", "error", e.message);
       toast({
         title: "Error",
         description: e.message,
@@ -47,7 +48,7 @@ export const useMintHypercert = () => {
       }
 
       if (receipt?.status === "reverted") {
-        setOpen(false);
+        // setOpen(false);
         throw new Error("Transaction reverted: Minting failed");
       }
 
@@ -78,10 +79,12 @@ export const useMintHypercert = () => {
         { id: "confirming", description: "Waiting for on-chain confirmation" },
         { id: "done", description: "Minting complete!" },
       ]);
+      console.log("preparing...");
       setDialogStep("preparing");
 
       let hash;
       try {
+        console.log("minting...");
         setDialogStep("minting");
         hash = await client.mintHypercert({
           metaData,
@@ -91,7 +94,7 @@ export const useMintHypercert = () => {
         });
       } catch (error: unknown) {
         console.error("Error minting hypercert:", error);
-        setOpen(false);
+        // setOpen(false);
         if (error instanceof Error) {
           throw new Error(`Failed to mint hypercert: ${error.message}`);
         } else {
@@ -100,7 +103,7 @@ export const useMintHypercert = () => {
       }
 
       if (!hash) {
-        setOpen(false);
+        // setOpen(false);
         throw new Error("No transaction hash returned");
       }
 
