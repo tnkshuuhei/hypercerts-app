@@ -1,3 +1,4 @@
+"use client";
 import { buttonVariants } from "@/components/ui/button";
 import {
   Dialog,
@@ -30,7 +31,11 @@ export type DialogStep = {
 export type StepData = Pick<DialogStep, "id" | "description">;
 
 export const StepProcessDialogContext = createContext<{
-  setDialogStep: (step: DialogStep["id"], errorMessage?: string) => void;
+  setDialogStep: (
+    step: DialogStep["id"],
+    newState?: StepState,
+    errorMessage?: string,
+  ) => void;
   setDialogSteps: React.Dispatch<React.SetStateAction<DialogStep[]>>;
   setSteps: React.Dispatch<React.SetStateAction<StepData[]>>;
   setOpen: (open: boolean) => void;
@@ -54,35 +59,40 @@ export const StepProcessDialogProvider = ({
   const [dialogSteps, setDialogSteps] = useState<DialogStep[]>([]);
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("Transaction in progress...");
+  const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
-    setDialogSteps(
-      steps.map((step) => ({
-        ...step,
-        state: "idle" as StepState,
-        errorMessage: "",
-      })),
-    );
-  }, [steps]);
+    if (steps.length === 0) return;
+    if (!initialized) {
+      setDialogSteps(
+        steps.map((step) => ({
+          ...step,
+          state: "idle",
+          errorMessage: "",
+        })),
+      );
+      setInitialized(true);
+    }
+  }, [steps, initialized]);
+
   const setDialogStep = useCallback(
-    (stepId: DialogStep["id"], errorMessage?: string) => {
+    (stepId: DialogStep["id"], newState?: StepState, errorMessage?: string) => {
       setDialogSteps((prevSteps) => {
         const stepIndex = prevSteps.findIndex((step) => step.id === stepId);
         if (stepIndex === -1) return prevSteps;
 
         return prevSteps.map((step, index) => {
-          if (index !== stepIndex) {
+          if (index === stepIndex) {
             return {
               ...step,
-              state: index < stepIndex ? "completed" : "idle",
+              state: newState || (errorMessage ? "error" : "active"),
+              errorMessage: errorMessage || "",
             };
           }
 
-          const newState: StepState = errorMessage ? "error" : "active";
           return {
             ...step,
-            state: newState,
-            errorMessage: errorMessage || "",
+            state: index < stepIndex ? "completed" : "idle",
           };
         });
       });
@@ -93,8 +103,7 @@ export const StepProcessDialogProvider = ({
   return (
     <StepProcessDialogContext.Provider
       value={{
-        setDialogStep: (step: string, errorMessage?: string) =>
-          setDialogStep(step, errorMessage || ""),
+        setDialogStep,
         setDialogSteps,
         setSteps,
         setOpen,
@@ -113,8 +122,15 @@ export const StepProcessDialogProvider = ({
   );
 };
 
-export const useStepProcessDialogContext = () =>
-  useContext(StepProcessDialogContext);
+export const useStepProcessDialogContext = () => {
+  const context = useContext(StepProcessDialogContext);
+  if (!context) {
+    throw new Error(
+      "useStepProcessDialogContext must be used within a StepProcessDialogProvider",
+    );
+  }
+  return context;
+};
 
 interface DialogProps {
   steps: DialogStep[];
