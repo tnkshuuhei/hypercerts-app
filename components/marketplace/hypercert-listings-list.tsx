@@ -194,27 +194,18 @@ export default function HypercertListingsList({
                 <div className="flex">
                   <TooltipProvider>
                     <Tooltip>
-                      <TooltipTrigger>
-                        <InfoIcon className="cursor-default" />
-                      </TooltipTrigger>
-                      <TooltipContent className="max-w-[300px]">
-                        This order has been evaluated to be invalid. You can
-                        refresh the order status by clicking the refresh icon.
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <div
+                      <TooltipTrigger asChild>
+                        <Button
                           className="ml-2"
+                          size={"sm"}
                           onClick={() => refreshOrderValidity(order.itemIds[0])}
                         >
                           <RefreshCwIcon />
-                        </div>
+                        </Button>
                       </TooltipTrigger>
                       <TooltipContent className="max-w-[300px]">
-                        Refresh the order status.
+                        This listing has been evaluated to be invalid. You can
+                        refresh the listing status by clicking the refresh icon.
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>

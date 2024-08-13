@@ -8,13 +8,14 @@ import {
   formatUnits,
   getAddress,
   parseAbiParameters,
+  parseUnits,
 } from "viem";
 import { OrderFragment } from "@/marketplace/fragments/order.fragment";
 import { MarketplaceOrder } from "@/marketplace/types";
 import { HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
 
-export const getCurrencyByAddress = (chain: ChainId, address: string) => {
-  const currenciesForNetwork = currenciesByNetwork[chain];
+export const getCurrencyByAddress = (chainId: ChainId, address: string) => {
+  const currenciesForNetwork = currenciesByNetwork[chainId];
   const allCurrencies = Object.values(currenciesForNetwork) as Currency[];
 
   return allCurrencies.find(
@@ -47,9 +48,9 @@ export const getPricePerUnit = (
   return BigInt(pricePerPercentWei) / unitsPerPercent;
 };
 
-export const getPricePerPercent = (price: string, totalUnits: bigint) => {
+export const getPricePerPercent = (priceInWei: string, totalUnits: bigint) => {
   const unitsPerPercent = totalUnits / BigInt(100);
-  return BigInt(price) * unitsPerPercent;
+  return BigInt(priceInWei) * unitsPerPercent;
 };
 
 export const formatPrice = (
@@ -116,4 +117,45 @@ export const orderFragmentToHypercert = (
   order: OrderFragment,
 ): HypercertFull => {
   return order.hypercert as unknown as HypercertFull;
+};
+
+export const getMinimumPrice = (
+  unitsForSale: bigint | string | undefined,
+  chainId: number,
+  currencyAddress: string,
+) => {
+  const currency = getCurrencyByAddress(chainId, currencyAddress);
+  return formatUnits(BigInt(unitsForSale || "0"), currency?.decimals || 0);
+};
+
+export const isTokenDividableBy = (
+  numerator: string,
+  denominator: string | undefined,
+  chainId: number,
+  currencyAddress: string,
+) => {
+  const currency = getCurrencyByAddress(chainId, currencyAddress);
+  if (!currency) {
+    throw new Error(`Currency not found for address ${currencyAddress}`);
+  }
+  const remainder =
+    parseUnits(numerator, currency.decimals) %
+    (parseUnits(denominator || "1", currency.decimals) || BigInt(1));
+  return remainder === BigInt(0);
+};
+
+export const getTotalPriceFromPercentage = (
+  pricePerPercent: bigint,
+  percentageAmount: number,
+) => {
+  if (percentageAmount < 0 || percentageAmount > 100) {
+    throw new Error("Percentage amount must be between 0 and 100");
+  }
+
+  const precision = 10 ** 16;
+
+  return (
+    (pricePerPercent * BigInt(Math.round(percentageAmount * precision))) /
+    BigInt(precision)
+  );
 };

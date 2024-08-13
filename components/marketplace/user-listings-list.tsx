@@ -80,7 +80,7 @@ export default function UserListingsList({
     return orders.filter((order) =>
       order.invalidated ? order.signer === currentUserAddress : true,
     );
-  }, []);
+  }, [currentUserAddress]);
 
   const refreshOrderValidity = async (tokenId: string) => {
     if (!hypercertExchangeClient) {

@@ -379,6 +379,7 @@ export const useBuyFractionalMakerAsk = () => {
         pricePerUnit,
       );
 
+      const totalPrice = BigInt(order.price) * BigInt(unitAmount);
       try {
         setStep("ERC20");
         if (currency.address !== zeroAddress) {
@@ -386,7 +387,6 @@ export const useBuyFractionalMakerAsk = () => {
             order.currency as `0x${string}`,
           );
 
-          const totalPrice = BigInt(order.price) * BigInt(unitAmount);
           if (currentAllowance < totalPrice) {
             const approveTx = await hypercertExchangeClient.approveErc20(
               order.currency,
@@ -417,10 +417,14 @@ export const useBuyFractionalMakerAsk = () => {
 
       try {
         setStep("Setting up order execution");
+        const overrides =
+          currency.address === zeroAddress ? { value: totalPrice } : undefined;
         const { call } = hypercertExchangeClient.executeOrder(
           order,
           takerOrder,
           order.signature,
+          undefined,
+          overrides,
         );
         setStep("Awaiting buy signature");
         const tx = await call();
@@ -431,8 +435,7 @@ export const useBuyFractionalMakerAsk = () => {
       } catch (e) {
         console.error(e);
 
-        const defaultMessage = `Error during step \"${"TO BE IMPLEMENTED CURRENT STEP"}\"`;
-        throw new Error(decodeContractError(e, defaultMessage));
+        throw new Error(decodeContractError(e, "Error buying listing"));
       } finally {
         setOpen(false);
       }

@@ -19,6 +19,7 @@ import {
   getCurrencyByAddress,
   getPricePerPercent,
   getPricePerUnit,
+  getTotalPriceFromPercentage,
 } from "@/marketplace/utils";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -152,8 +153,7 @@ export const BuyFractionalOrderForm = ({
 
   const totalPrice = formatPrice(
     order.chainId,
-    (BigInt(pricePerPercent) * BigInt(Number(percentageAmount) * 100)) /
-      BigInt(100),
+    getTotalPriceFromPercentage(BigInt(pricePerPercent), percentageAmount),
     currency.address,
     true,
   );

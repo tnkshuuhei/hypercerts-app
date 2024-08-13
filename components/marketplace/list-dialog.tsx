@@ -18,10 +18,13 @@ import { useCreateFractionalMakerAsk } from "@/marketplace/hooks";
 import { useEffect, useState } from "react";
 import { useHypercertExchangeClient } from "@/hooks/use-hypercert-exchange-client";
 import { toast } from "@/components/ui/use-toast";
-import { getCurrencyByAddress } from "@/marketplace/utils";
+import {
+  getCurrencyByAddress,
+  getMinimumPrice,
+  isTokenDividableBy,
+} from "@/marketplace/utils";
 import type { HypercertExchangeClient } from "@hypercerts-org/marketplace-sdk";
 import { parseClaimOrFractionId } from "@hypercerts-org/sdk";
-import { formatUnits, parseUnits } from "viem";
 import { cn } from "@/lib/utils";
 import { DateTimePicker } from "@/components/ui/datetime-picker";
 
@@ -51,6 +54,7 @@ function ListDialogInner({
     useCreateFractionalMakerAsk({
       hypercertId: hypercert.hypercert_id || "",
     });
+  const { chainId } = parseClaimOrFractionId(hypercert?.hypercert_id!);
 
   const units = BigInt(hypercert.units || "0");
   const fractions = hypercert.fractions?.data || [];
@@ -61,9 +65,10 @@ function ListDialogInner({
   const [state, setState] = useState<State>(() => {
     const currency = Object.values(client.currencies)[0];
     const unitsForSale = fractionsOwnedByUser[0]?.units || "0";
-    const minimumPrice = formatUnits(
-      BigInt(unitsForSale),
-      currency?.decimals || 0,
+    const minimumPrice = getMinimumPrice(
+      unitsForSale,
+      chainId,
+      currency.address,
     );
     return {
       fractionId:
@@ -138,14 +143,12 @@ function ListDialogInner({
     }
   };
 
-  const { chainId } = parseClaimOrFractionId(hypercert?.hypercert_id!);
-
   useEffect(() => {
     // Update the minimum price when the currency changes
-    const currency = getCurrencyByAddress(chainId, state.currency);
-    const minimumPrice = formatUnits(
-      BigInt(state.unitsForSale || "0"),
-      currency?.decimals || 0,
+    const minimumPrice = getMinimumPrice(
+      state.unitsForSale,
+      chainId,
+      state.currency,
     );
 
     setState((currentState) => ({
@@ -161,17 +164,21 @@ function ListDialogInner({
     return null;
   }
 
-  const minimumPrice = formatUnits(
-    BigInt(state.unitsForSale || "0"),
-    currency?.decimals || 0,
+  const minimumPrice = getMinimumPrice(
+    state.unitsForSale,
+    chainId,
+    state.currency,
   );
-  const remainder =
-    parseUnits(state.price, currency.decimals) %
-    (parseUnits(minimumPrice || "1", currency.decimals) || BigInt(1));
 
-  const isCorrectPrice = remainder === BigInt(0);
+  const isDividablePrice = isTokenDividableBy(
+    state.price,
+    minimumPrice,
+    chainId,
+    currency.address,
+  );
+
   const createButtonEnabled =
-    isPriceValid && state.formIsValid && isCorrectPrice;
+    isPriceValid && state.formIsValid && isDividablePrice;
 
   const validateStartDateTime = (): [boolean, React.ReactNode] => {
     if (!state.startDateTime) {
@@ -267,7 +274,7 @@ function ListDialogInner({
               {getCurrencyByAddress(chainId, state.currency)?.symbol}
             </b>
             .{" "}
-            <span className={cn([!isCorrectPrice && "text-red-600"])}>
+            <span className={cn([!isDividablePrice && "text-red-600"])}>
               Price should be a multiple of{" "}
               <b>
                 {minimumPrice}{" "}

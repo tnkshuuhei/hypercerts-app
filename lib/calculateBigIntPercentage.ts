@@ -7,7 +7,7 @@ export const calculateBigIntPercentage = (
   }
   const numeratorBigInt = BigInt(numerator);
   const denominatorBigInt = BigInt(denominator);
-  const precision = 10 ** 4;
+  const precision = 10 ** 18;
   const unCorrected = Number(
     (numeratorBigInt * BigInt(100) * BigInt(precision)) / denominatorBigInt,
   );
