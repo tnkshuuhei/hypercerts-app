@@ -13,11 +13,10 @@ import {
   TransferRestrictions,
 } from "@hypercerts-org/sdk";
 import { useEffect, useRef, useState } from "react";
-import { FieldErrors, useForm } from "react-hook-form";
-import { parseEther } from "viem";
+import { FieldErrors, useForm, useWatch } from "react-hook-form";
+import { TransactionReceipt } from "viem";
 import { z } from "zod";
-
-const DEFAULT_NUM_FRACTIONS = parseEther("1");
+import { DEFAULT_NUM_FRACTIONS } from "@/configs/hypercerts";
 
 const formSchema = z.object({
   title: z.string().trim().min(1, "We need a title for your hypercert"),

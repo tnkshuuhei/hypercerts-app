@@ -11,9 +11,9 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Drawer } from "vaul";
 import { EvaluateDrawer } from "./evaluate-drawer";
-import { HypercertFull } from "../../hypercerts/fragments/hypercert-full.fragment";
-import { TrustedAttestor } from "../../github/types/trusted-attestor.type";
-import { isChainIdSupported } from "../../lib/isChainIdSupported";
+import { HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
+import { TrustedAttestor } from "@/github/types/trusted-attestor.type";
+import { isChainIdSupported } from "@/lib/isChainIdSupported";
 import { useAccount } from "wagmi";
 
 export default function EvaluateButton({
@@ -29,6 +29,10 @@ export default function EvaluateButton({
     if (address) {
       fetch(`/api/evaluators/${address}`)
         .then((res) => res.json())
+        .catch(() => {
+          console.error(`Failed to fetch evaluator for address: ${address}`);
+          return null;
+        })
         .then((data) => {
           setEvaluator(data);
         });

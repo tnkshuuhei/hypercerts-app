@@ -15,12 +15,16 @@ import { HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
 import { FormattedUnits } from "@/components/formatted-units";
 import {
   decodeFractionalOrderParams,
+  formatPrice,
   getCurrencyByAddress,
   getPricePerPercent,
   getPricePerUnit,
+  getTotalPriceFromPercentage,
 } from "@/marketplace/utils";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { parseUnits } from "viem";
+import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
 
 const formSchema = z
   .object({
@@ -78,9 +82,10 @@ export const BuyFractionalOrderForm = ({
 
   const getUnitsToBuy = (percentageAmount: string) => {
     try {
+      const hypercertUnits = BigInt(hypercert.units || 0);
+      const percentageAsBigInt = BigInt(Number(percentageAmount) * 100);
       const unitsToBuy =
-        (BigInt(hypercert?.units || 0) * BigInt(percentageAmount)) /
-        BigInt(100);
+        (hypercertUnits * percentageAsBigInt) / BigInt(100 * 100);
       return unitsToBuy.toString();
     } catch (e) {
       console.error(e);
@@ -92,11 +97,17 @@ export const BuyFractionalOrderForm = ({
     return (units * BigInt(100)) / BigInt(hypercert?.units || 0);
   };
 
-  const currency = getCurrencyByAddress(order.currency);
+  const currency = getCurrencyByAddress(order.chainId, order.currency);
+
+  if (!currency) {
+    throw new Error("Currency not supported");
+  }
 
   const minPercentageAmount = getPercentageForUnits(minUnitAmount).toString();
-  const maxPercentageAmount =
-    getPercentageForUnits(maxUnitAmountToBuy).toString();
+  const maxPercentageAmount = calculateBigIntPercentage(
+    maxUnitAmountToBuy,
+    BigInt(hypercert.units || 0),
+  )?.toString();
   const minPricePerPercent = getPricePerPercent(
     order.price,
     BigInt(hypercert.units || 0),
@@ -109,19 +120,25 @@ export const BuyFractionalOrderForm = ({
       minPercentageAmount,
       maxPercentageAmount,
       percentageAmount: minPercentageAmount,
-      minPricePerPercent,
-      pricePerPercent: minPricePerPercent,
+      minPricePerPercent: minPricePerPercent.toString(),
+      pricePerPercent: minPricePerPercent.toString(),
     },
   });
 
   const { mutateAsync: buyFractionalMakerAsk } = useBuyFractionalMakerAsk();
 
   const onSubmit = async (values: BuyFractionalOrderFormValues) => {
+    const hypercertUnits = BigInt(hypercert.units || 0);
+
+    if (!hypercertUnits) {
+      throw new Error("Invalid hypercert units");
+    }
+
     const unitAmount = getUnitsToBuy(values.percentageAmount);
     const pricePerUnit = getPricePerUnit(
       values.pricePerPercent,
-      BigInt(hypercert.units || 0),
-    );
+      hypercertUnits,
+    ).toString();
 
     await buyFractionalMakerAsk({
       order,
@@ -134,10 +151,22 @@ export const BuyFractionalOrderForm = ({
   const percentageAmount = form.watch("percentageAmount");
   const pricePerPercent = form.watch("pricePerPercent");
 
-  const totalPrice = Math.max(
-    Number(pricePerPercent) * Number(percentageAmount),
-    0,
+  const totalPrice = formatPrice(
+    order.chainId,
+    getTotalPriceFromPercentage(
+      BigInt(pricePerPercent),
+      Number(percentageAmount),
+    ),
+    currency.address,
+    true,
   );
+
+  const formattedMinPrice = formatPrice(
+    order.chainId,
+    BigInt(minPricePerPercent),
+    currency.address,
+  );
+
   const unitsToBuy =
     BigInt(getUnitsToBuy(percentageAmount)) > BigInt(0)
       ? getUnitsToBuy(percentageAmount)
@@ -160,11 +189,8 @@ export const BuyFractionalOrderForm = ({
               <b>
                 <FormattedUnits>{unitsToBuy}</FormattedUnits>
               </b>{" "}
-              units , for a total of{" "}
-              <b>
-                <FormattedUnits>{totalPrice}</FormattedUnits> {currency?.symbol}
-              </b>
-              . (min: {minPercentageAmount}%, max: {maxPercentageAmount}%)
+              units , for a total of <b>{totalPrice}</b>. (min:{" "}
+              {minPercentageAmount}%, max: {maxPercentageAmount}%)
             </div>
             <FormMessage />
           </FormItem>
@@ -179,10 +205,26 @@ export const BuyFractionalOrderForm = ({
               Price per %
             </h5>
             <FormControl>
-              <Input {...form.register("pricePerPercent")} />
+              <Input
+                value={formatPrice(
+                  order.chainId,
+                  BigInt(pricePerPercent),
+                  currency.address,
+                )}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  form.setValue(
+                    "pricePerPercent",
+                    parseUnits(value, currency.decimals).toString(),
+                  );
+                }}
+              />
             </FormControl>
             <div className="text-sm text-gray-500">
-              You can voluntarily increase the price. (min: {minPricePerPercent}
+              You can voluntarily increase the price. (min:{" "}
+              <b>
+                {formattedMinPrice} {currency.symbol}
+              </b>
               ).
             </div>
             <FormMessage />

@@ -1,20 +1,26 @@
-import { currenciesByNetwork, Currency } from "@hypercerts-org/marketplace-sdk";
+import {
+  ChainId,
+  currenciesByNetwork,
+  Currency,
+} from "@hypercerts-org/marketplace-sdk";
 import {
   decodeAbiParameters,
-  formatEther,
+  formatUnits,
+  getAddress,
   parseAbiParameters,
-  parseEther,
+  parseUnits,
 } from "viem";
 import { OrderFragment } from "@/marketplace/fragments/order.fragment";
 import { MarketplaceOrder } from "@/marketplace/types";
 import { HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
 
-export const getCurrencyByAddress = (address: string) => {
-  const allCurrencies = Object.values(currenciesByNetwork).flatMap(
-    (currencies) => Object.values(currencies),
-  ) as Currency[];
+export const getCurrencyByAddress = (chainId: ChainId, address: string) => {
+  const currenciesForNetwork = currenciesByNetwork[chainId];
+  const allCurrencies = Object.values(currenciesForNetwork) as Currency[];
 
-  return allCurrencies.find((currency) => currency.address === address);
+  return allCurrencies.find(
+    (currency) => getAddress(currency.address) === getAddress(address),
+  );
 };
 
 export const decodeFractionalOrderParams = (params: string) => {
@@ -35,17 +41,44 @@ export const decodeFractionalOrderParams = (params: string) => {
 };
 
 export const getPricePerUnit = (
-  pricePerPercent: string,
+  pricePerPercentWei: string,
   totalUnits: bigint,
 ) => {
   const unitsPerPercent = totalUnits / BigInt(100);
-  const pricePerPercentWei = parseEther(pricePerPercent);
-  return formatEther(pricePerPercentWei / unitsPerPercent);
+  return BigInt(pricePerPercentWei) / unitsPerPercent;
 };
 
-export const getPricePerPercent = (price: string, totalUnits: bigint) => {
+export const getPricePerPercent = (priceInWei: string, totalUnits: bigint) => {
   const unitsPerPercent = totalUnits / BigInt(100);
-  return formatEther(BigInt(price) * unitsPerPercent);
+  return BigInt(priceInWei) * unitsPerPercent;
+};
+
+export const formatPrice = (
+  chainId: number | string | null | undefined,
+  units: bigint,
+  currency: string,
+  includeSymbol = false,
+) => {
+  if (!chainId) {
+    return "Unknown chain";
+  }
+
+  const parsedChainId =
+    typeof chainId === "number" ? chainId : parseInt(chainId, 10);
+
+  const currencyData = getCurrencyByAddress(parsedChainId, currency);
+
+  if (!currencyData) {
+    return "Unknown currency";
+  }
+
+  const formattedUnits = formatUnits(units, currencyData.decimals);
+
+  if (includeSymbol) {
+    return `${formattedUnits} ${currencyData.symbol}`;
+  }
+
+  return formattedUnits;
 };
 
 export const orderFragmentToMarketplaceOrder = (
@@ -84,4 +117,45 @@ export const orderFragmentToHypercert = (
   order: OrderFragment,
 ): HypercertFull => {
   return order.hypercert as unknown as HypercertFull;
+};
+
+export const getMinimumPrice = (
+  unitsForSale: bigint | string | undefined,
+  chainId: number,
+  currencyAddress: string,
+) => {
+  const currency = getCurrencyByAddress(chainId, currencyAddress);
+  return formatUnits(BigInt(unitsForSale || "0"), currency?.decimals || 0);
+};
+
+export const isTokenDividableBy = (
+  numerator: string,
+  denominator: string | undefined,
+  chainId: number,
+  currencyAddress: string,
+) => {
+  const currency = getCurrencyByAddress(chainId, currencyAddress);
+  if (!currency) {
+    throw new Error(`Currency not found for address ${currencyAddress}`);
+  }
+  const remainder =
+    parseUnits(numerator, currency.decimals) %
+    (parseUnits(denominator || "1", currency.decimals) || BigInt(1));
+  return remainder === BigInt(0);
+};
+
+export const getTotalPriceFromPercentage = (
+  pricePerPercent: bigint,
+  percentageAmount: number,
+) => {
+  if (percentageAmount < 0 || percentageAmount > 100) {
+    throw new Error("Percentage amount must be between 0 and 100");
+  }
+
+  const precision = 10 ** 16;
+
+  return (
+    (pricePerPercent * BigInt(Math.round(percentageAmount * precision))) /
+    BigInt(precision)
+  );
 };

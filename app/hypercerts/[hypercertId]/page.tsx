@@ -9,7 +9,7 @@ import ExternalUrl from "@/components/hypercert/external-url";
 import Fractions from "@/components/hypercert/fractions";
 import Image from "next/image";
 import { ListForSaleButton } from "@/components/marketplace/list-for-sale-button";
-import OrdersList from "@/components/marketplace/orders-list";
+import HypercertListingsList from "@/components/marketplace/hypercert-listings-list";
 import PageSkeleton from "@/components/hypercert/page-skeleton";
 import ReadMore from "@/components/read-more";
 import { Separator } from "@/components/ui/separator";
@@ -17,6 +17,7 @@ import WorkScope from "@/components/hypercert/scope";
 import TimeFrame from "@/components/hypercert/time-frame";
 import { getHypercert } from "@/hypercerts/getHypercert";
 import { getOrders } from "@/marketplace/getOpenOrders";
+import { CurrencyButtons } from "@/components/currency-buttons";
 
 type Props = {
   params: { hypercertId: string };
@@ -126,10 +127,11 @@ async function HypercertPageInner({
         </h5>
 
         <div className="flex gap-2">
+          <CurrencyButtons />
           <ListForSaleButton hypercert={hypercert} />
         </div>
       </div>
-      <OrdersList hypercert={hypercert} orders={orders?.data} />
+      <HypercertListingsList hypercert={hypercert} orders={orders?.data} />
     </section>
   );
 }

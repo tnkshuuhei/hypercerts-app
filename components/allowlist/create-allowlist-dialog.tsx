@@ -7,7 +7,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { LoaderCircle, MinusCircle, PlusCircle } from "lucide-react";
-import { isAddress, parseEther } from "viem";
+import { isAddress } from "viem";
 
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -16,6 +16,8 @@ import { errorHasMessage } from "@/lib/errorHasMessage";
 import { toast } from "../ui/use-toast";
 import { useValidateAllowlist } from "@/hypercerts/hooks/useCreateAllowLists";
 import { AllowlistEntry } from "@hypercerts-org/sdk";
+
+import { DEFAULT_NUM_FRACTIONS } from "@/configs/hypercerts";
 
 type AllowListItem = {
   address?: string;
@@ -104,7 +106,7 @@ export default function CreateAllowlistDialog({
   );
 
   const submitList = async () => {
-    const totalUnits = parseEther("1");
+    const totalUnits = DEFAULT_NUM_FRACTIONS;
     try {
       const parsedAllowList = allowList.map((entry) => {
         if (

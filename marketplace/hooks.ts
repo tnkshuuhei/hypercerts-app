@@ -1,13 +1,7 @@
-import {
-  useAccount,
-  useChainId,
-  usePublicClient,
-  useWalletClient,
-} from "wagmi";
+import { useAccount, useChainId, useWalletClient } from "wagmi";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   addressesByNetwork,
-  ApiClient,
   Maker,
   QuoteType,
   utils,
@@ -16,18 +10,17 @@ import {
 import { useHypercertClient } from "@/hooks/use-hypercert-client";
 import { useStepProcessDialogContext } from "@/components/global/step-process-dialog";
 import { parseClaimOrFractionId } from "@hypercerts-org/sdk";
-import { isAddress, parseEther } from "viem";
+import { isAddress, parseUnits, zeroAddress } from "viem";
 import { readContract, waitForTransactionReceipt } from "viem/actions";
 import {
   CreateFractionalOfferFormValues,
   MarketplaceOrder,
 } from "@/marketplace/types";
 import { decodeContractError } from "@/lib/decodeContractError";
-import { apiEnvironment } from "@/lib/constants";
 import { useHypercertExchangeClient } from "@/hooks/use-hypercert-exchange-client";
 import { toast } from "@/components/ui/use-toast";
-import { useState } from "react";
 import { getFractionsByHypercert } from "@/hypercerts/getFractionsByHypercert";
+import { getCurrencyByAddress } from "@/marketplace/utils";
 
 export const useCreateOrderInSupabase = () => {
   const chainId = useChainId();
@@ -150,6 +143,10 @@ export const useCreateFractionalMakerAsk = ({
         throw new Error("Hypercert exchange client not initialized");
       }
 
+      if (!values.currency) {
+        throw new Error("Currency not selected");
+      }
+
       const { contractAddress, id: fractionTokenId } = parseClaimOrFractionId(
         values.fractionId,
       );
@@ -189,11 +186,30 @@ export const useCreateFractionalMakerAsk = ({
 
       setStep("Create");
 
+      const { chainId: chainIdFromHypercertId } =
+        parseClaimOrFractionId(hypercertId);
+      const currency = getCurrencyByAddress(
+        chainIdFromHypercertId,
+        values.currency,
+      );
+
+      if (!currency) {
+        throw new Error("Invalid currency");
+      }
+
+      const pricePerUnit =
+        parseUnits(values.price, currency.decimals) /
+        BigInt(values.unitsForSale);
+
+      if (pricePerUnit === BigInt(0)) {
+        throw new Error("Price per unit is 0");
+      }
+
       const { maker, isCollectionApproved, isTransferManagerApproved } =
         await hypercertExchangeClient.createFractionalSaleMakerAsk({
           startTime: Math.floor(Date.now() / 1000), // Use it to create an order that will be valid in the future (Optional, Default to now)
           endTime: Math.floor(Date.now() / 1000) + 86400, // If you use a timestamp in ms, the function will revert
-          price: parseEther(values.price), // Be careful to use a price in wei, this example is for 1 ETH
+          price: pricePerUnit.toString(), // Be careful to use a price in wei, this example is for 1 ETH
           itemIds: [fractionTokenId.toString()], // Token id of the NFT(s) you want to sell, add several ids to create a bundle
           minUnitAmount: BigInt(values.minUnitAmount), // Minimum amount of units to keep after the sale
           maxUnitAmount: BigInt(values.maxUnitAmount), // Maximum amount of units to sell
@@ -244,6 +260,7 @@ export const useCreateFractionalMakerAsk = ({
         console.error(e);
         throw new Error("Error registering order");
       }
+      window.location.reload();
     },
     onSuccess: () => {
       setOpen(false);
@@ -256,62 +273,6 @@ export const useCreateFractionalMakerAsk = ({
         duration: 5000,
       });
     },
-  });
-};
-
-export const useFetchMarketplaceOrdersForHypercert = (hypercertId: string) => {
-  const chainId = useChainId();
-  const provider = usePublicClient();
-  const { client: hypercertExchangeClient } = useHypercertExchangeClient();
-  const { address } = useAccount();
-  const [checkedValidity, setCheckedValidity] = useState(false);
-
-  return useQuery({
-    queryKey: ["hypercert", "id", hypercertId, "chain", chainId, "orders"],
-    queryFn: async () => {
-      if (!provider) {
-        return null;
-      }
-
-      if (!hypercertExchangeClient) {
-        return null;
-      }
-
-      const apiClient = new ApiClient(apiEnvironment);
-      let { data: orders } = await apiClient.fetchOrdersByHypercertId({
-        hypercertId,
-      });
-
-      if (!orders) {
-        return null;
-      }
-
-      if (!checkedValidity) {
-        const validityResults =
-          await hypercertExchangeClient.checkOrdersValidity(
-            orders.filter((order: MarketplaceOrder) => !order.invalidated),
-          );
-        const tokenIdsWithInvalidOrder = validityResults
-          .filter((result) => !result.valid)
-          .map((result) => BigInt(result.order.itemIds[0]));
-        if (tokenIdsWithInvalidOrder.length) {
-          console.error("Invalid orders", tokenIdsWithInvalidOrder);
-          orders = orders.map((order: MarketplaceOrder) => {
-            if (tokenIdsWithInvalidOrder.includes(BigInt(order.itemIds[0]))) {
-              return { ...order, invalidated: true };
-            }
-            return order;
-          });
-          // Do not await but update validity in the background
-          apiClient.updateOrderValidity(tokenIdsWithInvalidOrder, chainId);
-          setCheckedValidity(true);
-        }
-      }
-      return (orders as MarketplaceOrder[]).filter((order: MarketplaceOrder) =>
-        order.invalidated ? order.signer === address : true,
-      );
-    },
-    enabled: !!chainId,
   });
 };
 
@@ -411,26 +372,38 @@ export const useBuyFractionalMakerAsk = () => {
       setOpen(true);
 
       setStep("Setting up order execution");
+      const currency = getCurrencyByAddress(order.chainId, order.currency);
+
+      if (!currency) {
+        throw new Error(
+          `Invalid currency ${order.currency} on chain ${order.chainId}`,
+        );
+      }
+
       const takerOrder = hypercertExchangeClient.createFractionalSaleTakerBid(
         order,
         address,
         unitAmount,
-        parseEther(pricePerUnit),
+        pricePerUnit,
       );
 
+      const totalPrice = BigInt(order.price) * BigInt(unitAmount);
       try {
         setStep("ERC20");
-        const currentAllowance = await getCurrentERC20Allowance(
-          order.currency as `0x${string}`,
-        );
-        if (currentAllowance < BigInt(order.price) * BigInt(unitAmount)) {
-          const approveTx = await hypercertExchangeClient.approveErc20(
-            order.currency,
-            BigInt(order.price) * BigInt(unitAmount),
+        if (currency.address !== zeroAddress) {
+          const currentAllowance = await getCurrentERC20Allowance(
+            order.currency as `0x${string}`,
           );
-          await waitForTransactionReceipt(walletClientData, {
-            hash: approveTx.hash as `0x${string}`,
-          });
+
+          if (currentAllowance < totalPrice) {
+            const approveTx = await hypercertExchangeClient.approveErc20(
+              order.currency,
+              totalPrice,
+            );
+            await waitForTransactionReceipt(walletClientData, {
+              hash: approveTx.hash as `0x${string}`,
+            });
+          }
         }
 
         setStep("Transfer manager");
@@ -452,10 +425,14 @@ export const useBuyFractionalMakerAsk = () => {
 
       try {
         setStep("Setting up order execution");
+        const overrides =
+          currency.address === zeroAddress ? { value: totalPrice } : undefined;
         const { call } = hypercertExchangeClient.executeOrder(
           order,
           takerOrder,
           order.signature,
+          undefined,
+          overrides,
         );
         setStep("Awaiting buy signature");
         const tx = await call();
@@ -466,11 +443,73 @@ export const useBuyFractionalMakerAsk = () => {
       } catch (e) {
         console.error(e);
 
-        const defaultMessage = `Error during step \"${"TO BE IMPLEMENTED CURRENT STEP"}\"`;
-        throw new Error(decodeContractError(e, defaultMessage));
+        throw new Error(decodeContractError(e, "Error buying listing"));
       } finally {
         setOpen(false);
       }
+    },
+  });
+};
+
+export const useCancelOrder = () => {
+  const { client: hec } = useHypercertExchangeClient();
+
+  return useMutation({
+    mutationKey: ["cancelOrder"],
+    mutationFn: async ({
+      nonce,
+      tokenId,
+      chainId,
+    }: {
+      nonce: bigint;
+      tokenId: string;
+      chainId: number;
+    }) => {
+      if (!hec) {
+        throw new Error("No client");
+      }
+
+      const tx = await hec.cancelOrders([BigInt(nonce)]).call();
+      await tx.wait();
+
+      await hec.api.updateOrderValidity([BigInt(tokenId)], chainId);
+      document.location.reload();
+    },
+    onError: (e) => {
+      console.error(e);
+      toast({
+        title: "Error",
+        description: e.message,
+        duration: 5000,
+      });
+    },
+  });
+};
+
+export const useDeleteOrder = () => {
+  const { client: hec } = useHypercertExchangeClient();
+
+  return useMutation({
+    mutationKey: ["deleteOrder"],
+    mutationFn: async ({ orderId }: { orderId: string }) => {
+      if (!hec) {
+        throw new Error("No client");
+      }
+
+      const success = await hec.deleteOrder(orderId);
+      if (success) {
+        document.location.reload();
+      } else {
+        throw new Error(`Could not delete listing ${orderId}`);
+      }
+    },
+    onError: (e) => {
+      console.error(e);
+      toast({
+        title: "Error",
+        description: e.message,
+        duration: 5000,
+      });
     },
   });
 };

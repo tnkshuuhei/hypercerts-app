@@ -4,6 +4,7 @@ import ExploreList from "@/components/explore/explore-list";
 import ExploreOrderBySelect from "@/components/explore/explore-order-by-select";
 import ExploreSearchBar from "@/components/explore/explore-search-bar";
 import { Metadata } from "next";
+import { CurrencyButtons } from "@/components/currency-buttons";
 
 export const metadata: Metadata = {
   title: "Explore",
@@ -23,10 +24,11 @@ export default async function ExplorePageInner({
       </h1>
       <section className="flex flex-col lg:flex-row gap-4 justify-between max-w-screen">
         <ExploreSearchBar />
-        <div className="flex space-x-2">
+        <div className="flex space-x-2 w-full">
           <ExploreChainFilterSelect />
           <ExploreEvaluationsFilterSelect />
           <ExploreOrderBySelect />
+          <CurrencyButtons />
         </div>
       </section>
       <ExploreList {...{ searchParams }} />

@@ -42,9 +42,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { parseEther } from "viem";
 import { toPng } from "html-to-image";
 import { FormattedUnits } from "@/components/formatted-units";
+import { DEFAULT_NUM_FRACTIONS } from "@/configs/hypercerts";
 
 interface FormStepsProps {
   form: UseFormReturn<HypercertFormValues>;
@@ -384,7 +384,7 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
 
 const calculatePercentageBigInt = (
   units: bigint,
-  total: bigint = parseEther("1"),
+  total: bigint = DEFAULT_NUM_FRACTIONS,
 ) => {
   return (units * BigInt(100)) / total;
 };
