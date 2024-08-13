@@ -9,7 +9,6 @@ import { formatDate } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   formatHypercertData,
-  formatHypercertData,
   HypercertMetadata,
   TransferRestrictions,
 } from "@hypercerts-org/sdk";
@@ -197,7 +196,6 @@ export default function NewHypercertForm() {
           <div className="flex flex-col p-6 items-center">
             <HypercertCard
               name={form.getValues().title || undefined}
-              description={form.getValues().description || undefined}
               banner={form.getValues().banner || undefined}
               logo={form.getValues().logo || undefined}
               scopes={form.getValues().tags}
