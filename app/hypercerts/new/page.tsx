@@ -17,7 +17,7 @@ import {
 import { ArrowUpRightIcon } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { FieldErrors, useForm } from "react-hook-form";
+import { FieldErrors, useForm, useWatch } from "react-hook-form";
 import { TransactionReceipt } from "viem";
 import { z } from "zod";
 import { DEFAULT_NUM_FRACTIONS } from "@/configs/hypercerts";
@@ -107,7 +107,7 @@ export default function NewHypercertForm() {
   const form = useForm<HypercertFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: formDefaultValues,
-    mode: "onChange",
+    mode: "onBlur",
   });
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -123,6 +123,19 @@ export default function NewHypercertForm() {
   } = useMintClaim({
     onComplete: onMintComplete,
   });
+
+  const watchedValues = useWatch({
+    control: form.control,
+    name: ["title", "banner", "logo", "tags", "projectDates"],
+  });
+
+  const cardPreviewData = {
+    title: watchedValues[0] ?? formDefaultValues.title,
+    banner: watchedValues[1] ?? formDefaultValues.banner,
+    logo: watchedValues[2] ?? formDefaultValues.logo,
+    tags: watchedValues[3] ?? formDefaultValues.tags,
+    projectDates: watchedValues[4] ?? formDefaultValues.projectDates,
+  };
 
   useEffect(() => {
     setLanguage(window.navigator.language);
@@ -214,17 +227,16 @@ export default function NewHypercertForm() {
         </section>
         <div className="flex flex-col p-6 items-center">
           <HypercertCard
-            name={form.getValues().title || undefined}
-            description={form.getValues().description || undefined}
-            banner={form.getValues().banner || undefined}
-            logo={form.getValues().logo || undefined}
-            scopes={form.getValues().tags}
+            name={cardPreviewData.title}
+            banner={cardPreviewData.banner}
+            logo={cardPreviewData.logo}
+            scopes={cardPreviewData.tags}
             fromDateDisplay={formatDate(
-              form.getValues().projectDates?.from?.toISOString(),
+              cardPreviewData.projectDates?.from?.toISOString(),
               language,
             )}
             toDateDisplay={formatDate(
-              form.getValues().projectDates?.to?.toISOString(),
+              cardPreviewData.projectDates?.to?.toISOString(),
               language,
             )}
             ref={cardRef}

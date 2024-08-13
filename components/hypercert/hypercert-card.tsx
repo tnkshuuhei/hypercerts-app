@@ -6,7 +6,6 @@ import { forwardRef } from "react";
 /**
  * HypercertCard component
  * @param {string} name - The name of the hypercert
- * @param {string} description - The description of the hypercert
  * @param {string} banner - The banner image of the hypercert
  * @param {string} logo - The logo image of the hypercert
  * @param {string} link - The link of the hypercert
@@ -15,7 +14,6 @@ import { forwardRef } from "react";
  */
 export interface HypercertCardProps {
   name?: string;
-  description?: string;
   banner?: string;
   logo?: string;
   fromDateDisplay?: string | null;
@@ -25,7 +23,6 @@ export interface HypercertCardProps {
 
 const defaultValues: HypercertCardProps = {
   name: "Your title here",
-  description: "Your description here",
   scopes: [],
 };
 
@@ -33,7 +30,6 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
   (
     {
       name: title,
-      description,
       banner,
       fromDateDisplay,
       toDateDisplay,
@@ -43,7 +39,6 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
     ref,
   ) => {
     title = title ?? defaultValues.name;
-    description = description ?? defaultValues.description;
 
     const formattedDateRange =
       fromDateDisplay && toDateDisplay
@@ -57,7 +52,7 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
         ref={ref}
         className="relative w-[275px] rounded-xl border-[1.5px] border-black overflow-clip bg-black"
       >
-        <header className="relative h-[135px] w-full flex items-center justify-center rounded-b-xl overflow-clip">
+        <header className="relative h-[125px] w-full flex items-center justify-center rounded-b-xl overflow-clip">
           {banner ? (
             <Image
               src={`https://cors-proxy.hypercerts.workers.dev/?url=${banner}`}
@@ -89,14 +84,14 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
             )}
           </div>
         </section>
-        <section className="p-3 pt-4 rounded-t-xl bg-white border-t-[1.5px] border-black space-y-2">
+        <section className="p-3 pt-4 rounded-t-xl bg-white border-t-[1.5px] border-black space-y-3">
           <div className="flex items-center">
             <span className="text-xs text-slate-600 uppercase">
               {formattedDateRange}
             </span>
           </div>
           <h5
-            className="text-base font-semibold text-slate-800 line-clamp-3 text-ellipsis tracking-tight leading-tight"
+            className="text-lg font-bold text-slate-800 line-clamp-3 text-ellipsis tracking-tight leading-tight h-[70px]"
             title={title}
           >
             {title}
