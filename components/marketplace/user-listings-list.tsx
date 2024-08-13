@@ -136,13 +136,11 @@ export default function UserListingsList({
         );
       },
       cell: (row) => {
-        const { chainId } = row.row.original;
-
-        if (!chainId) {
-          return <div>Invalid chain ID</div>;
+        const price = Number(row.getValue());
+        if (price < 0.01) {
+          return <div>{"<"} $0.01</div>;
         }
-
-        return <div>${row.getValue()}</div>;
+        return <div>${price.toFixed(2)}</div>;
       },
       sortingFn: (rowA, rowB) =>
         BigInt(rowA.getValue("price")) < BigInt(rowB.getValue("price"))
