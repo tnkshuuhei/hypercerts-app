@@ -9,6 +9,7 @@ import { formatDate } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   formatHypercertData,
+  formatHypercertData,
   HypercertMetadata,
   TransferRestrictions,
 } from "@hypercerts-org/sdk";
@@ -106,7 +107,7 @@ export default function NewHypercertForm() {
   const form = useForm<HypercertFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: formDefaultValues,
-    mode: "onChange",
+    mode: "onBlur",
   });
   const cardRef = useRef<HTMLDivElement>(null);
 

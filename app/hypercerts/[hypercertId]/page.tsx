@@ -63,7 +63,7 @@ async function HypercertPageInner({
     <section className="flex flex-col space-y-4">
       <article className="space-y-4 lg:flex lg:space-y-0 lg:space-x-6">
         <div className="h-[300px] lg:h-[350px] min-w-[300px] lg:min-w-[500px] max-w-[500px]">
-          <div className="relative w-full h-full bg-black border border-slate-800 rounded-lg overflow-hidden ">
+          <div className="relative w-full h-full bg-gray-200 border border-slate-800 rounded-lg overflow-hidden ">
             <Image
               src={`/api/hypercerts/${hypercertId}/image`}
               alt={hypercert?.metadata?.name || ""}
