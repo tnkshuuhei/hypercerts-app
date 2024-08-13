@@ -17,6 +17,7 @@ import WorkScope from "@/components/hypercert/scope";
 import TimeFrame from "@/components/hypercert/time-frame";
 import { getHypercert } from "@/hypercerts/getHypercert";
 import { getOrders } from "@/marketplace/getOpenOrders";
+import { CurrencyButtons } from "@/components/currency-buttons";
 
 type Props = {
   params: { hypercertId: string };
@@ -126,6 +127,7 @@ async function HypercertPageInner({
         </h5>
 
         <div className="flex gap-2">
+          <CurrencyButtons />
           <ListForSaleButton hypercert={hypercert} />
         </div>
       </div>

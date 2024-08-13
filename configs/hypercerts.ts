@@ -8,3 +8,5 @@ export const HYPERCERTS_DEFAULT_CONTRACT =
   "0xa16dfb32eb140a6f3f2ac68f41dad8c7e83c4941";
 
 export const DEFAULT_NUM_FRACTIONS = parseUnits("1", 8);
+
+export const DEFAULT_DISPLAY_CURRENCY = "usd";

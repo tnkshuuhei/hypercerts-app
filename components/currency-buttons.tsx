@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { DEFAULT_DISPLAY_CURRENCY } from "@/configs/hypercerts";
 
 export const CurrencyButtons = ({ className }: { className?: string }) => {
   const pathname = usePathname();
@@ -10,11 +11,13 @@ export const CurrencyButtons = ({ className }: { className?: string }) => {
   const router = useRouter();
 
   const urlSearchParams = new URLSearchParams(searchParams);
-  const value = urlSearchParams.get("currency") || "USD";
+  const value = urlSearchParams.get("currency") || DEFAULT_DISPLAY_CURRENCY;
 
   const onClickCurrency = (currency: string) => {
     urlSearchParams.set("currency", currency);
-    router.push(`${pathname}?${urlSearchParams.toString()}`);
+    router.push(`${pathname}?${urlSearchParams.toString()}`, {
+      scroll: false,
+    });
   };
 
   const sharedClasses = cn(

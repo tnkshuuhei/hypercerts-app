@@ -31,6 +31,7 @@ import { cn } from "@/lib/utils";
 import { useHypercertClient } from "@/hooks/use-hypercert-client";
 import {
   decodeFractionalOrderParams,
+  getCurrencyByAddress,
   orderFragmentToHypercert,
   orderFragmentToMarketplaceOrder,
 } from "@/marketplace/utils";
@@ -52,9 +53,10 @@ import {
 } from "@/components/ui/dialog";
 import { StepProcessDialogProvider } from "@/components/global/step-process-dialog";
 import { BuyFractionalOrderForm } from "@/components/marketplace/buy-fractional-order-form";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useCancelOrder, useDeleteOrder } from "@/marketplace/hooks";
 import { OrderValidatorCode } from "@hypercerts-org/marketplace-sdk";
+import { DEFAULT_DISPLAY_CURRENCY } from "@/configs/hypercerts";
 
 export default function UserListingsList({
   address,
@@ -65,6 +67,12 @@ export default function UserListingsList({
 }) {
   const chainId = useChainId();
   const { address: currentUserAddress } = useAccount();
+
+  const searchParams = useSearchParams();
+
+  const urlSearchParams = new URLSearchParams(searchParams);
+  const displayCurrency =
+    urlSearchParams.get("currency") || DEFAULT_DISPLAY_CURRENCY;
 
   const { client } = useHypercertClient();
   const { client: hypercertExchangeClient } = useHypercertExchangeClient();
@@ -136,6 +144,22 @@ export default function UserListingsList({
         );
       },
       cell: (row) => {
+        if (displayCurrency === "token") {
+          const { pricePerPercentInToken, currency, chainId } =
+            row.row.original;
+          const currencyData = getCurrencyByAddress(Number(chainId), currency);
+
+          if (!currencyData) {
+            return <div>Unknown currency</div>;
+          }
+
+          return (
+            <div>
+              {pricePerPercentInToken} {currencyData.symbol}
+            </div>
+          );
+        }
+
         const price = Number(row.getValue());
         if (price < 0.01) {
           return <div>{"<"} $0.01</div>;
@@ -143,7 +167,8 @@ export default function UserListingsList({
         return <div>${price.toFixed(2)}</div>;
       },
       sortingFn: (rowA, rowB) =>
-        BigInt(rowA.getValue("price")) < BigInt(rowB.getValue("price"))
+        Number(rowA.getValue("pricePerPercentInUSD")) <
+        Number(rowB.getValue("pricePerPercentInUSD"))
           ? 1
           : -1,
     }),

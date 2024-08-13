@@ -25,13 +25,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import {
-  ArrowUpDown,
-  InfoIcon,
-  RefreshCwIcon,
-  TrashIcon,
-  XIcon,
-} from "lucide-react";
+import { ArrowUpDown, RefreshCwIcon, TrashIcon, XIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BuyFractionalOrderForm } from "@/components/marketplace/buy-fractional-order-form";
 import EthAddress from "@/components/eth-address";
@@ -41,6 +35,7 @@ import { useHypercertClient } from "@/hooks/use-hypercert-client";
 import { HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
 import {
   decodeFractionalOrderParams,
+  getCurrencyByAddress,
   orderFragmentToMarketplaceOrder,
 } from "@/marketplace/utils";
 import { useAccount, useChainId } from "wagmi";
@@ -55,6 +50,8 @@ import { OrderFragment } from "@/marketplace/fragments/order.fragment";
 import { FormattedUnits } from "@/components/formatted-units";
 import { OrderValidatorCode } from "@hypercerts-org/marketplace-sdk";
 import { useCancelOrder, useDeleteOrder } from "@/marketplace/hooks";
+import { useSearchParams } from "next/navigation";
+import { DEFAULT_DISPLAY_CURRENCY } from "@/configs/hypercerts";
 
 export default function HypercertListingsList({
   orders,
@@ -68,6 +65,12 @@ export default function HypercertListingsList({
 
   const { client } = useHypercertClient();
   const { client: hypercertExchangeClient } = useHypercertExchangeClient();
+
+  const searchParams = useSearchParams();
+
+  const urlSearchParams = new URLSearchParams(searchParams);
+  const displayCurrency =
+    urlSearchParams.get("currency") || DEFAULT_DISPLAY_CURRENCY;
 
   const hypercertOnConnectedChain =
     client?.isClaimOrFractionOnConnectedChain(hypercert?.hypercert_id!) ||
@@ -135,6 +138,22 @@ export default function HypercertListingsList({
         );
       },
       cell: (row) => {
+        if (displayCurrency === "token") {
+          const { pricePerPercentInToken, currency, chainId } =
+            row.row.original;
+          const currencyData = getCurrencyByAddress(Number(chainId), currency);
+
+          if (!currencyData) {
+            return <div>Unknown currency</div>;
+          }
+
+          return (
+            <div>
+              {pricePerPercentInToken} {currencyData.symbol}
+            </div>
+          );
+        }
+
         const price = Number(row.getValue());
         if (price < 0.01) {
           return <div>{"<"} $0.01</div>;
@@ -142,7 +161,8 @@ export default function HypercertListingsList({
         return <div>${price.toFixed(2)}</div>;
       },
       sortingFn: (rowA, rowB) =>
-        BigInt(rowA.getValue("price")) < BigInt(rowB.getValue("price"))
+        Number(rowA.getValue("pricePerPercentInUSD")) <
+        Number(rowB.getValue("pricePerPercentInUSD"))
           ? 1
           : -1,
     }),
