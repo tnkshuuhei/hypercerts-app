@@ -174,44 +174,42 @@ export default function NewHypercertForm() {
   };
 
   return (
-    <>
-      <main className="flex flex-col p-8 md:px-24 pt-8 pb-24 space-y-4 flex-1 container max-w-screen-lg">
-        <h1 className="font-serif text-3xl lg:text-5xl tracking-tight w-full">
-          New hypercert
-        </h1>
-        <div className="p-3"></div>
-        <section className="flex flex-col-reverse lg:flex-row space-x-4 items-stretch md:justify-start">
-          <section className="flex flex-col space-y-4 flex-1 md:pr-5 md:border-r-[1.5px] md:border-slate-200">
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit, onSubmitInvalid)}>
-                <FormSteps
-                  form={form}
-                  currentStep={currentStep}
-                  setCurrentStep={setCurrentStep}
-                  cardRef={cardRef}
-                />
-              </form>
-            </Form>
-          </section>
-          <div className="flex flex-col p-6 items-center">
-            <HypercertCard
-              name={form.getValues().title || undefined}
-              banner={form.getValues().banner || undefined}
-              logo={form.getValues().logo || undefined}
-              scopes={form.getValues().tags}
-              fromDateDisplay={formatDate(
-                form.getValues().projectDates?.from?.toISOString(),
-                language,
-              )}
-              toDateDisplay={formatDate(
-                form.getValues().projectDates?.to?.toISOString(),
-                language,
-              )}
-              ref={cardRef}
-            />
-          </div>
+    <main className="flex flex-col p-8 md:px-24 pt-8 pb-24 space-y-4 flex-1 container max-w-screen-lg">
+      <h1 className="font-serif text-3xl lg:text-5xl tracking-tight w-full">
+        New hypercert
+      </h1>
+      <div className="p-3"></div>
+      <section className="flex flex-col-reverse lg:flex-row space-x-4 items-stretch md:justify-start">
+        <section className="flex flex-col space-y-4 flex-1 md:pr-5 md:border-r-[1.5px] md:border-slate-200">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit, onSubmitInvalid)}>
+              <FormSteps
+                form={form}
+                currentStep={currentStep}
+                setCurrentStep={setCurrentStep}
+                cardRef={cardRef}
+              />
+            </form>
+          </Form>
         </section>
-      </main>
-    </>
+        <div className="flex flex-col p-6 items-center">
+          <HypercertCard
+            name={form.getValues().title || undefined}
+            banner={form.getValues().banner || undefined}
+            logo={form.getValues().logo || undefined}
+            scopes={form.getValues().tags}
+            fromDateDisplay={formatDate(
+              form.getValues().projectDates?.from?.toISOString(),
+              language,
+            )}
+            toDateDisplay={formatDate(
+              form.getValues().projectDates?.to?.toISOString(),
+              language,
+            )}
+            ref={cardRef}
+          />
+        </div>
+      </section>
+    </main>
   );
 }
