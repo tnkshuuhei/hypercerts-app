@@ -153,7 +153,10 @@ export const BuyFractionalOrderForm = ({
 
   const totalPrice = formatPrice(
     order.chainId,
-    getTotalPriceFromPercentage(BigInt(pricePerPercent), percentageAmount),
+    getTotalPriceFromPercentage(
+      BigInt(pricePerPercent),
+      Number(percentageAmount),
+    ),
     currency.address,
     true,
   );
