@@ -1,16 +1,10 @@
 "use client";
 
 import FormSteps from "@/app/hypercerts/new/form-steps";
-import {
-  DialogStep,
-  TransactionDialog,
-} from "@/components/global/transaction-dialog";
 import HypercertCard from "@/components/hypercert/hypercert-card";
 import { Form } from "@/components/ui/form";
 import { toast } from "@/components/ui/use-toast";
 import { useMintHypercert } from "@/hooks/mutations/useMintHypercert";
-import { useMintHypercertFlow } from "@/hooks/transaction-flows/mint-hypercert";
-import { useTransactionSteps } from "@/hooks/useTransactionSteps";
 import { formatDate } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -20,8 +14,9 @@ import {
 } from "@hypercerts-org/sdk";
 import { useEffect, useRef, useState } from "react";
 import { FieldErrors, useForm } from "react-hook-form";
-import { parseEther, TransactionReceipt } from "viem";
+import { parseEther } from "viem";
 import { z } from "zod";
+
 const DEFAULT_NUM_FRACTIONS = parseEther("1");
 
 const formSchema = z.object({
@@ -106,26 +101,7 @@ export default function NewHypercertForm() {
   const [currentStep, setCurrentStep] = useState(1);
   const [language, setLanguage] = useState("en-US");
 
-  const initialSteps: DialogStep[] = [
-    {
-      id: "preparing",
-      description: "Preparing to mint hypercert...",
-      state: "idle",
-    },
-    {
-      id: "minting",
-      description: "Minting hypercert on-chain...",
-      state: "idle",
-    },
-    { id: "done", description: "Minting complete!", state: "idle" },
-  ];
-
-  const { txnSteps, resetTxnSteps, updateTxnStep } =
-    useTransactionSteps(initialSteps);
-
-  const [dialogOpen, setDialogOpen] = useState(false);
-
-  const mintHypercert = useMintHypercert();
+  const { mutateAsync: mintHypercert } = useMintHypercert();
 
   const form = useForm<HypercertFormValues>({
     resolver: zodResolver(formSchema),
@@ -134,21 +110,11 @@ export default function NewHypercertForm() {
   });
   const cardRef = useRef<HTMLDivElement>(null);
 
-  // const [txReceipt, setTxReceipt] = useState<TransactionReceipt | null>(null);
-  // const onMintComplete = (receipt: TransactionReceipt) => {
-  //   setTxReceipt(receipt);
-  // };
-
-  // const { write: mintClaim, ...mintClaimProps } = useMintHypercertFlow();
-
   useEffect(() => {
     setLanguage(window.navigator.language);
   }, []);
 
   async function onSubmit(values: HypercertFormValues) {
-    setDialogOpen(true);
-    updateTxnStep("preparing");
-
     const metadata: HypercertMetadata = {
       name: values.title,
       description: values.description,
@@ -178,49 +144,18 @@ export default function NewHypercertForm() {
       console.error("Invalid metadata", { errors: formattedMetadata.errors });
       return;
     }
-    // await mintClaim(
-    //   formattedMetadata.data!,
-    //   DEFAULT_NUM_FRACTIONS,
-    //   TransferRestrictions.FromCreatorOnly,
-    //   values.allowlistURL ||
-    //     values.allowlistEntries?.map((entry) => ({
-    //       ...entry,
-    //       units: BigInt(entry.units),
-    //     })),
-    // );
-    updateTxnStep("minting");
-    mintHypercert.mutate(
-      {
-        metaData: formattedMetadata.data!,
-        units: DEFAULT_NUM_FRACTIONS,
-        transferRestrictions: TransferRestrictions.FromCreatorOnly,
-        allowlistRecords:
-          values.allowlistURL ||
-          values.allowlistEntries?.map((entry) => ({
-            ...entry,
-            units: BigInt(entry.units),
-          })),
-      },
-      {
-        onSuccess: (receipt) => {
-          updateTxnStep("done", "", "completed");
-          console.log(receipt);
-          toast({
-            title: "Success",
-            description: "Hypercert minted successfully!",
-          });
-          // Handle success (e.g., redirect, update UI?)
-        },
-        onError: (error) => {
-          updateTxnStep("minting", error.message);
-          toast({
-            title: "Error",
-            description: error.message,
-            variant: "destructive",
-          });
-        },
-      },
-    );
+
+    await mintHypercert({
+      metaData: formattedMetadata.data!,
+      units: DEFAULT_NUM_FRACTIONS,
+      transferRestrictions: TransferRestrictions.FromCreatorOnly,
+      allowlistRecords:
+        values.allowlistURL ||
+        values.allowlistEntries?.map((entry) => ({
+          ...entry,
+          units: BigInt(entry.units),
+        })),
+    });
   }
 
   const onSubmitInvalid = (errors: FieldErrors) => {
@@ -278,12 +213,6 @@ export default function NewHypercertForm() {
           </div>
         </section>
       </main>
-      <TransactionDialog
-        steps={txnSteps}
-        title="Minting Hypercert"
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-      />
     </>
   );
 }
