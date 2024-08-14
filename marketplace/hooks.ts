@@ -453,6 +453,11 @@ export const useBuyFractionalMakerAsk = () => {
 
 export const useCancelOrder = () => {
   const { client: hec } = useHypercertExchangeClient();
+  const {
+    setDialogStep: setStep,
+    setSteps,
+    setOpen,
+  } = useStepProcessDialogContext();
 
   return useMutation({
     mutationKey: ["cancelOrder"],
@@ -469,10 +474,34 @@ export const useCancelOrder = () => {
         throw new Error("No client");
       }
 
+      setSteps([
+        {
+          id: "Awaiting user confirmation",
+          description: "Awaiting user confirmation",
+        },
+        {
+          id: "Awaiting confirmation",
+          description: "Awaiting confirmation",
+        },
+        {
+          id: "Updating order validity",
+          description: "Updating order validity",
+        },
+        {
+          id: "Confirmed order cancellation",
+          description: "Confirmed order cancellation",
+        },
+      ]);
+      setOpen(true);
+
+      setStep("Awaiting user confirmation");
       const tx = await hec.cancelOrders([BigInt(nonce)]).call();
+      setStep("Awaiting confirmation");
       await tx.wait();
 
+      setStep("Updating order validity");
       await hec.api.updateOrderValidity([BigInt(tokenId)], chainId);
+      setStep("Confirmed order cancellation");
       document.location.reload();
     },
     onError: (e) => {
@@ -488,6 +517,11 @@ export const useCancelOrder = () => {
 
 export const useDeleteOrder = () => {
   const { client: hec } = useHypercertExchangeClient();
+  const {
+    setDialogStep: setStep,
+    setSteps,
+    setOpen,
+  } = useStepProcessDialogContext();
 
   return useMutation({
     mutationKey: ["deleteOrder"],
@@ -495,9 +529,22 @@ export const useDeleteOrder = () => {
       if (!hec) {
         throw new Error("No client");
       }
+      setSteps([
+        {
+          id: "Awaiting user signature",
+          description: "Awaiting user signature",
+        },
+        {
+          id: "Confirmed order deletion",
+          description: "Confirmed order deletion",
+        },
+      ]);
+      setOpen(true);
 
+      setStep("Awaiting user signature");
       const success = await hec.deleteOrder(orderId);
       if (success) {
+        setStep("Confirmed order deletion");
         document.location.reload();
       } else {
         throw new Error(`Could not delete listing ${orderId}`);
