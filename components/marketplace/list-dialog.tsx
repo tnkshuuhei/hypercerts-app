@@ -12,21 +12,23 @@ import type { HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragme
 import { ListAskedPrice } from "./list-asked-price";
 import ListDialogSettingsForm from "./list-dialog-settings-form";
 import ListFractionSelect from "./list-fraction-select";
-import { LoaderCircle } from "lucide-react";
+import { InfoIcon, LoaderCircle } from "lucide-react";
 import { useAccount } from "wagmi";
 import { useCreateFractionalMakerAsk } from "@/marketplace/hooks";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useHypercertExchangeClient } from "@/hooks/use-hypercert-exchange-client";
 import { toast } from "@/components/ui/use-toast";
-import {
-  getCurrencyByAddress,
-  getMinimumPrice,
-  isTokenDividableBy,
-} from "@/marketplace/utils";
+import { getCurrencyByAddress, getMinimumPrice } from "@/marketplace/utils";
 import type { HypercertExchangeClient } from "@hypercerts-org/marketplace-sdk";
 import { parseClaimOrFractionId } from "@hypercerts-org/sdk";
-import { cn } from "@/lib/utils";
 import { DateTimePicker } from "@/components/ui/datetime-picker";
+import { formatUnits, parseUnits } from "viem";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 type State = {
   fractionId: string;
@@ -158,6 +160,27 @@ function ListDialogInner({
     }));
   }, [state.currency, state.unitsForSale]);
 
+  useEffect(() => {
+    setState((state) => {
+      const fraction = fractions.find(
+        (fraction) => fraction.fraction_id === state.fractionId,
+      );
+
+      if (!fraction) {
+        return state;
+      }
+
+      const unitsForSale = fraction?.units || "0";
+
+      return {
+        ...state,
+        unitsForSale,
+        unitsMaxPerOrder: fraction.units || "",
+        unitsMinPerOrder: "1",
+      };
+    });
+  }, [state.fractionId, fractions]);
+
   const currency = getCurrencyByAddress(chainId, state.currency);
 
   if (!currency) {
@@ -170,15 +193,16 @@ function ListDialogInner({
     state.currency,
   );
 
-  const isDividablePrice = isTokenDividableBy(
-    state.price,
-    minimumPrice,
-    chainId,
-    currency.address,
+  const actualPricePerUnit =
+    parseUnits(state.price, currency.decimals) /
+    BigInt(state.unitsForSale || 1);
+  const actualTotalPrice = actualPricePerUnit * BigInt(state.unitsForSale || 0);
+  const actualPriceForListing = formatUnits(
+    actualTotalPrice,
+    currency.decimals,
   );
 
-  const createButtonEnabled =
-    isPriceValid && state.formIsValid && isDividablePrice;
+  const createButtonEnabled = isPriceValid && state.formIsValid;
 
   const validateStartDateTime = (): [boolean, React.ReactNode] => {
     if (!state.startDateTime) {
@@ -208,7 +232,7 @@ function ListDialogInner({
   const endDateTimeValidation = validateEndDateTime();
 
   return (
-    <DialogContent className="gap-5 max-w-2xl max-h-full overflow-auto">
+    <DialogContent className="gap-5 max-w-2xl max-h-full overflow-y-auto">
       <DialogHeader>
         <div className="bg-orange-400/70 p-2 mb-2 rounded-sm">
           Hypercerts marketplace features are in beta. Please use with caution.
@@ -263,25 +287,40 @@ function ListDialogInner({
           setCurrency={(currency) => setState({ ...state, currency })}
         />
         {selectedFraction && isPriceValid && (
-          <div className="text-sm text-gray-500">
-            Creating this listing will offer{" "}
+          <div className="text-sm text-gray-500 flex align-middle w-full">
+            Creating this listing will offer&nbsp;
             <b>
               <FormattedUnits>{state.unitsForSale}</FormattedUnits>
-            </b>{" "}
-            units for sale at a total price of{" "}
+            </b>
+            &nbsp;units for sale at a total price of&nbsp;
             <b>
-              {floatPrice}{" "}
+              {actualPriceForListing}&nbsp;
               {getCurrencyByAddress(chainId, state.currency)?.symbol}
             </b>
-            .{" "}
-            <span className={cn([!isDividablePrice && "text-red-600"])}>
-              Price should be a multiple of{" "}
-              <b>
-                {minimumPrice}{" "}
-                {getCurrencyByAddress(chainId, state.currency)?.symbol}
-              </b>
-              .
-            </span>
+            .
+            {actualPriceForListing !== state.price && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger className={"ml-auto"}>
+                    <InfoIcon className="ml-auto text-red-500" />
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-[300px]" side={"left"}>
+                    Due to rounding errors, your listing will actually be for{" "}
+                    <b>
+                      {actualPriceForListing}{" "}
+                      {getCurrencyByAddress(chainId, state.currency)?.symbol}
+                    </b>
+                    . To prevent rounding errors, use a price that is a multiple
+                    of{" "}
+                    <b>
+                      {minimumPrice}{" "}
+                      {getCurrencyByAddress(chainId, state.currency)?.symbol}
+                    </b>
+                    .
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
           </div>
         )}
       </div>
