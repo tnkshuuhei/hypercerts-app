@@ -59,8 +59,8 @@ export default function RootLayout({
             <MobileNav />
           </StepProcessDialogProvider>
         </Web3ModalProvider>
-        <Toaster />
         <Footer />
+        <Toaster />
       </body>
     </html>
   );
