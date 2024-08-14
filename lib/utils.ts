@@ -1,5 +1,6 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { TransferRestrictions } from "@hypercerts-org/sdk";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -7,7 +8,7 @@ export function cn(...inputs: ClassValue[]) {
 
 export const truncateEthereumAddress = (
   address: `0x${string}`,
-  length = 4
+  length = 4,
 ): string => {
   if (!address) {
     return "";
@@ -16,7 +17,7 @@ export const truncateEthereumAddress = (
     return address;
   }
   return `${address.substring(0, length + 2)}...${address.substring(
-    address.length - length
+    address.length - length,
   )}`;
 };
 
@@ -27,4 +28,17 @@ export const formatDate = (date: string, locale?: string) => {
   return new Intl.DateTimeFormat(locale ?? "en-US", {
     dateStyle: "medium",
   }).format(new Date(date));
+};
+
+export const formatTransferRestriction = (
+  transferRestriction: TransferRestrictions,
+) => {
+  switch (transferRestriction) {
+    case TransferRestrictions.AllowAll:
+      return "Allow all";
+    case TransferRestrictions.DisallowAll:
+      return "Disallow all";
+    case TransferRestrictions.FromCreatorOnly:
+      return "From creator only";
+  }
 };

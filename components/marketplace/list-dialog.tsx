@@ -128,12 +128,25 @@ function ListDialogInner({
       return;
     }
 
+    const selectedFraction = fractions.find(
+      (fraction) => fraction.fraction_id === state.fractionId,
+    );
+
+    if (!selectedFraction?.units) {
+      console.error("Unknown units");
+      return;
+    }
+
+    const unitsInFraction = BigInt(selectedFraction.units);
+
     try {
       await createFractionalMakerAsk({
         fractionId: state.fractionId,
         minUnitAmount: state.unitsMinPerOrder,
         maxUnitAmount: state.unitsMaxPerOrder || state.unitsForSale,
-        minUnitsToKeep: (units - BigInt(state.unitsForSale)).toString(),
+        minUnitsToKeep: (
+          unitsInFraction - BigInt(state.unitsForSale)
+        ).toString(),
         price: state.price,
         sellLeftoverFraction: false,
         currency: state.currency,
