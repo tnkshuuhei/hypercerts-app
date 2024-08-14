@@ -11,6 +11,7 @@ export type WriteableErrorCategory =
   | "balance"
   | "chain"
   | "client";
+
 export type WriteableErrors = Record<WriteableErrorCategory, string>;
 
 const useIsWriteable = () => {
@@ -22,7 +23,13 @@ const useIsWriteable = () => {
   });
   const [checking, setChecking] = useState(false);
   const [writeable, setWriteable] = useState(false);
-  const [errors, setErrors] = useState<WriteableErrors>();
+  const [errors, setErrors] = useState<WriteableErrors>({
+    address: "",
+    client: "",
+    chain: "",
+    connection: "",
+    balance: "",
+  });
 
   const checkWriteable = useCallback(async () => {
     setChecking(true);
@@ -53,6 +60,12 @@ const useIsWriteable = () => {
         "Unable to locate client. Please check your configuration and connection settings.";
 
     setWriteable(Object.keys(currentErrors).length === 0);
+    // Log warnings for any errors
+    Object.entries(currentErrors).forEach(([category, message]) => {
+      if (message) {
+        console.warn(`[${category}] ${message}`);
+      }
+    });
     setErrors(currentErrors);
     setChecking(false);
   }, [isConnected, address, balance, chain, client]);
@@ -61,7 +74,18 @@ const useIsWriteable = () => {
     checkWriteable();
   }, [address, isConnected, balance, chain, client, checkWriteable]);
 
-  return { checking, writeable, errors };
+  const resetErrors = useCallback(() => {
+    setErrors({
+      address: "",
+      client: "",
+      chain: "",
+      connection: "",
+      balance: "",
+    });
+    checkWriteable();
+  }, [checkWriteable]);
+
+  return { checking, writeable, errors, resetErrors };
 };
 
 export default useIsWriteable;
