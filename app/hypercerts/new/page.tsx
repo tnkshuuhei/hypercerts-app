@@ -4,7 +4,9 @@ import FormSteps from "@/app/hypercerts/new/form-steps";
 import HypercertCard from "@/components/hypercert/hypercert-card";
 import { Form } from "@/components/ui/form";
 import { toast } from "@/components/ui/use-toast";
+import { DEFAULT_NUM_FRACTIONS } from "@/configs/hypercerts";
 import { useMintHypercert } from "@/hooks/mutations/useMintHypercert";
+import useIsWriteable from "@/hooks/useIsWriteable";
 import { formatDate } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -14,9 +16,7 @@ import {
 } from "@hypercerts-org/sdk";
 import { useEffect, useRef, useState } from "react";
 import { FieldErrors, useForm, useWatch } from "react-hook-form";
-import { TransactionReceipt } from "viem";
 import { z } from "zod";
-import { DEFAULT_NUM_FRACTIONS } from "@/configs/hypercerts";
 
 const formSchema = z.object({
   title: z.string().trim().min(1, "We need a title for your hypercert"),
@@ -99,6 +99,11 @@ const formDefaultValues: HypercertFormValues = {
 export default function NewHypercertForm() {
   const [currentStep, setCurrentStep] = useState(1);
   const [language, setLanguage] = useState("en-US");
+  const {
+    writeable,
+    errors: writeableErrors,
+    resetErrors: resetWriteableErrors,
+  } = useIsWriteable();
 
   const { mutateAsync: mintHypercert } = useMintHypercert();
 
@@ -127,6 +132,20 @@ export default function NewHypercertForm() {
   }, []);
 
   async function onSubmit(values: HypercertFormValues) {
+    const errors = Object.entries(writeableErrors).filter(
+      ([_, error]) => error !== "",
+    );
+    if (errors.length > 0) {
+      errors.forEach(([category, error]) => {
+        toast({
+          title: "Cannot start mint...",
+          variant: "destructive",
+          description: `${category}: ${error}`,
+        });
+      });
+      return;
+    }
+
     const metadata: HypercertMetadata = {
       name: values.title,
       description: values.description,
@@ -157,6 +176,22 @@ export default function NewHypercertForm() {
       return;
     }
 
+    // if (writeableErrors) {
+    //   Object.values(writeableErrors).forEach((error) => {
+    //     if (error) {
+    //       toast({
+    //         variant: "destructive",
+    //         title: "Sorry! We can't start the mint...",
+    //         description: error,
+    //       });
+    //     }
+    //   });
+    //   if (!writeable) {
+    //     resetWriteableErrors();
+    //     return;
+    //   }
+    // }
+
     await mintHypercert({
       metaData: formattedMetadata.data!,
       units: DEFAULT_NUM_FRACTIONS,
@@ -176,7 +211,7 @@ export default function NewHypercertForm() {
         const error = errors[key];
         if (error?.message) {
           toast({
-            title: "Error",
+            title: "Oops! Something went wrong",
             description: error.message.toString(),
             variant: "destructive",
           });
