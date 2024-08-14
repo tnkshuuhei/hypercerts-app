@@ -1,4 +1,3 @@
-"use client";
 import { useStepProcessDialogContext } from "@/components/global/step-process-dialog";
 import { useMutation } from "@tanstack/react-query";
 import {
