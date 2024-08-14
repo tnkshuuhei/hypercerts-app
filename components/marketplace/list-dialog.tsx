@@ -213,7 +213,8 @@ function ListDialogInner({
     currency.decimals,
   );
 
-  const createButtonEnabled = isPriceValid && state.formIsValid;
+  const createButtonEnabled =
+    isPriceValid && state.formIsValid && actualPricePerUnit !== BigInt(0);
 
   const validateStartDateTime = (): [boolean, React.ReactNode] => {
     if (!state.startDateTime) {
