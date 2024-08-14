@@ -1,3 +1,4 @@
+"use client";
 import { useStepProcessDialogContext } from "@/components/global/step-process-dialog";
 import { useMutation } from "@tanstack/react-query";
 import {
@@ -71,14 +72,14 @@ export const useMintHypercert = () => {
         throw new Error("No client found");
       }
 
-      setOpen(true);
-      setTitle("Minting Hypercert");
       setSteps([
         { id: "preparing", description: "Preparing to mint hypercert..." },
         { id: "minting", description: "Minting hypercert on-chain..." },
         { id: "confirming", description: "Waiting for on-chain confirmation" },
         { id: "done", description: "Minting complete!" },
       ]);
+      setOpen(true);
+      setTitle("Minting Hypercert");
       console.log("preparing...");
       setDialogStep("preparing");
 
