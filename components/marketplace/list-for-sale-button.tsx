@@ -7,17 +7,19 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
+import { StepProcessDialogProvider } from "@/components/global/step-process-dialog";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
-import { HypercertFull } from "../../hypercerts/fragments/hypercert-full.fragment";
-import ListDialog from "./list-dialog";
-import { StepProcessDialogProvider } from "../global/step-process-dialog";
-import { useAccount } from "wagmi";
 import { useHypercertClient } from "@/hooks/use-hypercert-client";
+import { type HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
 import { useState } from "react";
+import { useAccount } from "wagmi";
+import ListDialog from "./list-dialog";
+
+import { isChainIdSupported } from "@/lib/isChainIdSupported";
 
 export function ListForSaleButton({ hypercert }: { hypercert: HypercertFull }) {
-  const { isConnected, address } = useAccount();
+  const { isConnected, address, chainId } = useAccount();
   const { client } = useHypercertClient();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -40,6 +42,10 @@ export function ListForSaleButton({ hypercert }: { hypercert: HypercertFull }) {
 
     if (!isConnected || !address) {
       return "Connect your wallet to access this feature";
+    }
+
+    if (!isChainIdSupported(chainId)) {
+      return "Please connect to a supported network";
     }
 
     if (!client) {
