@@ -28,12 +28,20 @@ const ChainDisplay = () => {
 
   if (!address) return;
 
+  const isConnectedChainSupported =
+    connectedChain &&
+    supportedChains.some((chain) => chain.id === connectedChain.id);
+
   return (
     <Dialog open={open} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button
           variant="secondary"
-          className="flex justify-between space-x-2"
+          className={`flex justify-between space-x-2 border-2 ${
+            !isConnectedChainSupported
+              ? "border-red-600 bg-red-50"
+              : "border-transparent"
+          }`}
           size={"sm"}
         >
           <span className="text-sm">
