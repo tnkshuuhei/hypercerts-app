@@ -29,6 +29,17 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 type State = {
   fractionId: string;
@@ -405,14 +416,38 @@ function ListDialogInner({
         >
           Cancel
         </Button>
-        <Button
-          disabled={!createButtonEnabled}
-          className="w-full"
-          onClick={handleListButtonClick}
-        >
-          {isPending && <LoaderCircle className="h-4 w-4 animate-spin mr-1" />}
-          {isPending ? "Creating listing" : "Create listing"}
-        </Button>
+        <AlertDialog>
+          <AlertDialogTrigger className={"w-full"}>
+            <Button disabled={!createButtonEnabled} className="w-full">
+              {isPending && (
+                <LoaderCircle className="h-4 w-4 animate-spin mr-1" />
+              )}
+              {isPending ? "Creating listing" : "Create listing"}
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Confirm listing</AlertDialogTitle>
+              <AlertDialogDescription>
+                You will sell{" "}
+                <b>
+                  <FormattedUnits>{state.unitsForSale}</FormattedUnits>
+                </b>{" "}
+                units of your hypercert for{" "}
+                <b>
+                  {actualPriceForListing} {currency.symbol}
+                </b>{" "}
+                in total.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={handleListButtonClick}>
+                Continue
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </DialogContent>
   );
