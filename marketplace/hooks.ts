@@ -21,6 +21,7 @@ import { useHypercertExchangeClient } from "@/hooks/use-hypercert-exchange-clien
 import { toast } from "@/components/ui/use-toast";
 import { getFractionsByHypercert } from "@/hypercerts/getFractionsByHypercert";
 import { getCurrencyByAddress } from "@/marketplace/utils";
+import revalidatePathServerAction from "@/app/actions";
 
 export const useCreateOrderInSupabase = () => {
   const chainId = useChainId();
@@ -453,6 +454,7 @@ export const useBuyFractionalMakerAsk = () => {
 
 export const useCancelOrder = () => {
   const { client: hec } = useHypercertExchangeClient();
+  const { address } = useAccount();
   const {
     setDialogStep: setStep,
     setSteps,
@@ -465,10 +467,12 @@ export const useCancelOrder = () => {
       nonce,
       tokenId,
       chainId,
+      hypercertId,
     }: {
       nonce: bigint;
       tokenId: string;
       chainId: number;
+      hypercertId: string;
     }) => {
       if (!hec) {
         throw new Error("No client");
@@ -502,6 +506,8 @@ export const useCancelOrder = () => {
       setStep("Updating order validity");
       await hec.api.updateOrderValidity([BigInt(tokenId)], chainId);
       setStep("Confirmed order cancellation");
+      await revalidatePathServerAction(`/hypercerts/${hypercertId}`);
+      await revalidatePathServerAction(`/profile/${address}`);
       document.location.reload();
     },
     onError: (e) => {
