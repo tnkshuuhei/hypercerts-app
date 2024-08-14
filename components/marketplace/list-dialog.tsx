@@ -418,7 +418,10 @@ function ListDialogInner({
           Cancel
         </Button>
         <AlertDialog>
-          <AlertDialogTrigger className={"w-full"}>
+          <AlertDialogTrigger
+            disabled={!createButtonEnabled}
+            className={"w-full"}
+          >
             <Button disabled={!createButtonEnabled} className="w-full">
               {isPending && (
                 <LoaderCircle className="h-4 w-4 animate-spin mr-1" />
