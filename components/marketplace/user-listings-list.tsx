@@ -300,6 +300,7 @@ export default function UserListingsList({
                       e.preventDefault();
                       await deleteOrder({
                         orderId: order.id,
+                        hypercertId: order.hypercert_id,
                       });
                     }}
                     size={"sm"}

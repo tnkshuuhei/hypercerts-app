@@ -261,6 +261,10 @@ export const useCreateFractionalMakerAsk = ({
         console.error(e);
         throw new Error("Error registering order");
       }
+      await revalidatePathServerAction([
+        `/hypercerts/${hypercertId}`,
+        `/profile/${address}`,
+      ]);
       window.location.reload();
     },
     onSuccess: () => {
@@ -446,6 +450,10 @@ export const useBuyFractionalMakerAsk = () => {
 
         throw new Error(decodeContractError(e, "Error buying listing"));
       } finally {
+        await revalidatePathServerAction([
+          `/hypercerts/${order.hypercert_id}`,
+          `/profile/${address}`,
+        ]);
         setOpen(false);
       }
     },
@@ -506,8 +514,10 @@ export const useCancelOrder = () => {
       setStep("Updating order validity");
       await hec.api.updateOrderValidity([BigInt(tokenId)], chainId);
       setStep("Confirmed order cancellation");
-      await revalidatePathServerAction(`/hypercerts/${hypercertId}`);
-      await revalidatePathServerAction(`/profile/${address}`);
+      await revalidatePathServerAction([
+        `/hypercerts/${hypercertId}`,
+        `/profile/${address}`,
+      ]);
       document.location.reload();
     },
     onError: (e) => {
@@ -523,6 +533,7 @@ export const useCancelOrder = () => {
 
 export const useDeleteOrder = () => {
   const { client: hec } = useHypercertExchangeClient();
+  const { address } = useAccount();
   const {
     setDialogStep: setStep,
     setSteps,
@@ -531,7 +542,13 @@ export const useDeleteOrder = () => {
 
   return useMutation({
     mutationKey: ["deleteOrder"],
-    mutationFn: async ({ orderId }: { orderId: string }) => {
+    mutationFn: async ({
+      orderId,
+      hypercertId,
+    }: {
+      orderId: string;
+      hypercertId: string;
+    }) => {
       if (!hec) {
         throw new Error("No client");
       }
@@ -549,6 +566,10 @@ export const useDeleteOrder = () => {
 
       setStep("Awaiting user signature");
       const success = await hec.deleteOrder(orderId);
+      await revalidatePathServerAction([
+        `/hypercerts/${hypercertId}`,
+        `/profile/${address}`,
+      ]);
       if (success) {
         setStep("Confirmed order deletion");
         document.location.reload();

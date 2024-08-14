@@ -295,6 +295,7 @@ export default function HypercertListingsList({
                             e.preventDefault();
                             await deleteOrder({
                               orderId: order.id,
+                              hypercertId: order.hypercert_id,
                             });
                           }}
                           size={"sm"}
