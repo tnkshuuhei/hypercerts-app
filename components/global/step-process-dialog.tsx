@@ -35,15 +35,13 @@ export const StepProcessDialogContext = createContext<{
     step: DialogStep["id"],
     newState?: StepState,
     errorMessage?: string,
-  ) => void;
-  setDialogSteps: React.Dispatch<React.SetStateAction<DialogStep[]>>;
+  ) => Promise<void>;
   setSteps: React.Dispatch<React.SetStateAction<StepData[]>>;
   setOpen: (open: boolean) => void;
   setTitle: (title: string) => void;
   dialogSteps: DialogStep[];
 }>({
-  setDialogStep: () => {},
-  setDialogSteps: () => {},
+  setDialogStep: async () => Promise.resolve(),
   setSteps: () => {},
   setOpen: () => {},
   setTitle: () => {},
@@ -60,6 +58,7 @@ export const StepProcessDialogProvider = ({
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("Transaction in progress...");
   const [initialized, setInitialized] = useState(false);
+  const [, forceUpdate] = useState({});
 
   useEffect(() => {
     if (steps.length === 0) return;
@@ -75,27 +74,52 @@ export const StepProcessDialogProvider = ({
     }
   }, [steps, initialized]);
 
+  useEffect(() => {
+    if (!open) {
+      setSteps([]);
+      setInitialized(false);
+    }
+  }, [open]);
+
+  useEffect(() => {
+    console.log("Current dialogSteps:", dialogSteps);
+  }, [dialogSteps]);
+
   const setDialogStep = useCallback(
-    (stepId: DialogStep["id"], newState?: StepState, errorMessage?: string) => {
+    async (
+      stepId: DialogStep["id"],
+      newState?: StepState,
+      errorMessage?: string,
+    ) => {
       setDialogSteps((prevSteps) => {
         const stepIndex = prevSteps.findIndex((step) => step.id === stepId);
-        if (stepIndex === -1) return prevSteps;
+        if (stepIndex === -1) return prevSteps; // Step not found
 
-        return prevSteps.map((step, index) => {
+        const updatedSteps = prevSteps.map((step, index) => {
           if (index === stepIndex) {
             return {
               ...step,
-              state: newState || (errorMessage ? "error" : "active"),
+              state:
+                newState || ((errorMessage ? "error" : "active") as StepState),
               errorMessage: errorMessage || "",
             };
           }
-
           return {
             ...step,
-            state: index < stepIndex ? "completed" : "idle",
+            state:
+              index < stepIndex
+                ? ("completed" as StepState)
+                : ("idle" as StepState),
           };
         });
+
+        // Log the updated steps after state has been set
+        console.log("Updated dialog steps:", updatedSteps);
+        return updatedSteps;
       });
+
+      // Wait for the state to update
+      await new Promise((resolve) => setTimeout(resolve, 0));
     },
     [],
   );
@@ -104,7 +128,6 @@ export const StepProcessDialogProvider = ({
     <StepProcessDialogContext.Provider
       value={{
         setDialogStep,
-        setDialogSteps,
         setSteps,
         setOpen,
         setTitle,
@@ -113,6 +136,7 @@ export const StepProcessDialogProvider = ({
     >
       {children}
       <StepProcessModal
+        key={dialogSteps.map((step) => step.state).join(",")}
         open={open}
         onOpenChange={setOpen}
         steps={dialogSteps}

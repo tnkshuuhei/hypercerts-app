@@ -5,7 +5,7 @@ import HypercertCard from "@/components/hypercert/hypercert-card";
 import { Form } from "@/components/ui/form";
 import { toast } from "@/components/ui/use-toast";
 import { DEFAULT_NUM_FRACTIONS } from "@/configs/hypercerts";
-import { useMintHypercert } from "@/hooks/mutations/useMintHypercert";
+import { useMintHypercert } from "@/hypercerts/hooks/useMintHypercert";
 import useIsWriteable from "@/hooks/useIsWriteable";
 import { formatDate } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";

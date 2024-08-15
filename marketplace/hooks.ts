@@ -21,7 +21,6 @@ import { useHypercertExchangeClient } from "@/hooks/use-hypercert-exchange-clien
 import { toast } from "@/components/ui/use-toast";
 import { getFractionsByHypercert } from "@/hypercerts/getFractionsByHypercert";
 import { getCurrencyByAddress } from "@/marketplace/utils";
-import revalidatePathServerAction from "@/app/actions";
 
 export const useCreateOrderInSupabase = () => {
   const chainId = useChainId();
@@ -185,7 +184,7 @@ export const useCreateFractionalMakerAsk = ({
 
       let signature: string | undefined;
 
-      setStep("Create");
+      await setStep("Create");
 
       const { chainId: chainIdFromHypercertId } =
         parseClaimOrFractionId(hypercertId);
@@ -220,7 +219,7 @@ export const useCreateFractionalMakerAsk = ({
         });
 
       // Grant the TransferManager the right the transfer assets on behalf od the LooksRareProtocol
-      setStep("Approve transfer manager");
+      await setStep("Approve transfer manager");
       if (!isTransferManagerApproved) {
         const tx = await hypercertExchangeClient
           .grantTransferManagerApproval()
@@ -230,7 +229,7 @@ export const useCreateFractionalMakerAsk = ({
         });
       }
 
-      setStep("Approve collection");
+      await setStep("Approve collection");
       // Approve the collection items to be transferred by the TransferManager
       if (!isCollectionApproved) {
         const tx = await hypercertExchangeClient.approveAllCollectionItems(
@@ -242,14 +241,14 @@ export const useCreateFractionalMakerAsk = ({
       }
 
       // Sign your maker order
-      setStep("Sign order");
+      await setStep("Sign order");
       signature = await hypercertExchangeClient.signMakerOrder(maker);
 
       if (!signature) {
         throw new Error("Error signing order");
       }
 
-      setStep("Create order");
+      await setStep("Create order");
       try {
         await createOrder({
           order: maker,
@@ -261,10 +260,6 @@ export const useCreateFractionalMakerAsk = ({
         console.error(e);
         throw new Error("Error registering order");
       }
-      await revalidatePathServerAction([
-        `/hypercerts/${hypercertId}`,
-        `/profile/${address}`,
-      ]);
       window.location.reload();
     },
     onSuccess: () => {
@@ -376,7 +371,7 @@ export const useBuyFractionalMakerAsk = () => {
       ]);
       setOpen(true);
 
-      setStep("Setting up order execution");
+      await setStep("Setting up order execution");
       const currency = getCurrencyByAddress(order.chainId, order.currency);
 
       if (!currency) {
@@ -394,7 +389,7 @@ export const useBuyFractionalMakerAsk = () => {
 
       const totalPrice = BigInt(order.price) * BigInt(unitAmount);
       try {
-        setStep("ERC20");
+        await setStep("ERC20");
         if (currency.address !== zeroAddress) {
           const currentAllowance = await getCurrentERC20Allowance(
             order.currency as `0x${string}`,
@@ -411,7 +406,7 @@ export const useBuyFractionalMakerAsk = () => {
           }
         }
 
-        setStep("Transfer manager");
+        await setStep("Transfer manager");
         const isTransferManagerApproved =
           await hypercertExchangeClient.isTransferManagerApproved();
         if (!isTransferManagerApproved) {
@@ -429,7 +424,7 @@ export const useBuyFractionalMakerAsk = () => {
       }
 
       try {
-        setStep("Setting up order execution");
+        await setStep("Setting up order execution");
         const overrides =
           currency.address === zeroAddress ? { value: totalPrice } : undefined;
         const { call } = hypercertExchangeClient.executeOrder(
@@ -439,9 +434,9 @@ export const useBuyFractionalMakerAsk = () => {
           undefined,
           overrides,
         );
-        setStep("Awaiting buy signature");
+        await setStep("Awaiting buy signature");
         const tx = await call();
-        setStep("Awaiting confirmation");
+        await setStep("Awaiting confirmation");
         await waitForTransactionReceipt(walletClientData, {
           hash: tx.hash as `0x${string}`,
         });
@@ -450,10 +445,6 @@ export const useBuyFractionalMakerAsk = () => {
 
         throw new Error(decodeContractError(e, "Error buying listing"));
       } finally {
-        await revalidatePathServerAction([
-          `/hypercerts/${order.hypercert_id}`,
-          `/profile/${address}`,
-        ]);
         setOpen(false);
       }
     },
@@ -462,12 +453,6 @@ export const useBuyFractionalMakerAsk = () => {
 
 export const useCancelOrder = () => {
   const { client: hec } = useHypercertExchangeClient();
-  const { address } = useAccount();
-  const {
-    setDialogStep: setStep,
-    setSteps,
-    setOpen,
-  } = useStepProcessDialogContext();
 
   return useMutation({
     mutationKey: ["cancelOrder"],
@@ -475,49 +460,19 @@ export const useCancelOrder = () => {
       nonce,
       tokenId,
       chainId,
-      hypercertId,
     }: {
       nonce: bigint;
       tokenId: string;
       chainId: number;
-      hypercertId: string;
     }) => {
       if (!hec) {
         throw new Error("No client");
       }
 
-      setSteps([
-        {
-          id: "Awaiting user confirmation",
-          description: "Awaiting user confirmation",
-        },
-        {
-          id: "Awaiting confirmation",
-          description: "Awaiting confirmation",
-        },
-        {
-          id: "Updating order validity",
-          description: "Updating order validity",
-        },
-        {
-          id: "Confirmed order cancellation",
-          description: "Confirmed order cancellation",
-        },
-      ]);
-      setOpen(true);
-
-      setStep("Awaiting user confirmation");
       const tx = await hec.cancelOrders([BigInt(nonce)]).call();
-      setStep("Awaiting confirmation");
       await tx.wait();
 
-      setStep("Updating order validity");
       await hec.api.updateOrderValidity([BigInt(tokenId)], chainId);
-      setStep("Confirmed order cancellation");
-      await revalidatePathServerAction([
-        `/hypercerts/${hypercertId}`,
-        `/profile/${address}`,
-      ]);
       document.location.reload();
     },
     onError: (e) => {
@@ -533,45 +488,16 @@ export const useCancelOrder = () => {
 
 export const useDeleteOrder = () => {
   const { client: hec } = useHypercertExchangeClient();
-  const { address } = useAccount();
-  const {
-    setDialogStep: setStep,
-    setSteps,
-    setOpen,
-  } = useStepProcessDialogContext();
 
   return useMutation({
     mutationKey: ["deleteOrder"],
-    mutationFn: async ({
-      orderId,
-      hypercertId,
-    }: {
-      orderId: string;
-      hypercertId: string;
-    }) => {
+    mutationFn: async ({ orderId }: { orderId: string }) => {
       if (!hec) {
         throw new Error("No client");
       }
-      setSteps([
-        {
-          id: "Awaiting user signature",
-          description: "Awaiting user signature",
-        },
-        {
-          id: "Confirmed order deletion",
-          description: "Confirmed order deletion",
-        },
-      ]);
-      setOpen(true);
 
-      setStep("Awaiting user signature");
       const success = await hec.deleteOrder(orderId);
-      await revalidatePathServerAction([
-        `/hypercerts/${hypercertId}`,
-        `/profile/${address}`,
-      ]);
       if (success) {
-        setStep("Confirmed order deletion");
         document.location.reload();
       } else {
         throw new Error(`Could not delete listing ${orderId}`);

@@ -1,4 +1,7 @@
-import { useStepProcessDialogContext } from "@/components/global/step-process-dialog";
+import {
+  type StepState,
+  useStepProcessDialogContext,
+} from "@/components/global/step-process-dialog";
 import { useMutation } from "@tanstack/react-query";
 import {
   HypercertMetadata,
@@ -18,10 +21,9 @@ export const useMintHypercert = () => {
 
   return useMutation({
     mutationKey: ["MINT_HYPERCERT"],
-    scope: { id: "MINT_HYPERCERT" }, // Ensure only one instance runs
-    onError: (e) => {
+    onError: async (e) => {
       console.error(e);
-      setDialogStep("minting", "error", e.message);
+      await setDialogStep("minting", "error", e.message);
       toast({
         title: "Error",
         description: e.message,
@@ -29,7 +31,7 @@ export const useMintHypercert = () => {
       });
     },
     onSuccess: async (hash) => {
-      setDialogStep("confirming");
+      await setDialogStep("minting", "active");
       let receipt;
 
       try {
@@ -40,19 +42,16 @@ export const useMintHypercert = () => {
       } catch (error: unknown) {
         console.error("Error waiting for transaction receipt:", error);
         setOpen(false);
-        if (error instanceof Error) {
-          throw new Error(`Failed to confirm transaction: ${error.message}`);
-        } else {
-          throw new Error("Failed to confirm transaction: Unknown error");
-        }
+        throw new Error(
+          `Failed to confirm transaction: ${error instanceof Error ? error.message : "Unknown error"}`,
+        );
       }
 
       if (receipt?.status === "reverted") {
-        // setOpen(false);
         throw new Error("Transaction reverted: Minting failed");
       }
 
-      setDialogStep("done", "completed");
+      await setDialogStep("done", "completed");
       return receipt;
     },
     mutationFn: async ({
@@ -71,21 +70,21 @@ export const useMintHypercert = () => {
         throw new Error("No client found");
       }
 
+      setOpen(true);
       setSteps([
         { id: "preparing", description: "Preparing to mint hypercert..." },
         { id: "minting", description: "Minting hypercert on-chain..." },
         { id: "confirming", description: "Waiting for on-chain confirmation" },
         { id: "done", description: "Minting complete!" },
       ]);
-      setOpen(true);
       setTitle("Minting Hypercert");
+      await setDialogStep("preparing", "active");
       console.log("preparing...");
-      setDialogStep("preparing");
 
       let hash;
       try {
+        await setDialogStep("minting", "active");
         console.log("minting...");
-        setDialogStep("minting");
         hash = await client.mintHypercert({
           metaData,
           totalUnits: units,
@@ -94,16 +93,12 @@ export const useMintHypercert = () => {
         });
       } catch (error: unknown) {
         console.error("Error minting hypercert:", error);
-        // setOpen(false);
-        if (error instanceof Error) {
-          throw new Error(`Failed to mint hypercert: ${error.message}`);
-        } else {
-          throw new Error("Failed to mint hypercert: Unknown error");
-        }
+        throw new Error(
+          `Failed to mint hypercert: ${error instanceof Error ? error.message : "Unknown error"}`,
+        );
       }
 
       if (!hash) {
-        // setOpen(false);
         throw new Error("No transaction hash returned");
       }
 

@@ -57,10 +57,10 @@ export default function RootLayout({
             <Navbar />
             {children}
             <MobileNav />
+            <Footer />
+            <Toaster />
           </StepProcessDialogProvider>
         </Web3ModalProvider>
-        <Footer />
-        <Toaster />
       </body>
     </html>
   );
