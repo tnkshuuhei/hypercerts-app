@@ -77,7 +77,7 @@ export const useMintHypercert = () => {
         { id: "confirming", description: "Waiting for on-chain confirmation" },
         { id: "done", description: "Minting complete!" },
       ]);
-      setTitle("Minting Hypercert");
+      setTitle("Minting hypercert");
       await setDialogStep("preparing", "active");
       console.log("preparing...");
 

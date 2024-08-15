@@ -81,10 +81,6 @@ export const StepProcessDialogProvider = ({
     }
   }, [open]);
 
-  useEffect(() => {
-    console.log("Current dialogSteps:", dialogSteps);
-  }, [dialogSteps]);
-
   const setDialogStep = useCallback(
     async (
       stepId: DialogStep["id"],
@@ -113,8 +109,6 @@ export const StepProcessDialogProvider = ({
           };
         });
 
-        // Log the updated steps after state has been set
-        console.log("Updated dialog steps:", updatedSteps);
         return updatedSteps;
       });
 
