@@ -265,7 +265,6 @@ export default function HypercertListingsList({
                                 nonce,
                                 chainId: Number(order.chainId),
                                 tokenId: order.itemIds[0],
-                                hypercertId: order.hypercert_id,
                               });
                             }}
                             size={"sm"}
@@ -295,7 +294,6 @@ export default function HypercertListingsList({
                             e.preventDefault();
                             await deleteOrder({
                               orderId: order.id,
-                              hypercertId: order.hypercert_id,
                             });
                           }}
                           size={"sm"}
