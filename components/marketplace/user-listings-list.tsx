@@ -270,7 +270,6 @@ export default function UserListingsList({
                           nonce,
                           chainId: Number(order.chainId),
                           tokenId: order.itemIds[0],
-                          hypercertId: order.hypercert_id,
                         });
                       }}
                       size={"sm"}
@@ -300,7 +299,6 @@ export default function UserListingsList({
                       e.preventDefault();
                       await deleteOrder({
                         orderId: order.id,
-                        hypercertId: order.hypercert_id,
                       });
                     }}
                     size={"sm"}
