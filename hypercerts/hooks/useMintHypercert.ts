@@ -31,7 +31,7 @@ export const useMintHypercert = () => {
       });
     },
     onSuccess: async (hash) => {
-      await setDialogStep("minting", "active");
+      await setDialogStep("confirming", "active");
       let receipt;
 
       try {
