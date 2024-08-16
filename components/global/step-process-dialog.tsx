@@ -13,6 +13,7 @@ import { AlertCircle, Badge, BadgeCheck, Loader } from "lucide-react";
 import React, {
   createContext,
   createElement,
+  ReactNode,
   useCallback,
   useContext,
   useEffect,
@@ -40,12 +41,14 @@ export const StepProcessDialogContext = createContext<{
   setOpen: (open: boolean) => void;
   setTitle: (title: string) => void;
   dialogSteps: DialogStep[];
+  setExtraContent: React.Dispatch<React.SetStateAction<React.ReactNode>>;
 }>({
   setDialogStep: async () => Promise.resolve(),
   setSteps: () => {},
   setOpen: () => {},
   setTitle: () => {},
   dialogSteps: [],
+  setExtraContent: () => {},
 });
 
 export const StepProcessDialogProvider = ({
@@ -58,7 +61,7 @@ export const StepProcessDialogProvider = ({
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("Transaction in progress...");
   const [initialized, setInitialized] = useState(false);
-  const [, forceUpdate] = useState({});
+  const [extraContent, setExtraContent] = useState<ReactNode>(null);
 
   useEffect(() => {
     if (steps.length === 0) return;
@@ -126,6 +129,7 @@ export const StepProcessDialogProvider = ({
         setOpen,
         setTitle,
         dialogSteps,
+        setExtraContent,
       }}
     >
       {children}
@@ -135,6 +139,7 @@ export const StepProcessDialogProvider = ({
         onOpenChange={setOpen}
         steps={dialogSteps}
         title={title}
+        extraContent={extraContent}
       />
     </StepProcessDialogContext.Provider>
   );
