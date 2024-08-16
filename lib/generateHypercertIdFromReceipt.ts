@@ -1,4 +1,4 @@
-import { decodeEventLog, type TransactionReceipt } from "viem";
+import { decodeEventLog, getAddress, type TransactionReceipt } from "viem";
 import { HypercertMinterAbi } from "@hypercerts-org/contracts";
 import { BigNumber } from "@ethersproject/bignumber";
 
@@ -41,7 +41,7 @@ export const generateHypercertIdFromReceipt = (
     throw new Error("No tokenId arg in event");
   }
 
-  const contractId = receipt.to;
+  const contractId = getAddress(receipt.to || "");
   const tokenId = tokenIdBigNumber.toString();
 
   return `${chainId}-${contractId}-${tokenId}`;
