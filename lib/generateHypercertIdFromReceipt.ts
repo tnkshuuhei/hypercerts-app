@@ -41,7 +41,7 @@ export const generateHypercertIdFromReceipt = (
     throw new Error("No tokenId arg in event");
   }
 
-  const contractId = receipt.to?.toLowerCase();
+  const contractId = receipt.to;
   const tokenId = tokenIdBigNumber.toString();
 
   return `${chainId}-${contractId}-${tokenId}`;
