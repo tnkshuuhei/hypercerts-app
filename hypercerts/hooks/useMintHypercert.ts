@@ -1,22 +1,23 @@
+import { useStepProcessDialogContext } from "@/components/global/step-process-dialog";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { toast } from "@/components/ui/use-toast";
+import { useHypercertClient } from "@/hooks/use-hypercert-client";
+import { generateHypercertIdFromReceipt } from "@/lib/generateHypercertIdFromReceipt";
 import {
-  type StepState,
-  useStepProcessDialogContext,
-} from "@/components/global/step-process-dialog";
-import { useMutation } from "@tanstack/react-query";
-import {
+  AllowlistEntry,
   HypercertMetadata,
   TransferRestrictions,
-  AllowlistEntry,
 } from "@hypercerts-org/sdk";
-import { useHypercertClient } from "@/hooks/use-hypercert-client";
+import { useMutation } from "@tanstack/react-query";
+import { createElement } from "react";
 import { waitForTransactionReceipt } from "viem/actions";
-import { useWalletClient } from "wagmi";
-import { toast } from "@/components/ui/use-toast";
+import { useAccount, useWalletClient } from "wagmi";
 
 export const useMintHypercert = () => {
   const { client } = useHypercertClient();
   const { data: walletClient } = useWalletClient();
-  const { setDialogStep, setSteps, setOpen, setTitle } =
+  const { chain } = useAccount();
+  const { setDialogStep, setSteps, setOpen, setTitle, setExtraContent } =
     useStepProcessDialogContext();
 
   return useMutation({
@@ -34,6 +35,8 @@ export const useMintHypercert = () => {
       await setDialogStep("confirming", "active");
       let receipt;
 
+      console.log({ receipt });
+
       try {
         receipt = await waitForTransactionReceipt(walletClient!, {
           confirmations: 3,
@@ -41,7 +44,11 @@ export const useMintHypercert = () => {
         });
       } catch (error: unknown) {
         console.error("Error waiting for transaction receipt:", error);
-        setOpen(false);
+        await setDialogStep(
+          "confirming",
+          "error",
+          error instanceof Error ? error.message : "Unknown error",
+        );
         throw new Error(
           `Failed to confirm transaction: ${error instanceof Error ? error.message : "Unknown error"}`,
         );
@@ -51,8 +58,63 @@ export const useMintHypercert = () => {
         throw new Error("Transaction reverted: Minting failed");
       }
 
+      await setDialogStep("route", "active");
+
+      const hypercertId = generateHypercertIdFromReceipt(receipt, chain?.id!);
+      console.log({ hypercertId });
+
+      setExtraContent(
+        createElement(
+          "div",
+          { className: "flex flex-col space-y-2" },
+          createElement(
+            "p",
+            { className: "text-sm font-medium" },
+            "Your hypercert has been minted successfully!",
+          ),
+          createElement(
+            "div",
+            { className: "flex space-x-4" },
+            createElement(
+              "a",
+              {
+                href: `https://${chain?.id === 1 ? "" : `${chain?.name}.`}etherscan.io/tx/${receipt.transactionHash}`,
+                target: "_blank",
+                rel: "noopener noreferrer",
+              },
+
+              createElement(
+                Button,
+                {
+                  size: "default",
+                  className: buttonVariants({ variant: "secondary" }),
+                },
+                "View transaction",
+              ),
+            ),
+            createElement(
+              "a",
+              {
+                href: `/hypercerts/${hypercertId}`,
+                target: "_blank",
+                rel: "noopener noreferrer",
+              },
+              createElement(
+                Button,
+                {
+                  size: "default",
+                  className: buttonVariants({ variant: "default" }),
+                },
+                "View hypercert",
+              ),
+            ),
+          ),
+        ),
+      );
+
       await setDialogStep("done", "completed");
-      return receipt;
+
+      return { hypercertId, receipt, chain };
     },
     mutationFn: async ({
       metaData,
@@ -75,6 +137,7 @@ export const useMintHypercert = () => {
         { id: "preparing", description: "Preparing to mint hypercert..." },
         { id: "minting", description: "Minting hypercert on-chain..." },
         { id: "confirming", description: "Waiting for on-chain confirmation" },
+        { id: "route", description: "Creating your new hypercert's link..." },
         { id: "done", description: "Minting complete!" },
       ]);
       setTitle("Minting hypercert");
