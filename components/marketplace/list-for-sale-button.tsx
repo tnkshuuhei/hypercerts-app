@@ -68,7 +68,7 @@ export function ListForSaleButton({ hypercert }: { hypercert: HypercertFull }) {
     !fractionsOwnedByUser.length ||
     transferRestrictions === "DisallowAll" ||
     (transferRestrictions === "FromCreatorOnly" &&
-      address?.toLocaleLowerCase() !== hypercert.creator_address);
+      address?.toLowerCase() !== hypercert.creator_address?.toLowerCase());
 
   const getToolTipMessage = () => {
     if (!hypercert || !hypercertId) return;
