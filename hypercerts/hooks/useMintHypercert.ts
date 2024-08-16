@@ -10,8 +10,69 @@ import {
 } from "@hypercerts-org/sdk";
 import { useMutation } from "@tanstack/react-query";
 import { createElement } from "react";
+import type { Chain, TransactionReceipt } from "viem";
 import { waitForTransactionReceipt } from "viem/actions";
 import { useAccount, useWalletClient } from "wagmi";
+
+const createExtraContent = (
+  receipt: TransactionReceipt,
+  hypercertId?: string,
+  chain?: Chain,
+) => {
+  const receiptButton =
+    receipt &&
+    createElement(
+      "a",
+      {
+        href: `https://${chain?.id === 1 ? "" : `${chain?.name}.`}etherscan.io/tx/${receipt.transactionHash}`,
+        target: "_blank",
+        rel: "noopener noreferrer",
+      },
+      createElement(
+        Button,
+        {
+          size: "default",
+          className: buttonVariants({ variant: "secondary" }),
+        },
+        "View transaction",
+      ),
+    );
+
+  const hypercertButton =
+    hypercertId &&
+    createElement(
+      "a",
+      {
+        href: `/hypercerts/${hypercertId}`,
+        target: "_blank",
+        rel: "noopener noreferrer",
+      },
+      createElement(
+        Button,
+        {
+          size: "default",
+          className: buttonVariants({ variant: "default" }),
+        },
+        "View hypercert",
+      ),
+    );
+
+  return createElement(
+    "div",
+    { className: "flex flex-col space-y-2" },
+    createElement(
+      "p",
+      { className: "text-sm font-medium" },
+      "Your hypercert has been minted successfully!",
+    ),
+    createElement(
+      "div",
+      { className: "flex space-x-4" },
+      receiptButton,
+      hypercertButton,
+    ),
+  );
+};
 
 export const useMintHypercert = () => {
   const { client } = useHypercertClient();
@@ -35,13 +96,12 @@ export const useMintHypercert = () => {
       await setDialogStep("confirming", "active");
       let receipt;
 
-      console.log({ receipt });
-
       try {
         receipt = await waitForTransactionReceipt(walletClient!, {
           confirmations: 3,
           hash,
         });
+        console.log({ receipt });
       } catch (error: unknown) {
         console.error("Error waiting for transaction receipt:", error);
         await setDialogStep(
@@ -60,57 +120,21 @@ export const useMintHypercert = () => {
 
       await setDialogStep("route", "active");
 
-      const hypercertId = generateHypercertIdFromReceipt(receipt, chain?.id!);
-      console.log({ hypercertId });
+      let hypercertId;
+      try {
+        hypercertId = generateHypercertIdFromReceipt(receipt, chain?.id!);
+        console.log({ hypercertId });
+      } catch (error) {
+        console.error("Error generating hypercert ID:", error);
+        await setDialogStep(
+          "route",
+          "error",
+          error instanceof Error ? error.message : "Unknown error",
+        );
+      }
 
-      setExtraContent(
-        createElement(
-          "div",
-          { className: "flex flex-col space-y-2" },
-          createElement(
-            "p",
-            { className: "text-sm font-medium" },
-            "Your hypercert has been minted successfully!",
-          ),
-          createElement(
-            "div",
-            { className: "flex space-x-4" },
-            createElement(
-              "a",
-              {
-                href: `https://${chain?.id === 1 ? "" : `${chain?.name}.`}etherscan.io/tx/${receipt.transactionHash}`,
-                target: "_blank",
-                rel: "noopener noreferrer",
-              },
-
-              createElement(
-                Button,
-                {
-                  size: "default",
-                  className: buttonVariants({ variant: "secondary" }),
-                },
-                "View transaction",
-              ),
-            ),
-            createElement(
-              "a",
-              {
-                href: `/hypercerts/${hypercertId}`,
-                target: "_blank",
-                rel: "noopener noreferrer",
-              },
-              createElement(
-                Button,
-                {
-                  size: "default",
-                  className: buttonVariants({ variant: "default" }),
-                },
-                "View hypercert",
-              ),
-            ),
-          ),
-        ),
-      );
+      const extraContent = createExtraContent(receipt, hypercertId, chain);
+      setExtraContent(extraContent);
 
       await setDialogStep("done", "completed");
 
