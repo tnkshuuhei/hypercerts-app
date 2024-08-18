@@ -57,7 +57,29 @@ async function HypercertPageInner({
   });
 
   if (!hypercert) {
-    throw new Error("Hypercert not found.");
+    return (
+      <section className="flex flex-col space-y-4">
+        <section className="space-y-4 lg:flex lg:space-y-0 lg:space-x-8">
+          <div className="flex justify-between">
+            <h3 className="uppercase text-sm text-gray-500 font-medium tracking-wider"></h3>
+          </div>
+        </section>
+        <section className="flex flex-col space-y-4">
+          <h1 className="font-serif text-3xl lg:text-5xl tracking-tight">
+            Hypercert not found.
+          </h1>
+          <Separator />
+          <h3 className="uppercase text-sm text-gray-500 font-medium tracking-wider">
+            {`ID ${hypercertId}`}
+          </h3>
+          <p className="md:text-lg">
+            If this hypercert was freshly minted try refreshing in 30 seconds.
+            Please try again or contact us at{" "}
+            <a href="mailto:support@hypercerts.org">support@hypercerts.org</a>.
+          </p>
+        </section>
+      </section>
+    );
   }
 
   return (

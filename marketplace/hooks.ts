@@ -111,8 +111,12 @@ export const useCreateFractionalMakerAsk = ({
   const { data: currentFractions } =
     useFetchHypercertFractionsByHypercertId(hypercertId);
 
-  const { setSteps, setStep, setOpen, setTitle } =
-    useStepProcessDialogContext();
+  const {
+    setSteps,
+    setDialogStep: setStep,
+    setOpen,
+    setTitle,
+  } = useStepProcessDialogContext();
 
   setTitle("Create marketplace listing");
 
@@ -180,7 +184,7 @@ export const useCreateFractionalMakerAsk = ({
 
       let signature: string | undefined;
 
-      setStep("Create");
+      await setStep("Create");
 
       const { chainId: chainIdFromHypercertId } =
         parseClaimOrFractionId(hypercertId);
@@ -215,7 +219,7 @@ export const useCreateFractionalMakerAsk = ({
         });
 
       // Grant the TransferManager the right the transfer assets on behalf od the LooksRareProtocol
-      setStep("Approve transfer manager");
+      await setStep("Approve transfer manager");
       if (!isTransferManagerApproved) {
         const tx = await hypercertExchangeClient
           .grantTransferManagerApproval()
@@ -225,7 +229,7 @@ export const useCreateFractionalMakerAsk = ({
         });
       }
 
-      setStep("Approve collection");
+      await setStep("Approve collection");
       // Approve the collection items to be transferred by the TransferManager
       if (!isCollectionApproved) {
         const tx = await hypercertExchangeClient.approveAllCollectionItems(
@@ -237,14 +241,14 @@ export const useCreateFractionalMakerAsk = ({
       }
 
       // Sign your maker order
-      setStep("Sign order");
+      await setStep("Sign order");
       signature = await hypercertExchangeClient.signMakerOrder(maker);
 
       if (!signature) {
         throw new Error("Error signing order");
       }
 
-      setStep("Create order");
+      await setStep("Create order");
       try {
         await createOrder({
           order: maker,
@@ -300,7 +304,11 @@ export const useBuyFractionalMakerAsk = () => {
   const { client: hypercertExchangeClient } = useHypercertExchangeClient();
 
   const chainId = useChainId();
-  const { setStep, setSteps, setOpen } = useStepProcessDialogContext();
+  const {
+    setDialogStep: setStep,
+    setSteps,
+    setOpen,
+  } = useStepProcessDialogContext();
   const { data: walletClientData } = useWalletClient();
   const { address } = useAccount();
   const getCurrentERC20Allowance = useGetCurrentERC20Allowance();
@@ -363,7 +371,7 @@ export const useBuyFractionalMakerAsk = () => {
       ]);
       setOpen(true);
 
-      setStep("Setting up order execution");
+      await setStep("Setting up order execution");
       const currency = getCurrencyByAddress(order.chainId, order.currency);
 
       if (!currency) {
@@ -381,7 +389,7 @@ export const useBuyFractionalMakerAsk = () => {
 
       const totalPrice = BigInt(order.price) * BigInt(unitAmount);
       try {
-        setStep("ERC20");
+        await setStep("ERC20");
         if (currency.address !== zeroAddress) {
           const currentAllowance = await getCurrentERC20Allowance(
             order.currency as `0x${string}`,
@@ -398,7 +406,7 @@ export const useBuyFractionalMakerAsk = () => {
           }
         }
 
-        setStep("Transfer manager");
+        await setStep("Transfer manager");
         const isTransferManagerApproved =
           await hypercertExchangeClient.isTransferManagerApproved();
         if (!isTransferManagerApproved) {
@@ -416,7 +424,7 @@ export const useBuyFractionalMakerAsk = () => {
       }
 
       try {
-        setStep("Setting up order execution");
+        await setStep("Setting up order execution");
         const overrides =
           currency.address === zeroAddress ? { value: totalPrice } : undefined;
         const { call } = hypercertExchangeClient.executeOrder(
@@ -426,9 +434,9 @@ export const useBuyFractionalMakerAsk = () => {
           undefined,
           overrides,
         );
-        setStep("Awaiting buy signature");
+        await setStep("Awaiting buy signature");
         const tx = await call();
-        setStep("Awaiting confirmation");
+        await setStep("Awaiting confirmation");
         await waitForTransactionReceipt(walletClientData, {
           hash: tx.hash as `0x${string}`,
         });

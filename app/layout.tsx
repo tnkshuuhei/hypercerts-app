@@ -5,7 +5,7 @@ import { Instrument_Serif, Inter } from "next/font/google";
 import type { Metadata } from "next";
 import MobileNav from "@/components/global/mobile-nav";
 import Navbar from "@/components/global/navbar";
-import { Toaster } from "../components/ui/toaster";
+import { Toaster } from "@/components/ui/toaster";
 import { Web3ModalProvider } from "@/contexts/wagmi";
 import { cn } from "@/lib/utils";
 import { config } from "@/configs/wagmi";
@@ -13,6 +13,7 @@ import { cookieToInitialState } from "wagmi";
 import { headers } from "next/headers";
 import { siteConfig } from "@/configs/site";
 import Footer from "@/components/global/footer";
+import { StepProcessDialogProvider } from "@/components/global/step-process-dialog";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -52,12 +53,14 @@ export default function RootLayout({
         )}
       >
         <Web3ModalProvider initialState={initialState}>
-          <Navbar />
-          {children}
-          <MobileNav />
+          <StepProcessDialogProvider>
+            <Navbar />
+            {children}
+            <MobileNav />
+            <Footer />
+            <Toaster />
+          </StepProcessDialogProvider>
         </Web3ModalProvider>
-        <Toaster />
-        <Footer />
       </body>
     </html>
   );
