@@ -1,4 +1,5 @@
 "use client";
+import ChainDisplay from "@/components/chain-display";
 import {
   Menubar,
   MenubarContent,
@@ -22,7 +23,7 @@ const MobileNav = () => {
   if (isDesktop) return null;
 
   return (
-    <Menubar className="h-14 fixed bottom-4 left-4 right-4 md:hidden backdrop-blur-sm py-3 border-[1.5px] border-slate-300 bg-slate-50/70 justify-between">
+    <Menubar className="h-14 fixed bottom-4 left-4 right-4 md:hidden backdrop-blur-sm py-3 border-[1.5px] border-slate-300 bg-slate-50/70 justify-between z-10">
       <MenubarMenu>
         <MenubarTrigger
           aria-label="Menu"
@@ -57,11 +58,14 @@ const MobileNav = () => {
           </Link>
         </MenubarContent>
       </MenubarMenu>
-      <MenubarMenu>
-        <div className="pr-2 py-0 bg-none data-[state=open]:bg-none focus:bg-none">
-          <WalletProfile />
-        </div>
-      </MenubarMenu>
+      <section className="flex space-x-2">
+        <ChainDisplay />
+        <MenubarMenu>
+          <div className="pr-2 py-0 bg-none data-[state=open]:bg-none focus:bg-none">
+            <WalletProfile />
+          </div>
+        </MenubarMenu>
+      </section>
     </Menubar>
   );
 };
