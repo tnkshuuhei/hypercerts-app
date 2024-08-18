@@ -2,7 +2,7 @@ import "server-only";
 
 import { graphql, readFragment } from "@/lib/graphql";
 import { OrderFragment } from "@/marketplace/fragments/order.fragment";
-import { HYPERCERTS_API_URL } from "@/configs/hypercerts";
+import { HYPERCERTS_API_URL_GRAPH } from "@/configs/hypercerts";
 import request from "graphql-request";
 
 const ordersQuery = graphql(
@@ -38,7 +38,7 @@ interface GetOrdersParams {
 }
 
 export async function getOrders({ filter }: GetOrdersParams) {
-  const res = await request(HYPERCERTS_API_URL, ordersQuery, {
+  const res = await request(HYPERCERTS_API_URL_GRAPH, ordersQuery, {
     chainId: filter.chainId?.toString(),
     signer: filter.signer,
     hypercert_id: filter.hypercertId,

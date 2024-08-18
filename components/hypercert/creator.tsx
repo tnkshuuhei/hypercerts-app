@@ -1,7 +1,7 @@
 import { type HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
 import EthAddress from "../eth-address";
 import { Cuboid } from "lucide-react";
-import { type SupportedChainIdType, supportedChains } from "@/lib/constants";
+import { SUPPORTED_CHAINS, SupportedChainIdType } from "@/configs/constants";
 
 export default function Creator({ hypercert }: { hypercert: HypercertFull }) {
   if (!hypercert) return null;
@@ -18,7 +18,7 @@ export default function Creator({ hypercert }: { hypercert: HypercertFull }) {
           <span className="text-slate-400">•</span>
           <span>
             {
-              supportedChains.find(
+              SUPPORTED_CHAINS.find(
                 (x) =>
                   x.id ===
                   (Number(

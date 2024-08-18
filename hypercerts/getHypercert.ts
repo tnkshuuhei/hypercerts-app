@@ -2,7 +2,7 @@ import "server-only";
 
 import { graphql, readFragment } from "@/lib/graphql";
 
-import { HYPERCERTS_API_URL } from "@/configs/hypercerts";
+import { HYPERCERTS_API_URL_GRAPH } from "@/configs/hypercerts";
 import { HypercertFullFragment } from "./fragments/hypercert-full.fragment";
 import request from "graphql-request";
 
@@ -20,7 +20,7 @@ const query = graphql(
 );
 
 export async function getHypercert(hypercertId: string) {
-  const res = await request(HYPERCERTS_API_URL, query, {
+  const res = await request(HYPERCERTS_API_URL_GRAPH, query, {
     hypercert_id: hypercertId,
   });
 

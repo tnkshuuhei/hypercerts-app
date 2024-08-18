@@ -1,14 +1,5 @@
-import {
-  useAccount,
-  useChainId,
-  usePublicClient,
-  useWalletClient,
-} from "wagmi";
-import {
-  addressesByNetwork,
-  utils,
-  WETHAbi,
-} from "@hypercerts-org/marketplace-sdk";
+import { useWalletClient } from "wagmi";
+import { addressesByNetwork, utils } from "@hypercerts-org/marketplace-sdk";
 import { readContract } from "viem/actions";
 import {
   HypercertMinterAbi,

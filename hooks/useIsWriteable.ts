@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import { useAccount, useBalance } from "wagmi";
 import { useHypercertClient } from "@/hooks/use-hypercert-client";
-import { supportedChains } from "@/lib/constants";
+import { SUPPORTED_CHAINS } from "@/configs/constants";
 
 export type WriteableErrorCategory =
   | "connection"
@@ -52,9 +52,9 @@ const useIsWriteable = () => {
     if (!chain)
       currentErrors["chain"] =
         "No connection chain found. Please connect your wallet";
-    if (chain && !supportedChains.map((c) => c.id).includes(chain.id))
+    if (chain && !SUPPORTED_CHAINS.map((c) => c.id).includes(chain.id))
       currentErrors["chain"] =
-        `Wrong network. Please connect to one of "${supportedChains.map((c) => c.id).join(", ")}"`;
+        `Wrong network. Please connect to one of "${SUPPORTED_CHAINS.map((c) => c.id).join(", ")}"`;
     if (!client)
       currentErrors["client"] =
         "Unable to locate client. Please check your configuration and connection settings.";

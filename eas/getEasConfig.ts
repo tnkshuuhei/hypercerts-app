@@ -1,4 +1,4 @@
-import { EAS_CONFIG } from "../configs/eas";
+import { EAS_CONFIG } from "@/configs/eas";
 
 export function getEasConfig(chainId?: number) {
   if (!chainId) {

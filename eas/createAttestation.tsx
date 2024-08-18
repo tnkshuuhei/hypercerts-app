@@ -1,5 +1,5 @@
 import { EAS, SchemaEncoder } from "@ethereum-attestation-service/eas-sdk";
-import { EVALUATIONS_SCHEMA, EVALUATIONS_SCHEMA_UID } from "../configs/eas";
+import { EVALUATIONS_SCHEMA, EVALUATIONS_SCHEMA_UID } from "@/configs/eas";
 
 import { AllEvaluationStates } from "./types/all-evaluation-states.type";
 import { JsonRpcSigner } from "ethers";

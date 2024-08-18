@@ -4,7 +4,8 @@ import { useChainId, useWalletClient } from "wagmi";
 import { HypercertExchangeClient } from "@hypercerts-org/marketplace-sdk";
 import { useEthersProvider } from "@/hooks/use-ethers-provider";
 import { useEthersSigner } from "@/hooks/use-ethers-signer";
-import { supportedChains } from "@/lib/constants";
+import { HYPERCERTS_API_URL_REST } from "@/configs/hypercerts";
+import { SUPPORTED_CHAINS } from "@/configs/constants";
 
 export const useHypercertExchangeClient = () => {
   const { data: walletClient } = useWalletClient();
@@ -13,7 +14,9 @@ export const useHypercertExchangeClient = () => {
   const signer = useEthersSigner();
 
   const client = useMemo(() => {
-    if (!supportedChains.find((chain) => chain.id === walletClient?.chain.id)) {
+    if (
+      !SUPPORTED_CHAINS.find((chain) => chain.id === walletClient?.chain.id)
+    ) {
       return null;
     }
 
@@ -23,7 +26,7 @@ export const useHypercertExchangeClient = () => {
       provider,
       signer,
       {
-        apiEndpoint: process.env.NEXT_PUBLIC_HYPERCERT_API_ENDPOINT,
+        apiEndpoint: HYPERCERTS_API_URL_REST,
       },
     );
   }, [walletClient, chainId, provider, signer]);
