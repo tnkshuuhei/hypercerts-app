@@ -1,30 +1,81 @@
 "use client";
-import { HypercertClient } from "@hypercerts-org/sdk";
-import { useEffect, useState } from "react";
-import { useAccount, useWalletClient } from "wagmi";
-import { apiEnvironment, supportedChains } from "@/lib/constants";
+import React, { useEffect } from "react";
 
-export const useHypercertClient = () => {
-  const { data: walletClient } = useWalletClient();
-  const { isConnected } = useAccount();
-  const [client, setClient] = useState<HypercertClient>();
+import { HypercertClient, HypercertClientConfig } from "@hypercerts-org/sdk";
+import { base, baseSepolia, celo, optimism, sepolia } from "viem/chains";
+import { useAccount, useWalletClient } from "wagmi";
+
+const isSupportedChain = (chainId: number) => {
+  const supportedChainIds = [
+    base.id,
+    baseSepolia.id,
+    celo.id,
+    optimism.id,
+    sepolia.id,
+  ] as number[];
+
+  return supportedChainIds.includes(chainId);
+};
+export const useHypercertClient = ({
+  overrideChainId,
+}: {
+  overrideChainId?: number;
+} = {}) => {
+  const { chain } = useAccount();
+  const clientConfig = React.useMemo(
+    () => ({
+      chain: overrideChainId ? { id: overrideChainId } : chain,
+    }),
+    [overrideChainId, chain]
+  );
+  const [client, setClient] = React.useState<HypercertClient | null>(() => {
+    if (clientConfig.chain?.id && isSupportedChain(clientConfig.chain.id)) {
+      return new HypercertClient(clientConfig);
+    }
+    return null;
+  });
+  const [isLoading, setIsLoading] = React.useState(false);
+
+  const {
+    data: walletClient,
+    isError,
+    isLoading: walletClientLoading,
+  } = useWalletClient();
 
   useEffect(() => {
-    if (!walletClient || !isConnected) {
-      return;
+    const chainId = overrideChainId || chain?.id;
+    if (
+      chainId &&
+      isSupportedChain(chainId) &&
+      !walletClientLoading &&
+      !isError &&
+      walletClient
+    ) {
+      setIsLoading(true);
+
+      try {
+        const config: Partial<HypercertClientConfig> = {
+          ...clientConfig,
+          chain: { id: chainId },
+          walletClient,
+        };
+
+        const client = new HypercertClient(config);
+        setClient(client);
+      } catch (e) {
+        console.error(e);
+      }
     }
 
-    if (!supportedChains.find((chain) => chain.id === walletClient.chain.id)) {
-      return;
-    }
-    setClient(
-      new HypercertClient({
-        environment: apiEnvironment,
-        // @ts-ignore - wagmi and viem have different typing
-        walletClient,
-      }),
-    );
-  }, [walletClient, isConnected]);
+    setIsLoading(false);
+  }, [
+    chain?.id,
+    clientConfig,
+    isError,
+    overrideChainId,
+    walletClient,
+    walletClientLoading,
+  ]);
 
-  return { client };
+  return { client, isLoading };
 };
