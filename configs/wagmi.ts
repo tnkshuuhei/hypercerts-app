@@ -4,7 +4,7 @@ import { siteConfig } from "./site";
 import { walletConnect } from "wagmi/connectors";
 import { HttpTransport } from "viem";
 import { mainnet } from "viem/chains";
-import { SUPPORTED_CHAINS, WC_PROJECT_ID } from "@/configs/constants";
+import { SUPPORTED_CHAINS } from "@/configs/constants";
 
 const metadata = {
   name: siteConfig.name,
@@ -22,7 +22,9 @@ const supportedChainsWithMainnetForEnsLookup = [
 // Create wagmiConfig
 export const config = createConfig({
   chains: supportedChainsWithMainnetForEnsLookup,
-  connectors: [walletConnect({ projectId: WC_PROJECT_ID })],
+  connectors: [
+    walletConnect({ projectId: process.env.NEXT_PUBLIC_ENVIRONMENT! }),
+  ],
   pollingInterval: 2_000,
   ssr: true,
   storage: createStorage({

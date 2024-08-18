@@ -25,10 +25,6 @@ const nextConfig = {
       },
     ],
   },
-  env: {
-    WC_PROJECT_ID: process.env.NEXT_PUBLIC_WC_PROJECT_ID,
-    ENVIRONMENT: process.env.ENVIRONMENT,
-  }
 };
 
 export default nextConfig;

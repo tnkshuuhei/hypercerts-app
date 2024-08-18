@@ -2,8 +2,8 @@ import { base, baseSepolia, celo, optimism, sepolia } from "viem/chains";
 import { Chain } from "viem";
 import { Environment } from "@hypercerts-org/sdk";
 
-export const WC_PROJECT_ID = process.env.WC_PROJECT_ID;
-export const ENVIRONMENT = process.env.ENVIRONMENT as Environment;
+export const WC_PROJECT_ID = process.env.NEXT_PUBLIC_WC_PROJECT_ID;
+export const ENVIRONMENT = process.env.NEXT_PUBLIC_ENVIRONMENT as Environment;
 
 export const testNetChains = [sepolia, baseSepolia] as const;
 export const prodNetChains = [optimism, celo, base] as const;
