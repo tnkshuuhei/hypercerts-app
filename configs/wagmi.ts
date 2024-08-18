@@ -1,7 +1,10 @@
 import { cookieStorage, createConfig, createStorage, http } from "wagmi";
-import { walletConnect } from "wagmi/connectors";
-import { base, baseSepolia, celo, optimism, sepolia } from "viem/chains";
+
 import { siteConfig } from "./site";
+import { walletConnect } from "wagmi/connectors";
+import { supportedChains } from "@/lib/constants";
+import { HttpTransport } from "viem";
+import { mainnet } from "viem/chains";
 
 // Get projectId at https://cloud.walletconnect.com
 export const projectId = process.env.NEXT_PUBLIC_WC_PROJECT_ID;
@@ -15,21 +18,26 @@ const metadata = {
   icons: ["https://avatars.githubusercontent.com/u/124626532"],
 };
 
+// Mainnet needs to be here for the ENS lookup
+const supportedChainsWithMainnetForEnsLookup = [
+  ...supportedChains,
+  mainnet,
+] as const;
+
 // Create wagmiConfig
 export const config = createConfig({
-  // chains: [sepolia, celo, base, baseSepolia, optimism],
-  chains: [sepolia],
+  chains: supportedChainsWithMainnetForEnsLookup,
   connectors: [walletConnect({ projectId })],
   pollingInterval: 2_000,
   ssr: true,
   storage: createStorage({
     storage: cookieStorage,
   }),
-  transports: {
-    [sepolia.id]: http(),
-    // [celo.id]: http(),
-    // [base.id]: http(),
-    // [baseSepolia.id]: http(),
-    // [optimism.id]: http(),
-  },
+  transports: supportedChainsWithMainnetForEnsLookup.reduce(
+    (acc, chain) => {
+      acc[chain.id] = http();
+      return acc;
+    },
+    {} as Record<number, HttpTransport>,
+  ),
 });

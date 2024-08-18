@@ -1,29 +1,42 @@
 "use client";
-import { buttonVariants } from "@/components/ui/button";
+
+import { ArrowUpRight, ChevronDown } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { siteConfig } from "@/configs/site";
-import { ArrowUpRight, ChevronDown } from "lucide-react";
+
+import ChainDisplay from "@/components/chain-display";
+import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { WalletProfile } from "@/components/wallet-profile";
+import { buttonVariants } from "@/components/ui/button";
+import { siteConfig } from "@/configs/site";
+import { usePathname } from "next/navigation";
 
 const Navbar = () => {
   const currentPath = usePathname();
 
   return (
-    <nav className="flex items-center justify-between p-8 md:px-24">
-      <div className="flex items-center space-x-4">
+    <nav className="flex items-center justify-between p-3 md:px-24 border-b-[1.5px] border-black">
+      <div className="flex items-center space-x-6 w-full">
         <Link href="/">
-          <span className="font-bold tex-base md:text-xl tracking-tight">
-            Hypercerts
-          </span>
+          <div className="relative flex space-x-1">
+            <Image
+              src="/hypercerts-logo.png"
+              width={20}
+              height={20}
+              alt="Hypercerts mark"
+              className="w-6 h-6"
+            />
+            <span className="font-semibold text-base md:text-xl tracking-tight">
+              Hypercerts
+            </span>
+          </div>
         </Link>
-        <div className="hidden md:flex items-center space-x-2">
+        <div className="hidden md:flex items-center justify-center space-x-2 w-full">
           <Link
             key={siteConfig.links.explore}
             href={siteConfig.links.explore}
@@ -58,7 +71,7 @@ const Navbar = () => {
                   New Hypercert
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem
+              {/* <DropdownMenuItem
                 className={
                   currentPath === siteConfig.links.createHyperboard
                     ? "bg-accent"
@@ -71,7 +84,7 @@ const Navbar = () => {
                 >
                   New Hyperboard
                 </Link>
-              </DropdownMenuItem>
+              </DropdownMenuItem> */}
             </DropdownMenuContent>
           </DropdownMenu>
           <a
@@ -93,6 +106,7 @@ const Navbar = () => {
         </div>
       </div>
       <div className="hidden md:flex items-center space-x-4">
+        <ChainDisplay />
         <WalletProfile />
       </div>
     </nav>
