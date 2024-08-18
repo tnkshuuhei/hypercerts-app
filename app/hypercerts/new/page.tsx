@@ -1,12 +1,12 @@
 "use client";
 
 import FormSteps from "@/app/hypercerts/new/form-steps";
-import StepProcessDialog from "@/components/global/step-process-dialog";
 import HypercertCard from "@/components/hypercert/hypercert-card";
 import { Form } from "@/components/ui/form";
 import { toast } from "@/components/ui/use-toast";
-import { mintSteps, useMintClaim } from "@/hooks/use-mint-claim";
-import useProcessDialog, { StepData } from "@/hooks/use-process-dialog";
+import { DEFAULT_NUM_FRACTIONS } from "@/configs/hypercerts";
+import { useMintHypercert } from "@/hypercerts/hooks/useMintHypercert";
+import useIsWriteable from "@/hooks/useIsWriteable";
 import { formatDate } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -14,13 +14,9 @@ import {
   HypercertMetadata,
   TransferRestrictions,
 } from "@hypercerts-org/sdk";
-import { ArrowUpRightIcon } from "lucide-react";
-import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { FieldErrors, useForm, useWatch } from "react-hook-form";
-import { TransactionReceipt } from "viem";
 import { z } from "zod";
-import { DEFAULT_NUM_FRACTIONS } from "@/configs/hypercerts";
 
 const formSchema = z.object({
   title: z.string().trim().min(1, "We need a title for your hypercert"),
@@ -103,25 +99,18 @@ const formDefaultValues: HypercertFormValues = {
 export default function NewHypercertForm() {
   const [currentStep, setCurrentStep] = useState(1);
   const [language, setLanguage] = useState("en-US");
-  const { dialogSteps, setStep } = useProcessDialog(mintSteps);
+  const {
+    writeable,
+    errors: writeableErrors,
+    resetErrors: resetWriteableErrors,
+  } = useIsWriteable();
+
+  const { mutateAsync: mintHypercert } = useMintHypercert();
+
   const form = useForm<HypercertFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: formDefaultValues,
     mode: "onBlur",
-  });
-  const cardRef = useRef<HTMLDivElement>(null);
-
-  const [txReceipt, setTxReceipt] = useState<TransactionReceipt | null>(null);
-  const onMintComplete = (receipt: TransactionReceipt) => {
-    setTxReceipt(receipt);
-  };
-
-  const {
-    write: mintClaim,
-    txPending: mintClaimPending,
-    currentStep: mintStep,
-  } = useMintClaim({
-    onComplete: onMintComplete,
   });
 
   const watchedValues = useWatch({
@@ -136,16 +125,27 @@ export default function NewHypercertForm() {
     tags: watchedValues[3] ?? formDefaultValues.tags,
     projectDates: watchedValues[4] ?? formDefaultValues.projectDates,
   };
+  const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setLanguage(window.navigator.language);
   }, []);
 
-  useEffect(() => {
-    setStep(mintStep as StepData["id"]);
-  }, [mintStep]);
-
   async function onSubmit(values: HypercertFormValues) {
+    const errors = Object.entries(writeableErrors).filter(
+      ([_, error]) => error !== "",
+    );
+    if (errors.length > 0) {
+      errors.forEach(([category, error]) => {
+        toast({
+          title: "Cannot start mint...",
+          variant: "destructive",
+          description: `${category}: ${error}`,
+        });
+      });
+      return;
+    }
+
     const metadata: HypercertMetadata = {
       name: values.title,
       description: values.description,
@@ -176,19 +176,33 @@ export default function NewHypercertForm() {
       return;
     }
 
-    await mintClaim(
-      formattedMetadata.data!,
-      DEFAULT_NUM_FRACTIONS,
-      TransferRestrictions.FromCreatorOnly,
-      values.allowlistURL ||
+    // if (writeableErrors) {
+    //   Object.values(writeableErrors).forEach((error) => {
+    //     if (error) {
+    //       toast({
+    //         variant: "destructive",
+    //         title: "Sorry! We can't start the mint...",
+    //         description: error,
+    //       });
+    //     }
+    //   });
+    //   if (!writeable) {
+    //     resetWriteableErrors();
+    //     return;
+    //   }
+    // }
+
+    await mintHypercert({
+      metaData: formattedMetadata.data!,
+      units: DEFAULT_NUM_FRACTIONS,
+      transferRestrictions: TransferRestrictions.FromCreatorOnly,
+      allowlistRecords:
+        values.allowlistURL ||
         values.allowlistEntries?.map((entry) => ({
           ...entry,
           units: BigInt(entry.units),
         })),
-    );
-
-    form.reset();
-    setCurrentStep(1);
+    });
   }
 
   const onSubmitInvalid = (errors: FieldErrors) => {
@@ -197,7 +211,7 @@ export default function NewHypercertForm() {
         const error = errors[key];
         if (error?.message) {
           toast({
-            title: "Error",
+            title: "Oops! Something went wrong",
             description: error.message.toString(),
             variant: "destructive",
           });
@@ -243,27 +257,6 @@ export default function NewHypercertForm() {
           />
         </div>
       </section>
-      <StepProcessDialog
-        open={mintClaimPending}
-        steps={dialogSteps}
-        title="Mint your hypercert"
-        triggerLabel="See progress"
-        extraContent={
-          txReceipt && (
-            <Link
-              href={`https://sepolia.etherscan.io/tx/${txReceipt.transactionHash}`}
-              className="flex items-center underline underline-offset-2 hover:opacity-70 font-medium text-blue-700 tracking-tight group"
-              target="_blank"
-            >
-              View transaction on etherscan
-              <ArrowUpRightIcon
-                size={16}
-                className="ml-1 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-200"
-              />
-            </Link>
-          )
-        }
-      />
     </main>
   );
 }

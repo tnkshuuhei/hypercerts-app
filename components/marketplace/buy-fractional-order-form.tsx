@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { MarketplaceOrder } from "@/marketplace/types";
 import React from "react";
 import { useBuyFractionalMakerAsk } from "@/marketplace/hooks";
-import { HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
+import { type HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
 import { FormattedUnits } from "@/components/formatted-units";
 import {
   decodeFractionalOrderParams,

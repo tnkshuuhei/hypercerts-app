@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -6,11 +7,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { supportedChains } from "@/lib/constants";
+import { isChainIdSupported } from "@/lib/isChainIdSupported";
+import { ChevronDown } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAccount, useSwitchChain } from "wagmi";
-import { Button } from "@/components/ui/button";
-import { ChevronDown } from "lucide-react";
-import { supportedChains } from "@/lib/constants";
 
 const ChainDisplay = () => {
   const { address, chain: connectedChain, connector } = useAccount();
@@ -28,12 +29,18 @@ const ChainDisplay = () => {
 
   if (!address) return;
 
+  const isConnectedChainSupported = isChainIdSupported(connectedChain?.id);
+
   return (
     <Dialog open={open} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button
           variant="secondary"
-          className="flex justify-between space-x-2"
+          className={`flex justify-between space-x-2 border-2 ${
+            !isConnectedChainSupported
+              ? "border-red-600 bg-red-50"
+              : "border-transparent"
+          }`}
           size={"sm"}
         >
           <span className="text-sm">

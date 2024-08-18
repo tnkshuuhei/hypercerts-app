@@ -110,6 +110,7 @@ export const orderFragmentToMarketplaceOrder = (
     signature: order.signature,
     validator_codes:
       order.validator_codes?.map((code) => parseInt(code, 10)) || null,
+    hypercert_id: order.hypercert_id,
   };
 };
 

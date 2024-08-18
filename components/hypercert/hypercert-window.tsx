@@ -33,7 +33,12 @@ const HypercertWindow = ({
   const cheapestOrder = hypercert.orders?.cheapestOrder;
 
   if (priceDisplayCurrency === "usd" && cheapestOrder?.pricePerPercentInUSD) {
-    lowestPrice = `$${cheapestOrder.pricePerPercentInUSD}`;
+    const price = Number(cheapestOrder.pricePerPercentInUSD);
+    if (price < 0.01) {
+      lowestPrice = `< $0.01`;
+    } else {
+      lowestPrice = `$${price.toFixed(2)}`;
+    }
   }
 
   if (
