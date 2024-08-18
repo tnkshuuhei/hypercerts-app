@@ -7,20 +7,52 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-import { StepProcessDialogProvider } from "@/components/global/step-process-dialog";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
+import ListDialog from "./list-dialog";
+import { StepProcessDialogProvider } from "../global/step-process-dialog";
+import { useAccount, useReadContract } from "wagmi";
 import { useHypercertClient } from "@/hooks/use-hypercert-client";
 import { type HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
 import { useState } from "react";
-import { useAccount } from "wagmi";
-import ListDialog from "./list-dialog";
+import { Address } from "viem";
 
 import { isChainIdSupported } from "@/lib/isChainIdSupported";
 
 export function ListForSaleButton({ hypercert }: { hypercert: HypercertFull }) {
   const { isConnected, address, chainId } = useAccount();
   const { client } = useHypercertClient();
+
+  const contractAddress = hypercert.contract?.contract_address;
+  const tokenID = hypercert.token_id ? BigInt(hypercert.token_id) : null;
+
+  console.log("contractAddress", contractAddress);
+  console.log("tokenId", tokenID);
+
+  const { data: transferRestrictions } = useReadContract({
+    // ! Don't know if we really need to pass the ABI here
+    abi: [
+      {
+        inputs: [{ internalType: "uint256", name: "tokenID", type: "uint256" }],
+        name: "readTransferRestriction",
+        outputs: [
+          {
+            internalType: "string",
+            name: "",
+            type: "string",
+          },
+        ],
+        stateMutability: "view",
+        type: "function",
+      },
+    ],
+    address: contractAddress as Address,
+    functionName: "readTransferRestriction",
+    args: [tokenID!],
+    query: {
+      enabled: !!contractAddress && !!tokenID,
+    },
+  });
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -35,7 +67,10 @@ export function ListForSaleButton({ hypercert }: { hypercert: HypercertFull }) {
     !hypercertId ||
     !client ||
     !client.isClaimOrFractionOnConnectedChain(hypercertId) ||
-    !fractionsOwnedByUser.length;
+    !fractionsOwnedByUser.length ||
+    transferRestrictions === "DisallowAll" ||
+    (transferRestrictions === "FromCreatorOnly" &&
+      address?.toLowerCase() !== hypercert.creator_address?.toLowerCase());
 
   const getToolTipMessage = () => {
     if (!hypercert || !hypercertId) return;
@@ -58,6 +93,14 @@ export function ListForSaleButton({ hypercert }: { hypercert: HypercertFull }) {
 
     if (!fractionsOwnedByUser.length) {
       return "You do not own any fractions of this hypercert";
+    }
+
+    if (transferRestrictions === "DisallowAll") {
+      return "Secondary sales are not allowed for this hypercert";
+    }
+
+    if (transferRestrictions === "FromCreatorOnly") {
+      return "Only the creator can sell this hypercert";
     }
 
     return null;
