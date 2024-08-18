@@ -2,7 +2,7 @@
 import { HypercertClient } from "@hypercerts-org/sdk";
 import { useEffect, useState } from "react";
 import { useAccount, useWalletClient } from "wagmi";
-import { apiEnvironment, supportedChains } from "@/lib/constants";
+import { ENVIRONMENT, SUPPORTED_CHAINS } from "@/configs/constants";
 
 export const useHypercertClient = () => {
   const { data: walletClient } = useWalletClient();
@@ -14,12 +14,12 @@ export const useHypercertClient = () => {
       return;
     }
 
-    if (!supportedChains.find((chain) => chain.id === walletClient.chain.id)) {
+    if (!SUPPORTED_CHAINS.find((chain) => chain.id === walletClient.chain.id)) {
       return;
     }
     setClient(
       new HypercertClient({
-        environment: apiEnvironment,
+        environment: ENVIRONMENT,
         // @ts-ignore - wagmi and viem have different typing
         walletClient,
       }),

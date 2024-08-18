@@ -2,8 +2,8 @@ import "server-only";
 
 import { ResultOf, graphql, readFragment } from "@/lib/graphql";
 
-import { HYPERCERTS_API_URL } from "@/configs/hypercerts";
 import request from "graphql-request";
+import { HYPERCERTS_API_URL_GRAPH } from "@/configs/hypercerts";
 
 export const AllowListRecordFragment = graphql(`
   fragment AllowListRecordFragment on AllowlistRecord {
@@ -37,7 +37,7 @@ const query = graphql(
 );
 
 export async function getAllowListRecordsForAddress(address: string) {
-  const res = await request(HYPERCERTS_API_URL, query, {
+  const res = await request(HYPERCERTS_API_URL_GRAPH, query, {
     address,
   });
 

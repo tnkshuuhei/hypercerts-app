@@ -2,7 +2,7 @@ import "server-only";
 
 import { graphql, readFragment } from "@/lib/graphql";
 import { OrderFragment } from "@/marketplace/fragments/order.fragment";
-import { HYPERCERTS_API_URL } from "@/configs/hypercerts";
+import { HYPERCERTS_API_URL_GRAPH } from "@/configs/hypercerts";
 import request from "graphql-request";
 
 const query = graphql(
@@ -19,7 +19,7 @@ const query = graphql(
 );
 
 export async function getOrdersForAddress(address: string) {
-  const res = await request(HYPERCERTS_API_URL, query, {
+  const res = await request(HYPERCERTS_API_URL_GRAPH, query, {
     address,
   });
 

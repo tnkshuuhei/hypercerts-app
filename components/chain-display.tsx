@@ -7,11 +7,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { supportedChains } from "@/lib/constants";
 import { isChainIdSupported } from "@/lib/isChainIdSupported";
 import { ChevronDown } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAccount, useSwitchChain } from "wagmi";
+import { SUPPORTED_CHAINS } from "@/configs/constants";
 
 const ChainDisplay = () => {
   const { address, chain: connectedChain, connector } = useAccount();
@@ -54,7 +54,7 @@ const ChainDisplay = () => {
           <DialogTitle className="text-xl">Switch chains</DialogTitle>
         </DialogHeader>
         <ul>
-          {supportedChains.map((chain) => {
+          {SUPPORTED_CHAINS.map((chain) => {
             const isActiveChain = connectedChain?.id === chain.id;
             const activeChainClasses = isActiveChain
               ? "bg-slate-800 text-white"

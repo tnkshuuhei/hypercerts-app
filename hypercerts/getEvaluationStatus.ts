@@ -1,4 +1,4 @@
-import { EvaluationData } from "../eas/types/evaluation-data.type";
+import { EvaluationData } from "@/eas/types/evaluation-data.type";
 
 export type EvaluationStatus =
   | "not-evaluated"

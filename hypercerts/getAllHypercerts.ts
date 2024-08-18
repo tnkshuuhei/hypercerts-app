@@ -2,7 +2,7 @@ import "server-only";
 
 import { VariablesOf, graphql, readFragment } from "@/lib/graphql";
 
-import { HYPERCERTS_API_URL } from "@/configs/hypercerts";
+import { HYPERCERTS_API_URL_GRAPH } from "@/configs/hypercerts";
 import { HypercertListFragment } from "@/hypercerts/fragments/hypercert-list.fragment";
 import request from "graphql-request";
 
@@ -131,7 +131,7 @@ export async function getAllHypercerts({
   filter,
   chainId,
 }: GetAllHypercertsParams) {
-  const res = await request(HYPERCERTS_API_URL, query, {
+  const res = await request(HYPERCERTS_API_URL_GRAPH, query, {
     first,
     offset,
     sort: createOrderBy({ orderBy }),

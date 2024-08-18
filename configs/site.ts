@@ -1,5 +1,3 @@
-import { Book, Compass, LucideIcon, PlusCircle } from "lucide-react";
-
 interface SiteConfig {
   name: string;
   origin: string;

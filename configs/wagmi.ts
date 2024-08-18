@@ -2,14 +2,9 @@ import { cookieStorage, createConfig, createStorage, http } from "wagmi";
 
 import { siteConfig } from "./site";
 import { walletConnect } from "wagmi/connectors";
-import { supportedChains } from "@/lib/constants";
 import { HttpTransport } from "viem";
 import { mainnet } from "viem/chains";
-
-// Get projectId at https://cloud.walletconnect.com
-export const projectId = process.env.NEXT_PUBLIC_WC_PROJECT_ID;
-
-if (!projectId) throw new Error("Project ID is not defined");
+import { SUPPORTED_CHAINS } from "@/configs/constants";
 
 const metadata = {
   name: siteConfig.name,
@@ -20,14 +15,16 @@ const metadata = {
 
 // Mainnet needs to be here for the ENS lookup
 const supportedChainsWithMainnetForEnsLookup = [
-  ...supportedChains,
+  ...SUPPORTED_CHAINS,
   mainnet,
 ] as const;
 
 // Create wagmiConfig
 export const config = createConfig({
   chains: supportedChainsWithMainnetForEnsLookup,
-  connectors: [walletConnect({ projectId })],
+  connectors: [
+    walletConnect({ projectId: process.env.NEXT_PUBLIC_ENVIRONMENT! }),
+  ],
   pollingInterval: 2_000,
   ssr: true,
   storage: createStorage({

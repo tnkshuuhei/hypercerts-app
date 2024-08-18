@@ -1,11 +1,11 @@
 import { Separator } from "@/components/ui/separator";
 import { getEvaluationStatus } from "@/hypercerts/getEvaluationStatus";
-import { supportedChains, type SupportedChainIdType } from "@/lib/constants";
 import Image from "next/image";
 import Link from "next/link";
 import { HypercertListFragment } from "@/hypercerts/fragments/hypercert-list.fragment";
 import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
 import { getCurrencyByAddress } from "@/marketplace/utils";
+import { SUPPORTED_CHAINS, SupportedChainIdType } from "@/configs/constants";
 
 const HypercertWindow = ({
   hypercert,
@@ -20,7 +20,7 @@ const HypercertWindow = ({
   const chainId = Number(hypercert.contract?.chain_id) as SupportedChainIdType;
   const attestations = hypercert.attestations;
   const cardChain = (chainId: SupportedChainIdType) => {
-    return supportedChains.find((x) => x.id === chainId)?.name;
+    return SUPPORTED_CHAINS.find((x) => x.id === chainId)?.name;
   };
 
   const percentAvailable = calculateBigIntPercentage(

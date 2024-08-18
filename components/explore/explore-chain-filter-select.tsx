@@ -8,7 +8,7 @@ import {
   SelectValue,
 } from "../ui/select";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { supportedChains } from "@/lib/constants";
+import { SUPPORTED_CHAINS } from "@/configs/constants";
 
 export default function ChainFilterSelect() {
   const pathname = usePathname();
@@ -38,7 +38,7 @@ export default function ChainFilterSelect() {
       </SelectTrigger>
       <SelectContent className="w-max">
         <SelectItem value="all">All chains</SelectItem>
-        {supportedChains.map((chain) => (
+        {SUPPORTED_CHAINS.map((chain) => (
           <SelectItem key={chain.id} value={chain.id.toString()}>
             {chain.name}
           </SelectItem>
