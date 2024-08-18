@@ -9,7 +9,6 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
-import { HypercertFull } from "../../hypercerts/fragments/hypercert-full.fragment";
 import ListDialog from "./list-dialog";
 import { StepProcessDialogProvider } from "../global/step-process-dialog";
 import { useAccount, useReadContract } from "wagmi";
@@ -17,8 +16,6 @@ import { useHypercertClient } from "@/hooks/use-hypercert-client";
 import { type HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
 import { useState } from "react";
 import { Address } from "viem";
-import { useAccount } from "wagmi";
-import ListDialog from "./list-dialog";
 
 import { isChainIdSupported } from "@/lib/isChainIdSupported";
 
