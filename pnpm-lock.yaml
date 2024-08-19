@@ -18,14 +18,14 @@ importers:
         specifier: ^3.3.4
         version: 3.6.0(react-hook-form@7.52.0(react@18.3.1))
       '@hypercerts-org/contracts':
-        specifier: 2.0.0-alpha.4
-        version: 2.0.0-alpha.4(@nomicfoundation/hardhat-ethers@3.0.6(ethers@6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.8(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.6.5(@swc/helpers@0.5.5))(@types/node@20.14.9)(typescript@5.5.4))(typescript@5.5.2)(utf-8-validate@5.0.10)))(@swc/core@1.6.5(@swc/helpers@0.5.5))(@types/node@20.14.9)(bufferutil@4.0.8)(ethers@6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(ts-node@10.9.2(@swc/core@1.6.5(@swc/helpers@0.5.5))(@types/node@20.14.9)(typescript@5.5.4))(typescript@5.5.2)(utf-8-validate@5.0.10)
+        specifier: 2.0.0-alpha.5
+        version: 2.0.0-alpha.5(@nomicfoundation/hardhat-ethers@3.0.6(ethers@6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.8(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.6.5(@swc/helpers@0.5.5))(@types/node@20.14.9)(typescript@5.5.4))(typescript@5.5.2)(utf-8-validate@5.0.10)))(@swc/core@1.6.5(@swc/helpers@0.5.5))(@types/node@20.14.9)(bufferutil@4.0.8)(ethers@6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(ts-node@10.9.2(@swc/core@1.6.5(@swc/helpers@0.5.5))(@types/node@20.14.9)(typescript@5.5.4))(typescript@5.5.2)(utf-8-validate@5.0.10)
       '@hypercerts-org/marketplace-sdk':
-        specifier: 0.3.31
-        version: 0.3.31(@nomicfoundation/hardhat-ethers@3.0.6(ethers@6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.8(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.6.5(@swc/helpers@0.5.5))(@types/node@20.14.9)(typescript@5.5.4))(typescript@5.5.2)(utf-8-validate@5.0.10)))(@swc/helpers@0.5.5)(@types/node@20.14.9)(bufferutil@4.0.8)(ethers@6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(graphql@16.9.0)(rollup@4.18.0)(svelte@4.2.18)(ts-node@10.9.2(@swc/core@1.6.5(@swc/helpers@0.5.5))(@types/node@20.14.9)(typescript@5.5.4))(typescript@5.5.2)(utf-8-validate@5.0.10)
+        specifier: 0.3.32
+        version: 0.3.32(@nomicfoundation/hardhat-ethers@3.0.6(ethers@6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.8(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.6.5(@swc/helpers@0.5.5))(@types/node@20.14.9)(typescript@5.5.4))(typescript@5.5.2)(utf-8-validate@5.0.10)))(@swc/helpers@0.5.5)(@types/node@20.14.9)(bufferutil@4.0.8)(ethers@6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(graphql@16.9.0)(rollup@4.18.0)(svelte@4.2.18)(ts-node@10.9.2(@swc/core@1.6.5(@swc/helpers@0.5.5))(@types/node@20.14.9)(typescript@5.5.4))(typescript@5.5.2)(utf-8-validate@5.0.10)
       '@hypercerts-org/sdk':
-        specifier: 2.0.0-alpha.36
-        version: 2.0.0-alpha.36(@nomicfoundation/hardhat-ethers@3.0.6(ethers@6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.8(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.6.5(@swc/helpers@0.5.5))(@types/node@20.14.9)(typescript@5.5.4))(typescript@5.5.2)(utf-8-validate@5.0.10)))(@swc/helpers@0.5.5)(@types/node@20.14.9)(bufferutil@4.0.8)(ethers@6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(graphql@16.9.0)(rollup@4.18.0)(ts-node@10.9.2(@swc/core@1.6.5(@swc/helpers@0.5.5))(@types/node@20.14.9)(typescript@5.5.4))(typescript@5.5.2)(utf-8-validate@5.0.10)
+        specifier: 2.0.0-alpha.37
+        version: 2.0.0-alpha.37(@nomicfoundation/hardhat-ethers@3.0.6(ethers@6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.8(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.6.5(@swc/helpers@0.5.5))(@types/node@20.14.9)(typescript@5.5.4))(typescript@5.5.2)(utf-8-validate@5.0.10)))(@swc/helpers@0.5.5)(@types/node@20.14.9)(bufferutil@4.0.8)(ethers@6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(graphql@16.9.0)(rollup@4.18.0)(ts-node@10.9.2(@swc/core@1.6.5(@swc/helpers@0.5.5))(@types/node@20.14.9)(typescript@5.5.4))(typescript@5.5.2)(utf-8-validate@5.0.10)
       '@next/env':
         specifier: ^14.2.5
         version: 14.2.5
@@ -1326,7 +1326,6 @@ packages:
   '@humanwhocodes/config-array@0.11.14':
     resolution: {integrity: sha512-3T8LkOmg45BV5FICb15QQMsyUSWrQ8AygVfC7ZG32zOalnqrilm018ZVCw0eapXux8FtA33q8PSRSstjee3jSg==}
     engines: {node: '>=10.10.0'}
-    deprecated: Use @eslint/config-array instead
 
   '@humanwhocodes/module-importer@1.0.1':
     resolution: {integrity: sha512-bxveV4V8v5Yb4ncFTT3rPSgZBOpCkjfK0y4oVVVJwIuDVBRMDXrPyXRL988i5ap9m9bnyEEjWfm5WkBmtffLfA==}
@@ -1334,19 +1333,18 @@ packages:
 
   '@humanwhocodes/object-schema@2.0.3':
     resolution: {integrity: sha512-93zYdMES/c1D69yZiKDBj0V24vqNzB/koF26KPaagAfd3P/4gUlh3Dys5ogAK+Exi9QyzlD8x/08Zt7wIKcDcA==}
-    deprecated: Use @eslint/object-schema instead
 
-  '@hypercerts-org/contracts@2.0.0-alpha.4':
-    resolution: {integrity: sha512-8iOWb2PPxP1ID5DDyP5apNTbC4KVjt+Ygl9BXAYR2ftyJYu+M6QVpEnvs21BeApnL9689d5aqKeudI751YEgTw==}
+  '@hypercerts-org/contracts@2.0.0-alpha.5':
+    resolution: {integrity: sha512-yMYlI2YWQpb9eIBK/dopzekuj/QS6ynzu/sG8sFzBASdu4Jk8s4m8FGlNotj5lXpLi8hx+kHfk/1tTN7NX9UaA==}
 
-  '@hypercerts-org/marketplace-sdk@0.3.31':
-    resolution: {integrity: sha512-+NAZ4Ybx4TEQz6e34dA+2VsTQTHftilgS5tkux8fxEuFtasAoUkKvZBZaEPTif6Oz2tbZTRsTVq3NC62Z9bzUw==}
+  '@hypercerts-org/marketplace-sdk@0.3.32':
+    resolution: {integrity: sha512-kAYbrDeCwbsC2sT5I7a8ePRmY+aFSjfhURLivUi47fVB5yjsePs14tLEk3rO4P8eFvWsDMOyaYGHB3LS2sp2eA==}
     engines: {node: '>= 16.15.1 <= 20.x'}
     peerDependencies:
       ethers: ^6.6.2
 
-  '@hypercerts-org/sdk@2.0.0-alpha.36':
-    resolution: {integrity: sha512-H0qj6vKz7SABUpRU7ANj35RxmXr1Iy+xgw7Owr5vNUV02OcHi8mLlDXWCO40nUMCMYLf4Ep3R42J8XeQwawHOA==}
+  '@hypercerts-org/sdk@2.0.0-alpha.37':
+    resolution: {integrity: sha512-kEpZOKaiHzCr70yAYhO1z+of0xG+2Y8etwX2eZ+RV0RUjLs9qOYsh1lrIclXQ5+ayKZiVDkjBY8t7zMqJKnpZw==}
 
   '@isaacs/cliui@8.0.2':
     resolution: {integrity: sha512-O8jcjabXaleOG9DQ0+ARXWZBTfnP4WNAqzuiJK7ll44AmxGKv/J2M4TPjxjY3znBCfvBXFzucm1twdyFybFqEA==}
@@ -1528,7 +1526,6 @@ packages:
 
   '@motionone/vue@10.16.4':
     resolution: {integrity: sha512-z10PF9JV6SbjFq+/rYabM+8CVlMokgl8RFGvieSGNTmrkQanfHn+15XBrhG3BgUfvmTeSeyShfOHpG0i9zEdcg==}
-    deprecated: Motion One for Vue is deprecated. Use Oku Motion instead https://oku-ui.com/motion
 
   '@next/env@14.2.3':
     resolution: {integrity: sha512-W7fd7IbkfmeeY2gXrzJYDx8D2lWKbVoTIj1o1ScPHNzvp30s1AuoEFSdr39bC5sjxJaxTtq3OTCZboNp0lNWHA==}
@@ -4771,16 +4768,13 @@ packages:
 
   glob@7.2.0:
     resolution: {integrity: sha512-lmLf6gtyrPq8tTjSmrO94wBeQbFR3HbLHbuyD69wuyQkImp2hWqMGB47OX65FBkPffO641IP9jWa1z4ivqG26Q==}
-    deprecated: Glob versions prior to v9 are no longer supported
 
   glob@7.2.3:
     resolution: {integrity: sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==}
-    deprecated: Glob versions prior to v9 are no longer supported
 
   glob@8.1.0:
     resolution: {integrity: sha512-r8hpEjiQEYlF2QU0df3dS+nxxSIreXQS1qRhMJM0Q5NDdR386C7jb7Hwwod8Fgiuex+k0GFjgft18yvxm5XoCQ==}
     engines: {node: '>=12'}
-    deprecated: Glob versions prior to v9 are no longer supported
 
   globals@11.12.0:
     resolution: {integrity: sha512-WOBp/EEGUiIsJSp7wcv/y6MO+lV9UoncWqxuFfm8eBwzWNgyfBd6Gz+IeKQ9jCmyhoH99g15M3T+QaVHFjizVA==}
@@ -5018,7 +5012,6 @@ packages:
 
   inflight@1.0.6:
     resolution: {integrity: sha512-k92I/b08q4wvFscXCLvqfsHCrjrF7yiXsQuIVvVE7N82W3+aqpzuUdBbfhWcy/FZR3/4IgflMgKLOsvPDrGCJA==}
-    deprecated: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
 
   inherits@2.0.4:
     resolution: {integrity: sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==}
@@ -6551,12 +6544,10 @@ packages:
 
   rimraf@2.7.1:
     resolution: {integrity: sha512-uWjbaKIK3T1OSVptzX7Nl6PvQ3qAGtKEtVRjRuazjfL3Bx5eI409VZSqgND+4UNnmzLVdPj9FqFJNPqBZFve4w==}
-    deprecated: Rimraf versions prior to v4 are no longer supported
     hasBin: true
 
   rimraf@3.0.2:
     resolution: {integrity: sha512-JZkJMZkAGFFPP2YqXZXPbMlMBgsxzE8ILs4lMIX/2o0L9UBw9O/Y3o6wFw/i9YLapcUJWwqbi3kdxIPdC62TIA==}
-    deprecated: Rimraf versions prior to v4 are no longer supported
     hasBin: true
 
   ripemd160@2.0.2:
@@ -7713,7 +7704,6 @@ packages:
 
   zksync-web3@0.14.4:
     resolution: {integrity: sha512-kYehMD/S6Uhe1g434UnaMN+sBr9nQm23Ywn0EUP5BfQCsbjcr3ORuS68PosZw8xUTu3pac7G6YMSnNHk+fwzvg==}
-    deprecated: This package has been deprecated in favor of zksync-ethers@5.0.0
     peerDependencies:
       ethers: ^5.7.0
 
@@ -9228,7 +9218,7 @@ snapshots:
 
   '@humanwhocodes/object-schema@2.0.3': {}
 
-  '@hypercerts-org/contracts@2.0.0-alpha.4(@nomicfoundation/hardhat-ethers@3.0.6(ethers@6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.8(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.6.5(@swc/helpers@0.5.5))(@types/node@20.14.9)(typescript@5.5.4))(typescript@5.5.2)(utf-8-validate@5.0.10)))(@swc/core@1.6.5(@swc/helpers@0.5.5))(@types/node@20.14.9)(bufferutil@4.0.8)(ethers@6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(ts-node@10.9.2(@swc/core@1.6.5(@swc/helpers@0.5.5))(@types/node@20.14.9)(typescript@5.5.4))(typescript@5.5.2)(utf-8-validate@5.0.10)':
+  '@hypercerts-org/contracts@2.0.0-alpha.5(@nomicfoundation/hardhat-ethers@3.0.6(ethers@6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.8(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.6.5(@swc/helpers@0.5.5))(@types/node@20.14.9)(typescript@5.5.4))(typescript@5.5.2)(utf-8-validate@5.0.10)))(@swc/core@1.6.5(@swc/helpers@0.5.5))(@types/node@20.14.9)(bufferutil@4.0.8)(ethers@6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(ts-node@10.9.2(@swc/core@1.6.5(@swc/helpers@0.5.5))(@types/node@20.14.9)(typescript@5.5.4))(typescript@5.5.2)(utf-8-validate@5.0.10)':
     dependencies:
       '@tenderly/hardhat-tenderly': 2.3.0(@nomicfoundation/hardhat-ethers@3.0.6(ethers@6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.8(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.6.5(@swc/helpers@0.5.5))(@types/node@20.14.9)(typescript@5.5.4))(typescript@5.5.2)(utf-8-validate@5.0.10)))(@swc/core@1.6.5(@swc/helpers@0.5.5))(@types/node@20.14.9)(bufferutil@4.0.8)(ethers@6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.8(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.6.5(@swc/helpers@0.5.5))(@types/node@20.14.9)(typescript@5.5.4))(typescript@5.5.2)(utf-8-validate@5.0.10))(utf-8-validate@5.0.10)
       hardhat: 2.22.8(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.6.5(@swc/helpers@0.5.5))(@types/node@20.14.9)(typescript@5.5.4))(typescript@5.5.2)(utf-8-validate@5.0.10)
@@ -9247,9 +9237,9 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@hypercerts-org/marketplace-sdk@0.3.31(@nomicfoundation/hardhat-ethers@3.0.6(ethers@6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.8(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.6.5(@swc/helpers@0.5.5))(@types/node@20.14.9)(typescript@5.5.4))(typescript@5.5.2)(utf-8-validate@5.0.10)))(@swc/helpers@0.5.5)(@types/node@20.14.9)(bufferutil@4.0.8)(ethers@6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(graphql@16.9.0)(rollup@4.18.0)(svelte@4.2.18)(ts-node@10.9.2(@swc/core@1.6.5(@swc/helpers@0.5.5))(@types/node@20.14.9)(typescript@5.5.4))(typescript@5.5.2)(utf-8-validate@5.0.10)':
+  '@hypercerts-org/marketplace-sdk@0.3.32(@nomicfoundation/hardhat-ethers@3.0.6(ethers@6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.8(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.6.5(@swc/helpers@0.5.5))(@types/node@20.14.9)(typescript@5.5.4))(typescript@5.5.2)(utf-8-validate@5.0.10)))(@swc/helpers@0.5.5)(@types/node@20.14.9)(bufferutil@4.0.8)(ethers@6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(graphql@16.9.0)(rollup@4.18.0)(svelte@4.2.18)(ts-node@10.9.2(@swc/core@1.6.5(@swc/helpers@0.5.5))(@types/node@20.14.9)(typescript@5.5.4))(typescript@5.5.2)(utf-8-validate@5.0.10)':
     dependencies:
-      '@hypercerts-org/sdk': 2.0.0-alpha.36(@nomicfoundation/hardhat-ethers@3.0.6(ethers@6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.8(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.6.5(@swc/helpers@0.5.5))(@types/node@20.14.9)(typescript@5.5.4))(typescript@5.5.2)(utf-8-validate@5.0.10)))(@swc/helpers@0.5.5)(@types/node@20.14.9)(bufferutil@4.0.8)(ethers@6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(graphql@16.9.0)(rollup@4.18.0)(ts-node@10.9.2(@swc/core@1.6.5(@swc/helpers@0.5.5))(@types/node@20.14.9)(typescript@5.5.4))(typescript@5.5.2)(utf-8-validate@5.0.10)
+      '@hypercerts-org/sdk': 2.0.0-alpha.37(@nomicfoundation/hardhat-ethers@3.0.6(ethers@6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.8(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.6.5(@swc/helpers@0.5.5))(@types/node@20.14.9)(typescript@5.5.4))(typescript@5.5.2)(utf-8-validate@5.0.10)))(@swc/helpers@0.5.5)(@types/node@20.14.9)(bufferutil@4.0.8)(ethers@6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(graphql@16.9.0)(rollup@4.18.0)(ts-node@10.9.2(@swc/core@1.6.5(@swc/helpers@0.5.5))(@types/node@20.14.9)(typescript@5.5.4))(typescript@5.5.2)(utf-8-validate@5.0.10)
       '@supabase/supabase-js': 2.45.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@urql/core': 5.0.6(graphql@16.9.0)
       ethers: 6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -9272,10 +9262,10 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@hypercerts-org/sdk@2.0.0-alpha.36(@nomicfoundation/hardhat-ethers@3.0.6(ethers@6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.8(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.6.5(@swc/helpers@0.5.5))(@types/node@20.14.9)(typescript@5.5.4))(typescript@5.5.2)(utf-8-validate@5.0.10)))(@swc/helpers@0.5.5)(@types/node@20.14.9)(bufferutil@4.0.8)(ethers@6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(graphql@16.9.0)(rollup@4.18.0)(ts-node@10.9.2(@swc/core@1.6.5(@swc/helpers@0.5.5))(@types/node@20.14.9)(typescript@5.5.4))(typescript@5.5.2)(utf-8-validate@5.0.10)':
+  '@hypercerts-org/sdk@2.0.0-alpha.37(@nomicfoundation/hardhat-ethers@3.0.6(ethers@6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.8(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.6.5(@swc/helpers@0.5.5))(@types/node@20.14.9)(typescript@5.5.4))(typescript@5.5.2)(utf-8-validate@5.0.10)))(@swc/helpers@0.5.5)(@types/node@20.14.9)(bufferutil@4.0.8)(ethers@6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(graphql@16.9.0)(rollup@4.18.0)(ts-node@10.9.2(@swc/core@1.6.5(@swc/helpers@0.5.5))(@types/node@20.14.9)(typescript@5.5.4))(typescript@5.5.2)(utf-8-validate@5.0.10)':
     dependencies:
       '@graphql-typed-document-node/core': 3.2.0(graphql@16.9.0)
-      '@hypercerts-org/contracts': 2.0.0-alpha.4(@nomicfoundation/hardhat-ethers@3.0.6(ethers@6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.8(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.6.5(@swc/helpers@0.5.5))(@types/node@20.14.9)(typescript@5.5.4))(typescript@5.5.2)(utf-8-validate@5.0.10)))(@swc/core@1.6.5(@swc/helpers@0.5.5))(@types/node@20.14.9)(bufferutil@4.0.8)(ethers@6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(ts-node@10.9.2(@swc/core@1.6.5(@swc/helpers@0.5.5))(@types/node@20.14.9)(typescript@5.5.4))(typescript@5.5.2)(utf-8-validate@5.0.10)
+      '@hypercerts-org/contracts': 2.0.0-alpha.5(@nomicfoundation/hardhat-ethers@3.0.6(ethers@6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.8(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.6.5(@swc/helpers@0.5.5))(@types/node@20.14.9)(typescript@5.5.4))(typescript@5.5.2)(utf-8-validate@5.0.10)))(@swc/core@1.6.5(@swc/helpers@0.5.5))(@types/node@20.14.9)(bufferutil@4.0.8)(ethers@6.13.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))(ts-node@10.9.2(@swc/core@1.6.5(@swc/helpers@0.5.5))(@types/node@20.14.9)(typescript@5.5.4))(typescript@5.5.2)(utf-8-validate@5.0.10)
       '@openzeppelin/merkle-tree': 1.0.7
       '@swc/core': 1.6.5(@swc/helpers@0.5.5)
       ajv: 8.16.0
