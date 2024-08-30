@@ -327,15 +327,15 @@ function ListDialogInner({
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger className={"ml-auto"}>
-                    <InfoIcon className="ml-auto text-red-500" />
+                    <InfoIcon className="ml-auto text-black" />
                   </TooltipTrigger>
                   <TooltipContent className="max-w-[300px]" side={"left"}>
-                    Due to rounding errors, your listing will actually be for{" "}
+                    Due to rounding, your listing will actually be for{" "}
                     <b>
                       {actualPriceForListing}{" "}
                       {getCurrencyByAddress(chainId, state.currency)?.symbol}
                     </b>
-                    . To prevent rounding errors, use a price that is a multiple
+                    . To prevent this, use a price that is a multiple
                     of{" "}
                     <b>
                       {minimumPrice}{" "}
