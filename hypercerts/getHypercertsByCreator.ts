@@ -8,8 +8,8 @@ import request from "graphql-request";
 
 const query = graphql(
   `
-    query AllHypercerts($where: HypercertsWhereInput) {
-      hypercerts(where: $where, count: COUNT) {
+    query AllHypercerts($where: HypercertsWhereArgs) {
+      hypercerts(where: $where) {
         count
         data {
           ...HypercertListFragment
