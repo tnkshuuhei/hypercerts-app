@@ -8,7 +8,7 @@ import request from "graphql-request";
 const query = graphql(
   `
     query Fraction($hypercert_id: String!) {
-      fractions(where: { hypercert_id: { eq: $hypercert_id } }, count: COUNT) {
+      fractions(where: { hypercert_id: { eq: $hypercert_id } }) {
         count
         data {
           ...FractionStateFragment
