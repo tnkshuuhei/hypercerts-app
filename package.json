@@ -7,7 +7,17 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "vitest"
+    "test": "vitest",
+    "commitlint": "commitlint --config commitlintrc.ts --edit"
+  },
+  "lint-staged": {
+    "*.{mjx,cjs,js,jsx,ts,tsx}": [
+      "eslint --quiet --fix",
+      "prettier --write --ignore-unknown"
+    ],
+    "*.{json,html}": [
+      "prettier --write --ignore-unknown"
+    ]
   },
   "packageManager": "pnpm@9.2.0",
   "dependencies": {
@@ -70,6 +80,8 @@
   },
   "devDependencies": {
     "@0no-co/graphqlsp": "^1.12.5",
+    "@commitlint/cli": "^19.4.1",
+    "@commitlint/config-conventional": "^19.4.1",
     "@testing-library/react": "^16.0.0",
     "@types/node": "^20",
     "@types/react": "^18.3.3",
@@ -78,7 +90,10 @@
     "@vitejs/plugin-react": "^4.3.1",
     "eslint": "^8.56.0",
     "eslint-config-next": "14.2.3",
+    "eslint-config-prettier": "^9.1.0",
+    "husky": "^9.1.5",
     "jsdom": "^24.1.1",
+    "lint-staged": "^15.2.10",
     "postcss": "^8.4.38",
     "prettier": "3.3.2",
     "tailwindcss": "^3.4.1",

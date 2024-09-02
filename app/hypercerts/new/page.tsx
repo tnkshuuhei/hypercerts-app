@@ -72,7 +72,13 @@ const formSchema = z.object({
   allowlistEntries: z
     .array(z.object({ address: z.string(), units: z.bigint() }))
     .optional(),
-  allowlistURL: z.string().optional(),
+  allowlistURL: z
+    .string()
+    .trim()
+    .refine((input) => input && !input?.endsWith("/"), {
+      message: "URI cannot end with a trailing slash",
+    })
+    .optional(),
 });
 
 export type HypercertFormValues = z.infer<typeof formSchema>;
