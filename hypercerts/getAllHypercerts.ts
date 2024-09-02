@@ -132,6 +132,8 @@ export async function getAllHypercerts({
     where: createFilter({ search, filter, chainId }),
   });
 
+  console.log(res);
+
   // TODO: Throw error?
   if (!res.hypercerts?.data) {
     return undefined;

@@ -260,7 +260,7 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
             </FormControl>
             <FormMessage />
             <FormDescription>
-              “Add contributor addresses, names or pseudonyms, whose work is
+              Add contributor addresses, names or pseudonyms, whose work is
               represented by the hypercert. All information is public.
             </FormDescription>
             {field.value &&
