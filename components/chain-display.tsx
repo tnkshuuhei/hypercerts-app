@@ -12,6 +12,29 @@ import { ChevronDown } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAccount, useSwitchChain } from "wagmi";
 import { SUPPORTED_CHAINS } from "@/configs/constants";
+import Image from "next/image";
+import { Chain } from "viem";
+
+const chainIcon = (chain: Chain) => {
+  switch (chain.id) {
+    case 10:
+      return "/chain_icons/optimism.png";
+    case 8453:
+      return "/chain_icons/base.png";
+    case 84532:
+      return "/chain_icons/base_sepolia.png";
+    case 42161:
+      return "/chain_icons/arbitrum.png";
+    case 421614:
+      return "/chain_icons/arbitrum_sepolia.png";
+    case 42220:
+      return "/chain_icons/celo.png";
+    case 11155111:
+      return "/chain_icons/ethereum_sepolia.png";
+    default:
+      return "";
+  }
+};
 
 const ChainDisplay = () => {
   const { address, chain: connectedChain, connector } = useAccount();
@@ -43,6 +66,14 @@ const ChainDisplay = () => {
           }`}
           size={"sm"}
         >
+          <div className="relative w-6 h-6 object-c object-center rounded-sm overflow-clip">
+            <Image
+              layout="fill"
+              objectFit="contain"
+              src={chainIcon(connectedChain!)}
+              alt={`${connectedChain?.name}`}
+            />
+          </div>
           <span className="text-sm">
             {connectedChain?.name || "Not connected"}
           </span>
@@ -65,6 +96,14 @@ const ChainDisplay = () => {
                   className={`p-3 cursor-pointer rounded-sm ${activeChainClasses} font-medium flex items-center justify-between text-base w-full`}
                   onClick={() => setChosenChainId(chain.id)}
                 >
+                  <div className="relative w-6 h-6 object-c object-center rounded-sm overflow-clip">
+                    <Image
+                      layout="fill"
+                      objectFit="contain"
+                      src={chainIcon(chain)}
+                      alt={`${chain?.name}`}
+                    />
+                  </div>
                   <span>{chain.name}</span>
                   {isActiveChain && (
                     <section className="flex gap-2 text-xs items-center text-slate-50">
