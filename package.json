@@ -8,16 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "test": "vitest",
+    "prepare": "husky",
     "commitlint": "commitlint --config commitlintrc.ts --edit"
-  },
-  "lint-staged": {
-    "*.{mjx,cjs,js,jsx,ts,tsx}": [
-      "eslint --quiet --fix",
-      "prettier --write --ignore-unknown"
-    ],
-    "*.{json,html}": [
-      "prettier --write --ignore-unknown"
-    ]
   },
   "packageManager": "pnpm@9.2.0",
   "dependencies": {
