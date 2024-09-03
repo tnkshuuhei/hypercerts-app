@@ -44,55 +44,28 @@ export function getEvaluationStatus(
 
   let evaluationStatus: EvaluationStatus = "unverified";
 
-  // 0 = unverified
-  // 1 = verified
-  // 2 = disputed
   for (const attestation of attestations) {
     const data: EvaluationData = attestation.data as EvaluationData;
 
-    // All fields approved
-    if (countEvaluationValue(data, 1) === 3) {
+    const approvedCount = countEvaluationValue(data, 1);
+    const notApprovedCount = countEvaluationValue(data, 2);
+
+    if (approvedCount === 3) {
       if (evaluationStatus === "unverified") {
+        evaluationStatus = "verified";
+      } else if (evaluationStatus === "disputed") {
         evaluationStatus = "conflicting";
         break;
       }
-      evaluationStatus = "verified";
-      continue;
-    }
-
-    // All fields not approved
-    if (countEvaluationValue(data, 2) === 3) {
+    } else if (notApprovedCount === 3) {
       if (evaluationStatus === "verified") {
         evaluationStatus = "conflicting";
         break;
       }
-      evaluationStatus = "unverified";
-      continue;
-    }
-
-    // At least one field approved AND at least one field not approved
-    if (
-      countEvaluationValue(data, 1) > 0 &&
-      countEvaluationValue(data, 2) === 0
-    ) {
+      evaluationStatus = "disputed";
+    } else if (approvedCount > 0 && notApprovedCount > 0) {
       evaluationStatus = "conflicting";
       break;
-    }
-
-    // At least one field approved
-    if (countEvaluationValue(data, 1) > 0) {
-      if (evaluationStatus === "verified") {
-        continue;
-      }
-      evaluationStatus = "conflicting";
-    }
-
-    // At least one field not approved
-    if (countEvaluationValue(data, 2) > 0) {
-      if (evaluationStatus === "unverified") {
-        continue;
-      }
-      evaluationStatus = "conflicting";
     }
   }
 
