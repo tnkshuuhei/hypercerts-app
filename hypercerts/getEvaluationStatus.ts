@@ -1,9 +1,9 @@
 import { EvaluationData } from "@/eas/types/evaluation-data.type";
 
 export type EvaluationStatus =
-  | "not-evaluated"
-  | "approved"
-  | "not-approved"
+  | "unverified"
+  | "verified"
+  | "disputed"
   | "conflicting";
 
 function countEvaluationValue(data: EvaluationData, value: number): number {
@@ -33,40 +33,40 @@ export function getEvaluationStatus(
   hypercertAttestations: HypercertAttestations,
 ): EvaluationStatus {
   if (!hypercertAttestations || hypercertAttestations.count === 0) {
-    return "not-evaluated";
+    return "unverified";
   }
 
   const attestations = hypercertAttestations.data;
 
   if (!attestations || attestations.length === 0) {
-    return "not-evaluated";
+    return "unverified";
   }
 
-  let evaluationStatus: EvaluationStatus = "not-evaluated";
+  let evaluationStatus: EvaluationStatus = "unverified";
 
-  // 0 = not evaluated
-  // 1 = approved
-  // 2 = not approved
+  // 0 = unverified
+  // 1 = verified
+  // 2 = disputed
   for (const attestation of attestations) {
     const data: EvaluationData = attestation.data as EvaluationData;
 
     // All fields approved
     if (countEvaluationValue(data, 1) === 3) {
-      if (evaluationStatus === "not-approved") {
+      if (evaluationStatus === "unverified") {
         evaluationStatus = "conflicting";
         break;
       }
-      evaluationStatus = "approved";
+      evaluationStatus = "verified";
       continue;
     }
 
     // All fields not approved
     if (countEvaluationValue(data, 2) === 3) {
-      if (evaluationStatus === "approved") {
+      if (evaluationStatus === "verified") {
         evaluationStatus = "conflicting";
         break;
       }
-      evaluationStatus = "not-approved";
+      evaluationStatus = "unverified";
       continue;
     }
 
@@ -81,7 +81,7 @@ export function getEvaluationStatus(
 
     // At least one field approved
     if (countEvaluationValue(data, 1) > 0) {
-      if (evaluationStatus === "approved") {
+      if (evaluationStatus === "verified") {
         continue;
       }
       evaluationStatus = "conflicting";
@@ -89,7 +89,7 @@ export function getEvaluationStatus(
 
     // At least one field not approved
     if (countEvaluationValue(data, 2) > 0) {
-      if (evaluationStatus === "not-approved") {
+      if (evaluationStatus === "unverified") {
         continue;
       }
       evaluationStatus = "conflicting";
