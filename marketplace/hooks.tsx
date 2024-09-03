@@ -336,11 +336,6 @@ export const useCreateFractionalMakerAsk = ({
     },
     onError: (e) => {
       console.error(e);
-      toast({
-        title: "Error",
-        description: e.message,
-        duration: 5000,
-      });
     },
   });
 };
