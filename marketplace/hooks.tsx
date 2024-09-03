@@ -21,6 +21,8 @@ import { useHypercertExchangeClient } from "@/hooks/use-hypercert-exchange-clien
 import { toast } from "@/components/ui/use-toast";
 import { getFractionsByHypercert } from "@/hypercerts/getFractionsByHypercert";
 import { getCurrencyByAddress } from "@/marketplace/utils";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export const useCreateOrderInSupabase = () => {
   const chainId = useChainId();
@@ -116,6 +118,7 @@ export const useCreateFractionalMakerAsk = ({
     setDialogStep: setStep,
     setOpen,
     setTitle,
+    setExtraContent,
   } = useStepProcessDialogContext();
 
   setTitle("Create marketplace listing");
@@ -260,10 +263,28 @@ export const useCreateFractionalMakerAsk = ({
         console.error(e);
         throw new Error("Error registering order");
       }
-      window.location.reload();
-    },
-    onSuccess: () => {
-      setOpen(false);
+      setExtraContent(() => (
+        <div className="flex flex-col space-y-2">
+          <p className="text-sm font-medium">Order created successfully</p>
+          <div className="flex space-x-4">
+            <Button asChild>
+              <Link href={`/profile/${address}?tab=marketplace-listings`}>
+                View my listings
+              </Link>
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setOpen(false);
+                window.location.reload();
+              }}
+            >
+              Close
+            </Button>
+          </div>
+        </div>
+      ));
+      await setStep("Create order", "completed");
     },
     onError: (e) => {
       console.error(e);
