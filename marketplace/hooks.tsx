@@ -2,6 +2,7 @@ import { useAccount, useChainId, useWalletClient } from "wagmi";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   addressesByNetwork,
+  CreateMakerAskOutput,
   Maker,
   QuoteType,
   utils,
@@ -164,7 +165,7 @@ export const useCreateFractionalMakerAsk = ({
       setSteps([
         {
           id: "Create",
-          description: "Creating order in contract",
+          description: "Creating order",
         },
         {
           id: "Approve transfer manager",
@@ -187,67 +188,109 @@ export const useCreateFractionalMakerAsk = ({
 
       let signature: string | undefined;
 
-      await setStep("Create");
+      await setStep("Create", "active");
 
-      const { chainId: chainIdFromHypercertId } =
-        parseClaimOrFractionId(hypercertId);
-      const currency = getCurrencyByAddress(
-        chainIdFromHypercertId,
-        values.currency,
-      );
+      let createMakerAskOutput: CreateMakerAskOutput;
+      try {
+        const { chainId: chainIdFromHypercertId } =
+          parseClaimOrFractionId(hypercertId);
+        const currency = getCurrencyByAddress(
+          chainIdFromHypercertId,
+          values.currency,
+        );
 
-      if (!currency) {
-        throw new Error("Invalid currency");
+        if (!currency) {
+          throw new Error("Invalid currency");
+        }
+
+        const pricePerUnit =
+          parseUnits(values.price, currency.decimals) /
+          BigInt(values.unitsForSale);
+
+        if (pricePerUnit === BigInt(0)) {
+          throw new Error("Price per unit is 0");
+        }
+
+        createMakerAskOutput =
+          await hypercertExchangeClient.createFractionalSaleMakerAsk({
+            startTime: values.startDateTime, // Use it to create an order that will be valid in the future (Optional, Default to now)
+            endTime: values.endDateTime, // If you use a timestamp in ms, the function will revert
+            price: pricePerUnit.toString(), // Be careful to use a price in wei, this example is for 1 ETH
+            itemIds: [fractionTokenId.toString()], // Token id of the NFT(s) you want to sell, add several ids to create a bundle
+            minUnitAmount: BigInt(values.minUnitAmount), // Minimum amount of units to keep after the sale
+            maxUnitAmount: BigInt(values.maxUnitAmount), // Maximum amount of units to sell
+            minUnitsToKeep: BigInt(values.minUnitsToKeep), // Minimum amount of units to keep after the sale
+            sellLeftoverFraction: values.sellLeftoverFraction, // If you want to sell the leftover fraction
+            currency: values.currency, // Currency address (0x0 for ETH)
+          });
+        if (!createMakerAskOutput) {
+          throw new Error("Error creating order");
+        }
+      } catch (e) {
+        console.error(e);
+        await setStep(
+          "Create",
+          "error",
+          e instanceof Error ? e.message : "Error creating order",
+        );
       }
-
-      const pricePerUnit =
-        parseUnits(values.price, currency.decimals) /
-        BigInt(values.unitsForSale);
-
-      if (pricePerUnit === BigInt(0)) {
-        throw new Error("Price per unit is 0");
-      }
-
-      const { maker, isCollectionApproved, isTransferManagerApproved } =
-        await hypercertExchangeClient.createFractionalSaleMakerAsk({
-          startTime: values.startDateTime, // Use it to create an order that will be valid in the future (Optional, Default to now)
-          endTime: values.endDateTime, // If you use a timestamp in ms, the function will revert
-          price: pricePerUnit.toString(), // Be careful to use a price in wei, this example is for 1 ETH
-          itemIds: [fractionTokenId.toString()], // Token id of the NFT(s) you want to sell, add several ids to create a bundle
-          minUnitAmount: BigInt(values.minUnitAmount), // Minimum amount of units to keep after the sale
-          maxUnitAmount: BigInt(values.maxUnitAmount), // Maximum amount of units to sell
-          minUnitsToKeep: BigInt(values.minUnitsToKeep), // Minimum amount of units to keep after the sale
-          sellLeftoverFraction: values.sellLeftoverFraction, // If you want to sell the leftover fraction
-          currency: values.currency, // Currency address (0x0 for ETH)
-        });
+      const { maker, isTransferManagerApproved, isCollectionApproved } =
+        createMakerAskOutput!;
 
       // Grant the TransferManager the right the transfer assets on behalf od the LooksRareProtocol
-      await setStep("Approve transfer manager");
-      if (!isTransferManagerApproved) {
-        const tx = await hypercertExchangeClient
-          .grantTransferManagerApproval()
-          .call();
-        await waitForTransactionReceipt(walletClientData, {
-          hash: tx.hash as `0x${string}`,
-        });
+      try {
+        await setStep("Approve transfer manager");
+        if (!isTransferManagerApproved) {
+          const tx = await hypercertExchangeClient
+            .grantTransferManagerApproval()
+            .call();
+          await waitForTransactionReceipt(walletClientData, {
+            hash: tx.hash as `0x${string}`,
+          });
+        }
+      } catch (e) {
+        await setStep(
+          "Approve transfer manager",
+          "error",
+          e instanceof Error ? e.message : "Error approving transfer manager",
+        );
+        throw new Error("Error approving transfer manager");
       }
 
       await setStep("Approve collection");
       // Approve the collection items to be transferred by the TransferManager
-      if (!isCollectionApproved) {
-        const tx = await hypercertExchangeClient.approveAllCollectionItems(
-          maker.collection,
+      try {
+        if (!isCollectionApproved) {
+          const tx = await hypercertExchangeClient.approveAllCollectionItems(
+            maker.collection,
+          );
+          await waitForTransactionReceipt(walletClientData, {
+            hash: tx.hash as `0x${string}`,
+          });
+        }
+      } catch (e) {
+        await setStep(
+          "Approve collection",
+          "error",
+          e instanceof Error ? e.message : "Error approving collection",
         );
-        await waitForTransactionReceipt(walletClientData, {
-          hash: tx.hash as `0x${string}`,
-        });
+        throw new Error("Error approving collection");
       }
 
       // Sign your maker order
-      await setStep("Sign order");
-      signature = await hypercertExchangeClient.signMakerOrder(maker);
+      try {
+        await setStep("Sign order");
+        signature = await hypercertExchangeClient.signMakerOrder(maker);
 
-      if (!signature) {
+        if (!signature) {
+          throw new Error("Error signing order");
+        }
+      } catch (e) {
+        await setStep(
+          "Sign order",
+          "error",
+          e instanceof Error ? e.message : "Error signing order",
+        );
         throw new Error("Error signing order");
       }
 
@@ -261,6 +304,11 @@ export const useCreateFractionalMakerAsk = ({
         });
       } catch (e) {
         console.error(e);
+        await setStep(
+          "Create order",
+          "error",
+          e instanceof Error ? e.message : "Error registering order",
+        );
         throw new Error("Error registering order");
       }
       setExtraContent(() => (
