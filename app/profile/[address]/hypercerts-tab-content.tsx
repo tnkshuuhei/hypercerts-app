@@ -61,10 +61,10 @@ const HypercertsTabContentInner = async ({
         tabs={hypercertSubTabs}
       />
 
-      {activeTab === "hypercerts-created" &&
-        (showCreatedHypercerts ? (
+      {activeTab === "hypercerts-owned" &&
+        (showOwnedHypercerts ? (
           <div className="grid grid-cols-[repeat(auto-fit,_minmax(270px,_1fr))] gap-4 py-4">
-            {createdHypercerts.data.map((hypercert) => {
+            {ownedHypercerts.data.map((hypercert) => {
               return (
                 <HypercertWindow
                   key={hypercert.hypercert_id}
@@ -80,10 +80,10 @@ const HypercertsTabContentInner = async ({
           </section>
         ))}
 
-      {activeTab === "hypercerts-owned" &&
-        (showOwnedHypercerts ? (
+      {activeTab === "hypercerts-created" &&
+        (showCreatedHypercerts ? (
           <div className="grid grid-cols-[repeat(auto-fit,_minmax(270px,_1fr))] gap-4 py-4">
-            {ownedHypercerts.data.map((hypercert) => {
+            {createdHypercerts.data.map((hypercert) => {
               return (
                 <HypercertWindow
                   key={hypercert.hypercert_id}
