@@ -15,9 +15,11 @@ import { WalletProfile } from "@/components/wallet-profile";
 import { buttonVariants } from "@/components/ui/button";
 import { siteConfig } from "@/configs/site";
 import { usePathname } from "next/navigation";
+import { useAccount } from "wagmi";
 
 const Navbar = () => {
   const currentPath = usePathname();
+  const { address } = useAccount();
 
   return (
     <nav className="flex items-center justify-between p-3 md:px-24 border-b-[1.5px] border-black">
@@ -48,30 +50,56 @@ const Navbar = () => {
           >
             <span className="hover:underline">Explore</span>
           </Link>
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              className={`${buttonVariants({
-                variant: "link",
-              })} group text-lg duration-300 ease-out opacity-70 hover:opacity-100}`}
+          <Link
+            key={siteConfig.links.explore}
+            href={siteConfig.links.explore}
+            className={`${buttonVariants({ variant: "link" })} text-lg ${
+              currentPath === siteConfig.links.explore
+                ? "opacity-1 font-semibold hover:opacity-100"
+                : "opacity-70 hover:opacity-100"
+            }`}
+          >
+            <span className="hover:underline">Create hypercert</span>
+          </Link>
+
+          {address && (
+            <Link
+              key={siteConfig.links.profile}
+              href={`${siteConfig.links.profile}/${address}`}
+              className={`${buttonVariants({ variant: "link" })} text-lg ${
+                currentPath === siteConfig.links.explore
+                  ? "opacity-1 font-semibold hover:opacity-100"
+                  : "opacity-70 hover:opacity-100"
+              }`}
             >
-              Create <ChevronDown size={18} className="ml-1" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem
-                className={
-                  currentPath === siteConfig.links.createHypercert
-                    ? "bg-accent"
-                    : "bg-transparent"
-                }
-              >
-                <Link
-                  href={siteConfig.links.createHypercert}
-                  className="h-full w-full"
-                >
-                  New Hypercert
-                </Link>
-              </DropdownMenuItem>
-              {/* <DropdownMenuItem
+              <span className="hover:underline">My hypercerts</span>
+            </Link>
+          )}
+
+          {/*<DropdownMenu>*/}
+          {/*  <DropdownMenuTrigger*/}
+          {/*    className={`${buttonVariants({*/}
+          {/*      variant: "link",*/}
+          {/*    })} group text-lg duration-300 ease-out opacity-70 hover:opacity-100}`}*/}
+          {/*  >*/}
+          {/*    Create <ChevronDown size={18} className="ml-1" />*/}
+          {/*  </DropdownMenuTrigger>*/}
+          {/*  <DropdownMenuContent>*/}
+          {/*    <DropdownMenuItem*/}
+          {/*      className={*/}
+          {/*        currentPath === siteConfig.links.createHypercert*/}
+          {/*          ? "bg-accent"*/}
+          {/*          : "bg-transparent"*/}
+          {/*      }*/}
+          {/*    >*/}
+          {/*      <Link*/}
+          {/*        href={siteConfig.links.createHypercert}*/}
+          {/*        className="h-full w-full"*/}
+          {/*      >*/}
+          {/*        New Hypercert*/}
+          {/*      </Link>*/}
+          {/*    </DropdownMenuItem>*/}
+          {/* <DropdownMenuItem
                 className={
                   currentPath === siteConfig.links.createHyperboard
                     ? "bg-accent"
@@ -85,8 +113,8 @@ const Navbar = () => {
                   New Hyperboard
                 </Link>
               </DropdownMenuItem> */}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {/*  </DropdownMenuContent>*/}
+          {/*</DropdownMenu>*/}
           <a
             href={siteConfig.links.docs}
             key={siteConfig.links.docs}

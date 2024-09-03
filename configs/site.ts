@@ -12,6 +12,7 @@ interface SiteConfig {
     createHyperboard: string;
     explore: string;
     evaluators: string;
+    profile: string;
   };
 }
 
@@ -30,5 +31,6 @@ export const siteConfig: SiteConfig = {
     createHyperboard: "/hyperboards/new",
     explore: "/explore",
     evaluators: "/evaluators",
+    profile: "/profile",
   },
 };
