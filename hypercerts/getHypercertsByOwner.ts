@@ -5,6 +5,7 @@ import { graphql, readFragment } from "@/lib/graphql";
 import { HYPERCERTS_API_URL_GRAPH } from "@/configs/hypercerts";
 import { HypercertListFragment } from "@/hypercerts/fragments/hypercert-list.fragment";
 import request from "graphql-request";
+import { getAddress } from "viem";
 
 const query = graphql(
   `
@@ -27,8 +28,10 @@ export async function getHypercertsByOwner({
 }) {
   try {
     const queryRes = await request(HYPERCERTS_API_URL_GRAPH, query, {
-      where: { fractions: { owner_address: { eq: ownerAddress } } },
+      where: { fractions: { owner_address: { eq: getAddress(ownerAddress) } } },
     });
+
+    console.log(Object.keys(queryRes));
 
     if (!queryRes.hypercerts?.data) return undefined;
 

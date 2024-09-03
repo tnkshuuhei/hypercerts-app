@@ -26,9 +26,12 @@ export async function getHypercertsByCreator({
   creatorAddress: string;
 }) {
   try {
+    console.log(creatorAddress);
     const queryRes = await request(HYPERCERTS_API_URL_GRAPH, query, {
-      where: { creator_address: { contains: creatorAddress } },
+      where: { creator_address: { eq: creatorAddress.toLowerCase() } },
     });
+
+    console.log(Object.keys(queryRes));
 
     if (!queryRes.hypercerts?.data) return undefined;
 
