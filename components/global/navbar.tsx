@@ -51,8 +51,8 @@ const Navbar = () => {
             <span className="hover:underline">Explore</span>
           </Link>
           <Link
-            key={siteConfig.links.explore}
-            href={siteConfig.links.explore}
+            key={siteConfig.links.createHypercert}
+            href={siteConfig.links.createHypercert}
             className={`${buttonVariants({ variant: "link" })} text-lg ${
               currentPath === siteConfig.links.explore
                 ? "opacity-1 font-semibold hover:opacity-100"
