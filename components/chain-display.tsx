@@ -16,24 +16,34 @@ import Image from "next/image";
 import { Chain } from "viem";
 
 const chainIcon = (chain: Chain) => {
-  switch (chain.id) {
+  let icon;
+  switch (chain?.id) {
     case 10:
-      return "/chain_icons/optimism.png";
+      icon = "/chain_icons/optimism.png";
+      break;
     case 8453:
-      return "/chain_icons/base.png";
+      icon = "/chain_icons/base.png";
+      break;
     case 84532:
-      return "/chain_icons/base_sepolia.png";
+      icon = "/chain_icons/base_sepolia.png";
+      break;
     case 42161:
-      return "/chain_icons/arbitrum.png";
+      icon = "/chain_icons/arbitrum.png";
+      break;
     case 421614:
-      return "/chain_icons/arbitrum_sepolia.png";
+      icon = "/chain_icons/arbitrum_sepolia.png";
+      break;
     case 42220:
-      return "/chain_icons/celo.png";
+      icon = "/chain_icons/celo.png";
+      break;
     case 11155111:
-      return "/chain_icons/ethereum_sepolia.png";
+      icon = "/chain_icons/ethereum_sepolia.png";
+      break;
     default:
-      return "";
+      icon = "";
   }
+
+  return icon;
 };
 
 const ChainDisplay = () => {
@@ -66,14 +76,16 @@ const ChainDisplay = () => {
           }`}
           size={"sm"}
         >
-          <div className="relative w-6 h-6 object-c object-center rounded-sm overflow-clip">
-            <Image
-              layout="fill"
-              objectFit="contain"
-              src={chainIcon(connectedChain!)}
-              alt={`${connectedChain?.name}`}
-            />
-          </div>
+          {isConnectedChainSupported && (
+            <div className="relative w-6 h-6 object-c object-center rounded-sm overflow-clip">
+              <Image
+                fill
+                style={{ objectFit: "contain" }}
+                src={chainIcon(connectedChain!)}
+                alt={`${connectedChain?.name}`}
+              />
+            </div>
+          )}
           <span className="text-sm">
             {connectedChain?.name || "Not connected"}
           </span>
