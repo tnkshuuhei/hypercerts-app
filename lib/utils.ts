@@ -53,3 +53,21 @@ export const generateBlockExplorerLink = (
   }
   return `https://${chain?.id === 1 ? "" : `${chain?.name}.`}etherscan.io/tx/${transactionHash}`;
 };
+
+export const containsMarkdown = (text: string) => {
+  // Regular expressions to match common Markdown patterns
+  const patterns = [
+    /[*_]{1,2}[^*_\n]+[*_]{1,2}/, // Bold or italic
+    /#{1,6}\s.+/, // Headers
+    /\[.+\]\(.+\)/, // Links
+    /```[\s\S]*?```/, // Code blocks
+    /^\s*[-*+]\s/, // Unordered lists
+    /^\s*\d+\.\s/, // Ordered lists
+    /\|.+\|.+\|/, // Tables
+    /^\s*>.+/, // Blockquotes
+    /!\[.+\]\(.+\)/, // Images
+  ];
+
+  // Check if any pattern matches the text
+  return patterns.some((pattern) => pattern.test(text));
+};
