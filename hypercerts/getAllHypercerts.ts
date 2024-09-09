@@ -96,7 +96,7 @@ function createFilter({
     where.metadata = { name: { contains: search } };
   }
   if (filter === "evaluated") {
-    where.attestations = {};
+    where.attestations_count = { gt: "0" };
   }
   if (chainId) {
     where.contract = {
