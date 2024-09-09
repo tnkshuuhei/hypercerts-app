@@ -54,7 +54,7 @@ export const generateBlockExplorerLink = (
   return `https://${chain?.id === 1 ? "" : `${chain?.name}.`}etherscan.io/tx/${transactionHash}`;
 };
 
-export const containsMarkdown = (text: string): string[] => {
+export const containsMarkdown = (text: string): boolean => {
   // Regular expressions to match common Markdown patterns
   const patterns = [
     /[*_]{1,2}[^*_\n]+[*_]{1,2}/, // Bold or italic
