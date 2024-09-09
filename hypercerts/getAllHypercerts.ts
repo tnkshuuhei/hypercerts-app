@@ -106,8 +106,6 @@ function createFilter({
     };
   }
 
-  console.log(where);
-
   return where;
 }
 
