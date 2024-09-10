@@ -14,7 +14,7 @@ import {
   HypercertMetadata,
   TransferRestrictions,
 } from "@hypercerts-org/sdk";
-import { useEffect, useRef, useMemo, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FieldErrors, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { useLocalStorage } from "react-use";
@@ -146,9 +146,6 @@ export default function NewHypercertForm() {
     control: form.control,
     name: ["title", "banner", "logo", "tags", "projectDates"],
   });
-
-  console.log("storage: ", value);
-  console.log("form: ", form.watch());
 
   const cardPreviewData = {
     title: watchedValues[0] ?? formDefaultValues.title,
