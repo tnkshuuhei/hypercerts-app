@@ -154,42 +154,6 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
     <section className="space-y-8">
       <FormField
         control={form.control}
-        name="tags"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Work scope</FormLabel>
-            <FormControl>
-              <Textarea
-                {...field}
-                className="resize-none h-4"
-                placeholder="Separate tags with commas"
-                onChange={(e) => {
-                  const tags = e.target.value
-                    .split(",")
-                    .map((tag) => tag.toLowerCase());
-                  field.onChange(tags.length > 0 ? tags : []);
-                }}
-              />
-            </FormControl>
-            <FormMessage />
-            <FormDescription>
-              Tags are used to categorize your project.
-            </FormDescription>
-            {field.value &&
-              field.value.filter((tag: string) => tag !== "").length > 0 && (
-                <div className="flex flex-wrap gap-0.5">
-                  {field?.value?.map((tag: string) => (
-                    <Badge key={tag} variant="secondary">
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
-              )}
-          </FormItem>
-        )}
-      />
-      <FormField
-        control={form.control}
         name="projectDates"
         render={({ field }) => (
           <FormItem className="flex flex-col">
@@ -241,6 +205,43 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
             <FormDescription>
               The start and end date of the work represented by the hypercert
             </FormDescription>
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="tags"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Work scope</FormLabel>
+            <FormControl>
+              <Textarea
+                {...field}
+                className="resize-none h-4"
+                placeholder="Separate tags with commas"
+                onChange={(e) => {
+                  const tags = e.target.value
+                    .split(",")
+                    .map((tag) => tag.toLowerCase());
+                  field.onChange(tags.length > 0 ? tags : []);
+                }}
+              />
+            </FormControl>
+            <FormMessage />
+            <FormDescription>
+              Tags are used to categorize your project.
+            </FormDescription>
+            {field.value &&
+              field.value.filter((tag: string) => tag !== "").length > 0 && (
+                <div className="flex flex-wrap gap-0.5">
+                  {field?.value?.map((tag: string) => (
+                    <Badge key={tag} variant="secondary">
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+              )}
           </FormItem>
         )}
       />
