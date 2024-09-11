@@ -140,6 +140,18 @@ const GeneralInformation = ({ form }: FormStepsProps) => {
           </FormItem>
         )}
       />
+    </section>
+  );
+};
+
+const DatesAndPeople = ({ form }: FormStepsProps) => {
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const setAllowlistEntries = (allowlistEntries: AllowlistEntry[]) => {
+    form.setValue("allowlistEntries", allowlistEntries);
+  };
+  const allowlistEntries = form.watch("allowlistEntries");
+  return (
+    <section className="space-y-8">
       <FormField
         control={form.control}
         name="tags"
@@ -176,18 +188,6 @@ const GeneralInformation = ({ form }: FormStepsProps) => {
           </FormItem>
         )}
       />
-    </section>
-  );
-};
-
-const DatesAndPeople = ({ form }: FormStepsProps) => {
-  const [createDialogOpen, setCreateDialogOpen] = useState(false);
-  const setAllowlistEntries = (allowlistEntries: AllowlistEntry[]) => {
-    form.setValue("allowlistEntries", allowlistEntries);
-  };
-  const allowlistEntries = form.watch("allowlistEntries");
-  return (
-    <section className="space-y-8">
       <FormField
         control={form.control}
         name="projectDates"
@@ -447,14 +447,14 @@ export const hypercertFormSteps = new Map([
     1,
     {
       title: "General",
-      fields: ["title", "banner", "description", "logo", "tags"],
+      fields: ["title", "banner", "description", "logo"],
     } as FormStep,
   ],
   [
     2,
     {
       title: "Who did what & when",
-      fields: ["contributors", "confirmContributorsPermission"],
+      fields: ["contributors", "confirmContributorsPermission", "tags"],
     } as FormStep,
   ],
   [3, { title: "Mint", fields: ["acceptTerms"] } as FormStep],
