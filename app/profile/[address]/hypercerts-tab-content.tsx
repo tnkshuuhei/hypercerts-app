@@ -26,7 +26,7 @@ const HypercertsTabContentInner = async ({
 
   const claimableHypercerts = await getAllowListRecordsForAddressByClaimed(
     address,
-    true,
+    false,
   );
 
   const showCreatedHypercerts =
