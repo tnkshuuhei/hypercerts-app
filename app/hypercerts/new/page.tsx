@@ -261,7 +261,7 @@ export default function NewHypercertForm() {
   };
 
   return (
-    <main className="flex flex-col p-8 md:px-24 pt-8 pb-24 space-y-4 flex-1 container max-w-screen-lg">
+    <main className="flex flex-col p-8 md:px-16 pt-8 pb-24 space-y-4 flex-1 container max-w-screen-lg">
       <h1 className="font-serif text-3xl lg:text-5xl tracking-tight w-full">
         New hypercert
       </h1>
