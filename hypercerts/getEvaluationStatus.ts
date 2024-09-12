@@ -1,9 +1,9 @@
 import { EvaluationData } from "@/eas/types/evaluation-data.type";
 
 export type EvaluationStatus =
-  | "not-evaluated"
-  | "approved"
-  | "not-approved"
+  | "unverified"
+  | "verified"
+  | "disputed"
   | "conflicting";
 
 function countEvaluationValue(data: EvaluationData, value: number): number {
@@ -33,66 +33,39 @@ export function getEvaluationStatus(
   hypercertAttestations: HypercertAttestations,
 ): EvaluationStatus {
   if (!hypercertAttestations || hypercertAttestations.count === 0) {
-    return "not-evaluated";
+    return "unverified";
   }
 
   const attestations = hypercertAttestations.data;
 
   if (!attestations || attestations.length === 0) {
-    return "not-evaluated";
+    return "unverified";
   }
 
-  let evaluationStatus: EvaluationStatus = "not-evaluated";
+  let evaluationStatus: EvaluationStatus = "unverified";
 
-  // 0 = not evaluated
-  // 1 = approved
-  // 2 = not approved
   for (const attestation of attestations) {
     const data: EvaluationData = attestation.data as EvaluationData;
 
-    // All fields approved
-    if (countEvaluationValue(data, 1) === 3) {
-      if (evaluationStatus === "not-approved") {
+    const approvedCount = countEvaluationValue(data, 1);
+    const notApprovedCount = countEvaluationValue(data, 2);
+
+    if (approvedCount === 3) {
+      if (evaluationStatus === "unverified") {
+        evaluationStatus = "verified";
+      } else if (evaluationStatus === "disputed") {
         evaluationStatus = "conflicting";
         break;
       }
-      evaluationStatus = "approved";
-      continue;
-    }
-
-    // All fields not approved
-    if (countEvaluationValue(data, 2) === 3) {
-      if (evaluationStatus === "approved") {
+    } else if (notApprovedCount === 3) {
+      if (evaluationStatus === "verified") {
         evaluationStatus = "conflicting";
         break;
       }
-      evaluationStatus = "not-approved";
-      continue;
-    }
-
-    // At least one field approved AND at least one field not approved
-    if (
-      countEvaluationValue(data, 1) > 0 &&
-      countEvaluationValue(data, 2) === 0
-    ) {
+      evaluationStatus = "disputed";
+    } else if (approvedCount > 0 && notApprovedCount > 0) {
       evaluationStatus = "conflicting";
       break;
-    }
-
-    // At least one field approved
-    if (countEvaluationValue(data, 1) > 0) {
-      if (evaluationStatus === "approved") {
-        continue;
-      }
-      evaluationStatus = "conflicting";
-    }
-
-    // At least one field not approved
-    if (countEvaluationValue(data, 2) > 0) {
-      if (evaluationStatus === "not-approved") {
-        continue;
-      }
-      evaluationStatus = "conflicting";
     }
   }
 

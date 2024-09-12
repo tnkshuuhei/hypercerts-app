@@ -16,7 +16,8 @@ import Image from "next/image";
 import { Chain } from "viem";
 
 const chainIcon = (chain: Chain) => {
-  switch (chain.id) {
+  let icon;
+  switch (chain?.id) {
     case 10:
       return "/chain-icons/optimism.png";
     case 8453:
@@ -32,8 +33,10 @@ const chainIcon = (chain: Chain) => {
     case 11155111:
       return "/chain-icons/ethereum_sepolia.png";
     default:
-      return "";
+      icon = "";
   }
+
+  return icon;
 };
 
 const ChainDisplay = () => {
@@ -66,14 +69,16 @@ const ChainDisplay = () => {
           }`}
           size={"sm"}
         >
-          <div className="relative w-6 h-6 object-c object-center rounded-sm overflow-clip">
-            <Image
-              layout="fill"
-              objectFit="contain"
-              src={chainIcon(connectedChain!)}
-              alt={`${connectedChain?.name}`}
-            />
-          </div>
+          {isConnectedChainSupported && (
+            <div className="relative w-6 h-6 object-c object-center rounded-sm overflow-clip">
+              <Image
+                fill
+                style={{ objectFit: "contain" }}
+                src={chainIcon(connectedChain!)}
+                alt={`${connectedChain?.name}`}
+              />
+            </div>
+          )}
           <span className="text-sm">
             {connectedChain?.name || "Not connected"}
           </span>

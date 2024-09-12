@@ -1,6 +1,7 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { TransferRestrictions } from "@hypercerts-org/sdk";
+import { Chain } from "viem";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -41,4 +42,32 @@ export const formatTransferRestriction = (
     case TransferRestrictions.FromCreatorOnly:
       return "From creator only";
   }
+};
+
+export const generateBlockExplorerLink = (
+  chain: Chain | undefined,
+  transactionHash: string,
+) => {
+  if (!chain) {
+    return "";
+  }
+  return `https://${chain?.id === 1 ? "" : `${chain?.name}.`}etherscan.io/tx/${transactionHash}`;
+};
+
+export const containsMarkdown = (text: string): boolean => {
+  // Regular expressions to match common Markdown patterns
+  const patterns = [
+    /[*_]{1,2}[^*_\n]+[*_]{1,2}/, // Bold or italic
+    /#{1,6}\s.+/, // Headers
+    /\[.+\]\(.+\)/, // Links
+    /```[\s\S]*?```/, // Code blocks
+    /^\s*[-*+]\s/, // Unordered lists
+    /^\s*\d+\.\s/, // Ordered lists
+    /\|.+\|.+\|/, // Tables
+    /^\s*>.+/, // Blockquotes
+    /!\[.+\]\(.+\)/, // Images
+  ];
+
+  // Check if any pattern matches the text
+  return patterns.some((pattern) => pattern.test(text));
 };
