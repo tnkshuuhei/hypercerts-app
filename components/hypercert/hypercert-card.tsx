@@ -48,8 +48,8 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
         : "";
 
     const CardContent = () => {
-      const maxVisibleTags = 8;
-      const maxScopeLength = 16;
+      const maxVisibleTags = 7;
+      const maxScopeLength = 12;
 
       const clipScope = (scope: string) =>
         scope.length > maxScopeLength
@@ -63,9 +63,9 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
       return (
         <article
           ref={ref}
-          className="relative w-[275px] h-[343.75px] rounded-xl border-[1px] border-black overflow-clip bg-black"
+          className="relative w-[336px] h-[420px] rounded-xl border-[1px] border-black overflow-clip bg-black"
         >
-          <header className="relative h-[153px] w-full flex items-center justify-center rounded-b-xl overflow-clip">
+          <header className="relative h-[173px] w-full flex items-center justify-center rounded-b-xl overflow-clip">
             {banner ? (
               <Image
                 src={`https://cors-proxy.hypercerts.workers.dev/?url=${banner}`}
@@ -97,19 +97,19 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
               )}
             </div>
           </section>
-          <section className="p-3 pt-4 rounded-t-xl bg-white border-t-[1px] border-black h-[189.75px] flex flex-col">
+          <section className="p-3 pt-4 rounded-t-xl bg-white border-t-[1px] border-black h-[246px] flex flex-col">
             <div className="flex items-center mb-2">
               <span className="text-xs text-slate-600 uppercase">
                 {formattedDateRange}
               </span>
             </div>
             <h5
-              className="text-lg font-bold text-slate-800 line-clamp-3 text-ellipsis tracking-[-0.03em] leading-tight mb-2"
+              className="text-xl font-bold text-slate-800 line-clamp-3 text-ellipsis tracking-[-0.03em] leading-tight mb-2"
               title={title}
             >
               {title}
             </h5>
-            <div className="h-[80px] mt-auto overflow-hidden">
+            <div className="h-[60px] mt-auto overflow-hidden">
               <div className="flex flex-wrap gap-1 justify-start h-full content-end pb-1">
                 {visibleScopes.map((scope) => (
                   <span
@@ -125,7 +125,7 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
                   </span>
                 ))}
                 {hiddenScopesCount > 0 && (
-                  <span className="text-xs font-medium text-slate-800 px-2 py-1 leading-none border border-slate-400 rounded-full flex items-center bg-neutral-100">
+                  <span className="text-xs text-slate-900 px-2 py-1 leading-none border border-slate-400 rounded-full flex items-center bg-neutral-100">
                     +{hiddenScopesCount} more
                   </span>
                 )}
