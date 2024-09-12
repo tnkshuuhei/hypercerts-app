@@ -15,7 +15,7 @@ export default async function EvaluatorsPage({
   const currentPage = Number(searchParams?.p) || 1;
 
   return (
-    <main className="flex flex-col p-8 md:px-24 pt-8 pb-24 md:pb-6 space-y-4 flex-1 container max-w-screen-2xl">
+    <main className="flex flex-col p-8 md:px-24 pt-8 pb-24 md:pb-6 space-y-4 flex-1 container max-w-3xl">
       <h1 className="font-serif text-3xl lg:text-5xl tracking-tight">
         Evaluators
       </h1>

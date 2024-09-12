@@ -77,25 +77,20 @@ function ListDialogInner({
 
   const [state, setState] = useState<State>(() => {
     const currency = Object.values(client.currencies)[0];
-    const unitsForSale = fractionsOwnedByUser[0]?.units || "0";
+    const defaultFraction = fractionsOwnedByUser[0];
+    const unitsForSale = defaultFraction?.units || "0";
     const minimumPrice = getMinimumPrice(
       unitsForSale,
       chainId,
       currency.address,
     );
     return {
-      fractionId:
-        fractionsOwnedByUser.length === 1
-          ? fractionsOwnedByUser[0].fraction_id || ""
-          : "",
+      fractionId: defaultFraction?.fraction_id || "",
       price: "",
       currency: currency.address,
       unitsForSale,
       unitsMinPerOrder: "1",
-      unitsMaxPerOrder:
-        fractionsOwnedByUser.length === 1
-          ? fractionsOwnedByUser[0].units || ""
-          : "",
+      unitsMaxPerOrder: defaultFraction?.units || "",
       formIsValid: true,
       minimumPrice,
       startDateTime: new Date(Date.now()),
@@ -327,16 +322,15 @@ function ListDialogInner({
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger className={"ml-auto"}>
-                    <InfoIcon className="ml-auto text-red-500" />
+                    <InfoIcon className="ml-auto text-black" />
                   </TooltipTrigger>
                   <TooltipContent className="max-w-[300px]" side={"left"}>
-                    Due to rounding errors, your listing will actually be for{" "}
+                    Due to rounding, your listing will actually be for{" "}
                     <b>
                       {actualPriceForListing}{" "}
                       {getCurrencyByAddress(chainId, state.currency)?.symbol}
                     </b>
-                    . To prevent rounding errors, use a price that is a multiple
-                    of{" "}
+                    . To prevent this, use a price that is a multiple of{" "}
                     <b>
                       {minimumPrice}{" "}
                       {getCurrencyByAddress(chainId, state.currency)?.symbol}

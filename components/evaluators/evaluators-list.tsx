@@ -14,8 +14,8 @@ async function EvaluatorsListInner({
   const currentPage = Number(searchParams?.p) || 1;
 
   return (
-    <section className="h-full flex flex-col space-y-8">
-      <section>
+    <section className="h-full flex flex-col space-y-8 items-center">
+      <section className="w-full">
         {attestors
           .slice(
             (currentPage - 1) * ATTESTORS_PER_PAGE,

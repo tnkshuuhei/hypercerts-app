@@ -9,15 +9,15 @@ import request from "graphql-request";
 export type ClaimsOrderBy =
   | "created_asc"
   | "created_desc"
-  | "claim_attestation_count_asc"
-  | "claim_attestation_count_desc";
+  | "attestations_count_asc"
+  | "attestations_count_desc";
 
 export function isClaimsOrderBy(value: string): value is ClaimsOrderBy {
   return [
     "created_asc",
     "created_desc",
-    "claim_attestation_count_asc",
-    "claim_attestation_count_desc",
+    "attestations_count_asc",
+    "attestations_count_desc",
   ].includes(value);
 }
 
@@ -30,18 +30,12 @@ export function isClaimsFilter(value: string): value is ClaimsFilter {
 const query = graphql(
   `
     query AllHypercerts(
-      $where: HypercertsWhereInput
+      $where: HypercertsWhereArgs
       $sort: HypercertFetchInput
       $first: Int
       $offset: Int
     ) {
-      hypercerts(
-        where: $where
-        first: $first
-        offset: $offset
-        count: COUNT
-        sort: $sort
-      ) {
+      hypercerts(where: $where, first: $first, offset: $offset, sort: $sort) {
         count
 
         data {
@@ -72,10 +66,10 @@ function createOrderBy({
         },
       };
     }
-    if (orderByAttribute === "claim_attestation_count") {
+    if (orderByAttribute === "attestations_count") {
       return {
         by: {
-          claim_attestation_count:
+          attestations_count:
             orderByDirection === "asc" ? "ascending" : "descending",
         },
       };
@@ -102,7 +96,7 @@ function createFilter({
     where.metadata = { name: { contains: search } };
   }
   if (filter === "evaluated") {
-    where.attestations = {};
+    where.attestations_count = { gte: 1 };
   }
   if (chainId) {
     where.contract = {
@@ -111,6 +105,7 @@ function createFilter({
       },
     };
   }
+
   return where;
 }
 
