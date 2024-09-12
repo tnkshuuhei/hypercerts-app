@@ -18,12 +18,12 @@ const footerIcons = [
   {
     label: "Twitter",
     url: "https://x.com/hypercerts",
-    icon: "/socials_icons/twitter-logo.png",
+    icon: "/social-icons/x.svg",
   },
   {
     label: "Discord",
     url: "https://discord.gg/VVSyKg75",
-    icon: "/socials_icons/discord-logo.png",
+    icon: "/social-icons/discord.svg",
   },
   {
     label: "Hypercerts Foundation",
@@ -33,12 +33,12 @@ const footerIcons = [
   {
     label: "Github",
     url: "https://github.com/hypercerts-org/",
-    icon: "/socials_icons/github-logo.png",
+    icon: "/social-icons/github.svg",
   },
   {
     label: "Telegram",
     url: "https://hypercerts.org/docs/",
-    icon: "/socials_icons/telegram-logo.png",
+    icon: "/social-icons/telegram.svg",
   },
 ];
 
@@ -46,14 +46,14 @@ const Footer = () => (
   <footer className="flex flex-col space-y-2 justify-center items-center py-5 px-3 border-t-[1.5px] border-black pb-24 md:pb-5 bg-slate-50 mt-auto">
     <ul className="flex space-x-4">
       {footerIcons.map((item) => (
-        <Link
-          className="relative"
+        <a
+          className="relative hover:-translate-y-1 hover:opacity-75 transition-transform"
           href={item.url}
           title={item.label}
           key={item.label}
         >
-          <Image src={item.icon} alt={item.label} width={48} height={48} />
-        </Link>
+          <Image src={item.icon} alt={item.label} width={40} height={40} />
+        </a>
       ))}
     </ul>
 

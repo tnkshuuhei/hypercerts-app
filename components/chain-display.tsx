@@ -18,19 +18,19 @@ import { Chain } from "viem";
 const chainIcon = (chain: Chain) => {
   switch (chain.id) {
     case 10:
-      return "/chain_icons/optimism.png";
+      return "/chain-icons/optimism.png";
     case 8453:
-      return "/chain_icons/base.png";
+      return "/chain-icons/base.png";
     case 84532:
-      return "/chain_icons/base_sepolia.png";
+      return "/chain-icons/base_sepolia.png";
     case 42161:
-      return "/chain_icons/arbitrum.png";
+      return "/chain-icons/arbitrum.png";
     case 421614:
-      return "/chain_icons/arbitrum_sepolia.png";
+      return "/chain-icons/arbitrum_sepolia.png";
     case 42220:
-      return "/chain_icons/celo.png";
+      return "/chain-icons/celo.png";
     case 11155111:
-      return "/chain_icons/ethereum_sepolia.png";
+      return "/chain-icons/ethereum_sepolia.png";
     default:
       return "";
   }
