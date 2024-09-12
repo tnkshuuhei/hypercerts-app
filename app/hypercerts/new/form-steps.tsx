@@ -12,7 +12,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { ArrowLeftIcon, ArrowRightIcon, CalendarIcon } from "lucide-react";
+import {
+  ArrowLeftIcon,
+  ArrowRightIcon,
+  CalendarIcon,
+  Trash2Icon,
+} from "lucide-react";
 import { RefObject, useState } from "react";
 
 import {
@@ -51,6 +56,7 @@ interface FormStepsProps {
   currentStep: number;
   setCurrentStep: (step: number) => void;
   cardRef: RefObject<HTMLDivElement>;
+  reset: () => void;
 }
 
 const GeneralInformation = ({ form }: FormStepsProps) => {
@@ -260,7 +266,7 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
             </FormControl>
             <FormMessage />
             <FormDescription>
-              “Add contributor addresses, names or pseudonyms, whose work is
+              Add contributor addresses, names or pseudonyms, whose work is
               represented by the hypercert. All information is public.
             </FormDescription>
             {field.value &&
@@ -459,6 +465,7 @@ const FormSteps = ({
   currentStep,
   setCurrentStep,
   cardRef,
+  reset,
 }: FormStepsProps) => {
   const isLastStep = currentStep === hypercertFormSteps.size;
   const { address } = useAccount();
@@ -536,6 +543,7 @@ const FormSteps = ({
           currentStep={currentStep}
           setCurrentStep={setCurrentStep}
           cardRef={cardRef}
+          reset={reset}
         />
       )}
       {currentStep === 2 && (
@@ -544,6 +552,7 @@ const FormSteps = ({
           currentStep={currentStep}
           setCurrentStep={setCurrentStep}
           cardRef={cardRef}
+          reset={reset}
         />
       )}
       {currentStep === 3 && (
@@ -552,12 +561,11 @@ const FormSteps = ({
           currentStep={currentStep}
           setCurrentStep={setCurrentStep}
           cardRef={cardRef}
+          reset={reset}
         />
       )}
 
-      <div
-        className={`flex items-center py-3 ${currentStep === 1 ? "justify-end" : "justify-between"}`}
-      >
+      <div className="relative flex items-center py-3 justify-between">
         <Button
           onClick={() => setCurrentStep(currentStep - 1)}
           className={currentStep === 1 ? "hidden" : ""}
@@ -566,6 +574,10 @@ const FormSteps = ({
         >
           <ArrowLeftIcon className="w-4 h-4 mr-2" />
           Previous
+        </Button>
+        <Button onClick={reset} type="button">
+          <Trash2Icon className="w-4 h-4 mr-2" />
+          Reset
         </Button>
         {!isLastStep && (
           <Button

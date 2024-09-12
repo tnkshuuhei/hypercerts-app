@@ -1,5 +1,5 @@
 import { getHypercertsByCreator } from "@/hypercerts/getHypercertsByCreator";
-import { getAllowListRecordsForAddress } from "@/allowlists/getAllowListRecordsForAddress";
+import { getAllowListRecordsForAddressByClaimed } from "@/allowlists/getAllowListRecordsForAddressByClaimed";
 import HypercertWindow from "@/components/hypercert/hypercert-window";
 import { EmptySection } from "@/app/profile/[address]/sections";
 import UnclaimedHypercertsList from "@/components/profile/unclaimed-hypercerts-list";
@@ -24,22 +24,17 @@ const HypercertsTabContentInner = async ({
     ownerAddress: address,
   });
 
-  const allowlist = await getAllowListRecordsForAddress(address);
-
-  // TODO: Do this in the query. Currently it doesn't support multiple filters at the same time
-  const unclaimedHypercerts =
-    allowlist?.data.filter((item) => !item.claimed) || [];
-
-  const isEmptyAllowlist =
-    !allowlist ||
-    allowlist.count === 0 ||
-    !allowlist.data ||
-    !Array.isArray(allowlist.data);
+  const claimableHypercerts = await getAllowListRecordsForAddressByClaimed(
+    address,
+    false,
+  );
 
   const showCreatedHypercerts =
     createdHypercerts?.data && createdHypercerts.data.length > 0;
   const showOwnedHypercerts =
     ownedHypercerts?.data && ownedHypercerts.data.length > 0;
+  const showClaimableHypercerts =
+    claimableHypercerts?.data && claimableHypercerts.data.length > 0;
   const hypercertSubTabs = subTabs.filter(
     (tab) => tab.key.split("-")[0] === "hypercerts",
   );
@@ -49,7 +44,7 @@ const HypercertsTabContentInner = async ({
   > = {
     "hypercerts-created": createdHypercerts?.count ?? 0,
     "hypercerts-owned": ownedHypercerts?.count ?? 0,
-    "hypercerts-claimable": unclaimedHypercerts.length,
+    "hypercerts-claimable": claimableHypercerts?.count ?? 0,
   };
 
   return (
@@ -60,25 +55,6 @@ const HypercertsTabContentInner = async ({
         tabBadgeCounts={tabBadgeCounts}
         tabs={hypercertSubTabs}
       />
-
-      {activeTab === "hypercerts-created" &&
-        (showCreatedHypercerts ? (
-          <div className="grid grid-cols-[repeat(auto-fit,_minmax(270px,_1fr))] gap-4 py-4">
-            {createdHypercerts.data.map((hypercert) => {
-              return (
-                <HypercertWindow
-                  key={hypercert.hypercert_id}
-                  hypercert={hypercert}
-                  priceDisplayCurrency="usd"
-                />
-              );
-            })}
-          </div>
-        ) : (
-          <section className="pt-4">
-            <EmptySection />
-          </section>
-        ))}
 
       {activeTab === "hypercerts-owned" &&
         (showOwnedHypercerts ? (
@@ -99,14 +75,35 @@ const HypercertsTabContentInner = async ({
           </section>
         ))}
 
-      {activeTab === "hypercerts-claimable" && (
-        <section className="pt-4">
+      {activeTab === "hypercerts-created" &&
+        (showCreatedHypercerts ? (
+          <div className="grid grid-cols-[repeat(auto-fit,_minmax(270px,_1fr))] gap-4 py-4">
+            {createdHypercerts.data.map((hypercert) => {
+              return (
+                <HypercertWindow
+                  key={hypercert.hypercert_id}
+                  hypercert={hypercert}
+                  priceDisplayCurrency="usd"
+                />
+              );
+            })}
+          </div>
+        ) : (
+          <section className="pt-4">
+            <EmptySection />
+          </section>
+        ))}
+
+      {activeTab === "hypercerts-claimable" &&
+        (showClaimableHypercerts ? (
           <UnclaimedHypercertsList
-            unclaimedHypercerts={unclaimedHypercerts}
-            isEmptyAllowlist={isEmptyAllowlist}
+            unclaimedHypercerts={claimableHypercerts?.data}
           />
-        </section>
-      )}
+        ) : (
+          <section className="pt-4">
+            <EmptySection />
+          </section>
+        ))}
     </section>
   );
 };

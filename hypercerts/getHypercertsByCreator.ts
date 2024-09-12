@@ -8,8 +8,8 @@ import request from "graphql-request";
 
 const query = graphql(
   `
-    query AllHypercerts($where: HypercertsWhereInput) {
-      hypercerts(where: $where, count: COUNT) {
+    query AllHypercerts($where: HypercertsWhereArgs) {
+      hypercerts(where: $where) {
         count
         data {
           ...HypercertListFragment
@@ -27,7 +27,7 @@ export async function getHypercertsByCreator({
 }) {
   try {
     const queryRes = await request(HYPERCERTS_API_URL_GRAPH, query, {
-      where: { creator_address: { contains: creatorAddress } },
+      where: { creator_address: { eq: creatorAddress.toLowerCase() } },
     });
 
     if (!queryRes.hypercerts?.data) return undefined;

@@ -48,7 +48,7 @@ export default function CreateAllowlistDialog({
   ]);
 
   useEffect(() => {
-    if (validateAllowlistResponse?.valid) {
+    if (validateAllowlistResponse?.success) {
       (async () => {
         const values = validateAllowlistResponse.values;
         setAllowlistEntries(values);
