@@ -61,7 +61,9 @@ async function HypercertPageInner({
       <section className="flex flex-col space-y-4">
         <section className="space-y-4 lg:flex lg:space-y-0 lg:space-x-8">
           <div className="flex justify-between">
-            <h3 className="uppercase text-sm text-gray-500 font-medium tracking-wider"></h3>
+            <h3 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
+              Oops! Something went wrong...
+            </h3>
           </div>
         </section>
         <section className="flex flex-col space-y-4">
@@ -69,7 +71,7 @@ async function HypercertPageInner({
             Hypercert not found.
           </h1>
           <Separator />
-          <h3 className="uppercase text-sm text-gray-500 font-medium tracking-wider">
+          <h3 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
             {`ID ${hypercertId}`}
           </h3>
           <p className="md:text-lg">
@@ -86,7 +88,7 @@ async function HypercertPageInner({
     <section className="flex flex-col space-y-4">
       <article className="space-y-4 lg:flex lg:space-y-0 lg:space-x-6">
         <div className="h-[300px] lg:h-[350px] min-w-[300px] lg:min-w-[500px] max-w-[500px]">
-          <div className="relative w-full h-full bg-gray-200 border border-slate-800 rounded-lg overflow-hidden ">
+          <div className="relative w-full h-full bg-accent border border-slate-300 rounded-lg overflow-hidden ">
             <Image
               src={`/api/hypercerts/${hypercertId}/image`}
               alt={hypercert?.metadata?.name || ""}
@@ -106,7 +108,7 @@ async function HypercertPageInner({
           {(hypercert?.metadata?.work_timeframe_from as string) && (
             <Fragment>
               <Separator />
-              <h5 className="uppercase text-sm text-gray-500 font-medium tracking-wider">
+              <h5 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
                 TIME OF WORK
               </h5>
               <TimeFrame
@@ -136,7 +138,7 @@ async function HypercertPageInner({
       )}
       <Separator />
       <div className="flex justify-between">
-        <h5 className="uppercase text-sm text-gray-500 font-medium tracking-wider">
+        <h5 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
           Evaluations
         </h5>
         <EvaluateButton hypercert={hypercert} />
@@ -144,7 +146,7 @@ async function HypercertPageInner({
       <EvaluationsList hypercert={hypercert} />
       <Separator />
       <div className="flex justify-between">
-        <h5 className="uppercase text-sm text-gray-500 font-medium tracking-wider">
+        <h5 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
           Marketplace
         </h5>
 

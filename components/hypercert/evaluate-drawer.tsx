@@ -204,7 +204,7 @@ export function EvaluateDrawer({ hypercert }: { hypercert: HypercertFull }) {
       </div>
 
       <div className="flex flex-col items-start w-full">
-        <h5 className="uppercase text-sm text-gray-500 font-medium tracking-wider">
+        <h5 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
           Basics
         </h5>
         <div className="flex justify-between w-full items-center">
@@ -222,7 +222,7 @@ export function EvaluateDrawer({ hypercert }: { hypercert: HypercertFull }) {
       </div>
 
       <div className="flex flex-col items-start w-full">
-        <h5 className="uppercase text-sm text-gray-500 font-medium tracking-wider">
+        <h5 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
           Work
         </h5>
         <div className="flex justify-between w-full items-center">
@@ -240,7 +240,7 @@ export function EvaluateDrawer({ hypercert }: { hypercert: HypercertFull }) {
       </div>
 
       <div className="flex flex-col items-start w-full">
-        <h5 className="uppercase text-sm text-gray-500 font-medium tracking-wider">
+        <h5 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
           Contributors
         </h5>
         <div className="flex justify-between w-full items-center">
@@ -258,7 +258,7 @@ export function EvaluateDrawer({ hypercert }: { hypercert: HypercertFull }) {
       </div>
 
       <div className="flex flex-col items-start w-full">
-        <h5 className="uppercase text-sm text-gray-500 font-medium tracking-wider">
+        <h5 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
           Tags
         </h5>
         <p>Tags add context to the attestation and makes it easier to find.</p>
@@ -270,7 +270,7 @@ export function EvaluateDrawer({ hypercert }: { hypercert: HypercertFull }) {
       </div>
 
       <div className="flex flex-col items-start w-full">
-        <h5 className="uppercase text-sm text-gray-500 font-medium tracking-wider pb-2">
+        <h5 className="uppercase text-sm text-slate-500 font-medium tracking-wider pb-2">
           Comment
         </h5>
         <Textarea

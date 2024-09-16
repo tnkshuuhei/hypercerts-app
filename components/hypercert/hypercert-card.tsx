@@ -75,12 +75,12 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
                 unoptimized
               />
             ) : (
-              <div className="flex items-center justify-center bg-slate-200 h-full w-full">
+              <div className="flex items-center justify-center bg-accent h-full w-full">
                 <span className="text-slate-500 text-lg">Your banner here</span>
               </div>
             )}
           </header>
-          <section className="absolute top-4 left-3 border-white border-2 rounded-full overflow-hidden bg-slate-200">
+          <section className="absolute top-4 left-3 border-white border-2 rounded-full overflow-hidden bg-accent">
             <div className="relative w-8 h-8 flex items-center justify-center border border-slate-300 rounded-full overflow-hidden">
               {logo ? (
                 <Image
@@ -125,7 +125,7 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
                   </span>
                 ))}
                 {hiddenScopesCount > 0 && (
-                  <span className="text-xs text-slate-900 px-2 py-1 leading-none border border-slate-400 rounded-full flex items-center bg-neutral-100">
+                  <span className="text-xs text-slate-900 px-2 py-1 leading-none border border-slate-400 rounded-full flex items-center bg-slate-100">
                     +{hiddenScopesCount} more
                   </span>
                 )}

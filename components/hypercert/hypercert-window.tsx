@@ -59,7 +59,7 @@ const HypercertWindow = ({
 
   return (
     <Link href={`/hypercerts/${hypercertId}`}>
-      <article className="transition-transform duration-300 hover:-translate-y-2 relative group bg-black/10 rounded-lg overflow-hidden">
+      <article className="transition-transform duration-300 hover:-translate-y-2 relative group bg-accent rounded-lg overflow-hidden">
         <div className="h-[320px] w-full relative p-1">
           <Image
             src={`/api/hypercerts/${hypercertId}/image`}
@@ -77,10 +77,10 @@ const HypercertWindow = ({
             {evaluationStatus}
           </div>
         </section>
-        <section className="bg-gray-200/80 backdrop-blur-md bottom-0 w-full p-4 text-black space-y-2">
+        <section className="bg-accent backdrop-blur-md bottom-0 w-full p-4 text-black space-y-2">
           <p
             className={`flex-1 text-sm font-semibold line-clamp-2 text-ellipsis ${
-              name ? "text-black" : "text-gray-700"
+              name ? "text-black" : "text-slate-700"
             }`}
           >
             {name || "[Untitled]"}
