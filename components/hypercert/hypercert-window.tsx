@@ -58,8 +58,8 @@ const HypercertWindow = ({
   const evaluationStatus = getEvaluationStatus(attestations);
 
   return (
-    <Link href={`/hypercerts/${hypercertId}`}>
-      <article className="transition-transform duration-300 hover:-translate-y-2 relative group bg-black/10 rounded-lg overflow-hidden">
+    <Link className="flex flex-col" href={`/hypercerts/${hypercertId}`}>
+      <article className="transition-transform duration-300 hover:-translate-y-2 relative group bg-black/10 rounded-lg overflow-hidden flex-1">
         <div className="h-[320px] w-full relative p-1">
           <Image
             src={`/api/hypercerts/${hypercertId}/image`}
