@@ -27,7 +27,7 @@ const Navbar = () => {
         <Link href="/">
           <div className="relative flex space-x-1">
             <Image
-              src="/hypercerts-logo.png"
+              src="/hypercerts-logo.svg"
               width={46}
               height={46}
               alt="Hypercerts mark"
