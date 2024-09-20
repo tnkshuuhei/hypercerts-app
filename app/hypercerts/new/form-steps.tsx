@@ -498,7 +498,7 @@ const FormSteps = ({
   };
 
   const handleNextClick = async () => {
-    if (currentStep === 1) {
+    if (currentStep === 2) {
       await takeCardSnapshot();
     }
     const currentStepFields = hypercertFormSteps.get(currentStep)?.fields ?? [];

@@ -104,7 +104,7 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
               </span>
             </div>
             <h5
-              className="text-xl font-bold text-slate-800 line-clamp-3 text-ellipsis tracking-[-0.03em] leading-tight mb-2"
+              className="text-[28px] font-semibold text-slate-800 line-clamp-3 text-ellipsis tracking-[-0.03em] leading-[30px] mb-2"
               title={title}
             >
               {title}
@@ -114,7 +114,7 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
                 {visibleScopes.map((scope) => (
                   <span
                     key={scope}
-                    className="text-xs text-slate-600 px-2 py-1 leading-none border border-slate-400 rounded-full flex items-center"
+                    className="text-xs text-slate-600 px-2 py-1 leading-none border border-slate-400 rounded-lg flex items-center"
                     title={
                       scope.endsWith("...")
                         ? scopes?.find((s) => s.startsWith(scope.slice(0, -3)))
