@@ -1,23 +1,23 @@
-import { Fragment, Suspense } from "react";
 import { Metadata, ResolvingMetadata } from "next";
+import { Fragment, Suspense } from "react";
 
+import { CurrencyButtons } from "@/components/currency-buttons";
 import Contributors from "@/components/hypercert/contributors";
 import Creator from "@/components/hypercert/creator";
 import EvaluateButton from "@/components/hypercert/evaluate-button";
 import EvaluationsList from "@/components/hypercert/evaluations-list";
 import ExternalUrl from "@/components/hypercert/external-url";
 import Fractions from "@/components/hypercert/fractions";
-import Image from "next/image";
-import { ListForSaleButton } from "@/components/marketplace/list-for-sale-button";
-import HypercertListingsList from "@/components/marketplace/hypercert-listings-list";
 import PageSkeleton from "@/components/hypercert/page-skeleton";
-import ReadMore from "@/components/read-more";
-import { Separator } from "@/components/ui/separator";
 import WorkScope from "@/components/hypercert/scope";
 import TimeFrame from "@/components/hypercert/time-frame";
+import HypercertListingsList from "@/components/marketplace/hypercert-listings-list";
+import { ListForSaleButton } from "@/components/marketplace/list-for-sale-button";
+import ReadMore from "@/components/read-more";
+import { Separator } from "@/components/ui/separator";
 import { getHypercert } from "@/hypercerts/getHypercert";
 import { getOrders } from "@/marketplace/getOpenOrders";
-import { CurrencyButtons } from "@/components/currency-buttons";
+import Image from "next/image";
 
 type Props = {
   params: { hypercertId: string };
@@ -71,9 +71,9 @@ async function HypercertPageInner({
             Hypercert not found.
           </h1>
           <Separator />
-          <h3 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
-            {`ID ${hypercertId}`}
-          </h3>
+          <pre className="uppercase text-sm text-slate-500 font-medium tracking-wider">
+            {`ID: ${hypercertId}`}
+          </pre>
           <p className="md:text-lg">
             If this hypercert was freshly minted try refreshing in 30 seconds.
             Please try again or contact us at{" "}
