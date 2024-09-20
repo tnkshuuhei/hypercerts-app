@@ -10,7 +10,6 @@ import { Button } from "../ui/button";
 import { Drawer } from "vaul";
 import EvaluateToggle from "./evaluate-toggle";
 import { HypercertFull } from "../../hypercerts/fragments/hypercert-full.fragment";
-import Tags from "@yaireo/tagify/dist/react.tagify";
 import { Textarea } from "../ui/textarea";
 import { clearCacheAfterEvaluation } from "../../app/actions/clearCacheAfterEvaluation";
 import { cn } from "../../lib/utils";
@@ -67,6 +66,13 @@ export function EvaluateDrawer({ hypercert }: { hypercert: HypercertFull }) {
     });
   const [comments, setComments] = useState<string>("");
   const [uid, setUid] = useState<string>();
+  const [Tags, setTags] = useState<any>(null);
+
+  useEffect(() => {
+    import("@yaireo/tagify/dist/react.tagify").then((module) => {
+      setTags(module.default);
+    });
+  }, []);
 
   // Save tags to global state for use with next evaluation
   useEffect(() => {
@@ -262,11 +268,13 @@ export function EvaluateDrawer({ hypercert }: { hypercert: HypercertFull }) {
           Tags
         </h5>
         <p>Tags add context to the attestation and makes it easier to find.</p>
-        <Tags
-          className="tags"
-          whitelist={whitelistAttestTags}
-          tagifyRef={tagifyRef}
-        />
+        {Tags && (
+          <Tags
+            className="tags"
+            whitelist={whitelistAttestTags}
+            tagifyRef={tagifyRef}
+          />
+        )}
       </div>
 
       <div className="flex flex-col items-start w-full">
