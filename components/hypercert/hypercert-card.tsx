@@ -54,10 +54,10 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
 
     const CardContent = () => {
       const maxVisibleTags = 7;
-      const maxScopeLength = 12;
+      const maxScopeLength = 10;
 
       const clipScope = (scope: string) =>
-        scope.length > maxScopeLength
+        scope.trim().length > maxScopeLength
           ? scope.trim().slice(0, maxScopeLength - 3) + "..."
           : scope.trim();
 
@@ -116,7 +116,7 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
                   {formattedDateRange}
                 </span>
               </div>
-              <div className="h-[60px] mt-auto overflow-hidden">
+              <div className="h-[60px] mt-auto overflow-hidden w-full">
                 <div className="flex flex-wrap gap-1 justify-start h-full content-end pb-1">
                   {visibleScopes.map((scope) => (
                     <span
@@ -134,9 +134,9 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
                     </span>
                   ))}
                   {hiddenScopesCount > 0 && (
-                    <span className="text-xs text-slate-900 px-2 py-1 leading-none border border-black rounded-md flex items-center">
-                      +{hiddenScopesCount} more
-                    </span>
+                    <div className="text-xs font-medium text-slate-900 px-2 py-1 leading-none border border-black rounded-full flex items-stretch bg-neutral-100">
+                      +{hiddenScopesCount}
+                    </div>
                   )}
                 </div>
               </div>
