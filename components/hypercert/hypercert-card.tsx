@@ -53,8 +53,8 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
       ) : null;
 
     const CardContent = () => {
-      const maxVisibleTags = 7;
-      const maxScopeLength = 10;
+      const maxVisibleTags = 6;
+      const maxScopeLength = 14;
 
       const clipScope = (scope: string) =>
         scope.trim().length > maxScopeLength
@@ -104,24 +104,24 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
           </section>
           <section className="p-3 pt-4 rounded-t-xl bg-white border-t-[1px] border-black h-[246px] flex flex-col justify-between">
             <h5
-              className="text-[28px] font-semibold text-slate-800 line-clamp-3 text-ellipsis tracking-[-0.03em] leading-[30px] mb-2"
+              className="text-[28px] font-semibold text-slate-800 line-clamp-3 text-ellipsis tracking-[-0.03em] leading-[30px] py-1"
               title={title}
             >
               {title}
             </h5>
             <section className="border-t-[1.5px] border-black">
-              <div className="flex items-center my-1 justify-between">
+              <div className="flex items-center pb-2 pt-1 justify-between">
                 <span className="uppercase text-xs tracking-wide">work</span>
                 <span className="text-xs uppercase font-medium">
                   {formattedDateRange}
                 </span>
               </div>
-              <div className="h-[60px] mt-auto overflow-hidden w-full">
+              <div className="h-[62px] mt-auto overflow-hidden w-full">
                 <div className="flex flex-wrap gap-1 justify-start h-full content-end pb-1">
                   {visibleScopes.map((scope) => (
                     <span
                       key={scope}
-                      className="text-xs px-2 py-1 leading-none border border-black rounded-md flex items-center"
+                      className="text-base px-2 py-1 leading-none border-[1.5px] border-black rounded-lg flex items-center"
                       title={
                         scope.endsWith("...")
                           ? scopes?.find((s) =>
@@ -134,7 +134,7 @@ const HypercertCard = forwardRef<HTMLDivElement, HypercertCardProps>(
                     </span>
                   ))}
                   {hiddenScopesCount > 0 && (
-                    <div className="text-xs font-medium text-slate-900 px-2 py-1 leading-none border border-black rounded-full flex items-stretch bg-neutral-100">
+                    <div className="text-sm font-medium text-slate-900 px-2 py-1 leading-none border border-black rounded-full flex items-center justify-center bg-neutral-100">
                       +{hiddenScopesCount}
                     </div>
                   )}
