@@ -70,12 +70,10 @@ const GeneralInformation = ({ form }: FormStepsProps) => {
           <FormItem>
             <FormLabel>Title</FormLabel>
             <FormControl>
-              <Input {...field} />
+              <Input {...field} maxLength={100} />
             </FormControl>
             <FormMessage />
-            <FormDescription>
-              Keep it short but descriptive! (max 100 characters)
-            </FormDescription>
+            <FormDescription>Keep it short but descriptive!</FormDescription>
           </FormItem>
         )}
       />
@@ -86,7 +84,7 @@ const GeneralInformation = ({ form }: FormStepsProps) => {
           <FormItem>
             <FormLabel>Description</FormLabel>
             <FormControl>
-              <Textarea {...field} />
+              <Textarea {...field} maxLength={5000} />
             </FormControl>
             <FormMessage />
             <FormDescription>
@@ -224,14 +222,14 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
                 onChange={(e) => {
                   const tags = e.target.value
                     .split(",")
-                    .map((tag) => tag.toLowerCase());
-                  field.onChange(tags.length > 0 ? tags : []);
+                    .map((tag) => tag.toLowerCase().slice(0, 50));
+                  field.onChange(tags.length > 0 ? tags.slice(0, 20) : []);
                 }}
               />
             </FormControl>
             <FormMessage />
             <FormDescription>
-              Tags are used to categorize your project.
+              Tags are used to categorize your project. (Max: 20)
             </FormDescription>
             {field.value &&
               field.value.filter((tag: string) => tag !== "").length > 0 && (
@@ -261,7 +259,9 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
                 onChange={(e) => {
                   const contributors = e.target.value
                     .split(",")
-                    .map((contributor) => contributor.trim().toLowerCase());
+                    .map((contributor) =>
+                      contributor.trim().toLowerCase().slice(0, 50),
+                    );
                   field.onChange(contributors.length > 0 ? contributors : []);
                 }}
               />
