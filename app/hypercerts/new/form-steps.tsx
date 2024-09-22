@@ -50,6 +50,7 @@ import {
 import { toPng } from "html-to-image";
 import { FormattedUnits } from "@/components/formatted-units";
 import { DEFAULT_NUM_FRACTIONS } from "@/configs/hypercerts";
+// import Image from "next/image";
 
 interface FormStepsProps {
   form: UseFormReturn<HypercertFormValues>;
@@ -499,6 +500,7 @@ const FormSteps = ({
 
   const handleNextClick = async () => {
     if (currentStep === 2) {
+      await new Promise((resolve) => setTimeout(resolve, 1500));
       await takeCardSnapshot();
     }
     const currentStepFields = hypercertFormSteps.get(currentStep)?.fields ?? [];
@@ -511,6 +513,19 @@ const FormSteps = ({
 
   return (
     <section className="space-y-5">
+      {/* {form.watch("cardImage") && (
+        <div className="border-2 border-slate-300 rounded-lg p-4 mb-4">
+          <h3 className="text-lg font-semibold mb-2">Card Preview</h3>
+          <div className="relative w-[336px] h-[420px] mx-auto">
+            <Image
+              src={form.watch("cardImage")}
+              alt="Hypercert Card Preview"
+              layout="fill"
+              objectFit="contain"
+            />
+          </div>
+        </div>
+      )} */}
       <div className="space-y-3">
         <Progress value={(currentStep / 3) * 100} className="h-[6px]" />
 
