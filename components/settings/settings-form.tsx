@@ -17,9 +17,8 @@ import { Input } from "@/components/ui/input";
 import { normalize } from "viem/ens";
 import { Button } from "@/components/ui/button";
 import { mainnet } from "viem/chains";
-import { useEffect } from "react";
-import Image from "next/image";
-import { useAddOrUpdateUser } from "@/users/hooks";
+import { useEffect, useState } from "react";
+import { useAddOrUpdateUser, useGetUser } from "@/users/hooks";
 
 const formSchema = z.object({
   displayName: z.string().max(30, "Max. 30 characters").optional(),
@@ -35,39 +34,70 @@ const defaultValues = {
 
 export const SettingsForm = () => {
   const { address } = useAccount();
-  const { data: ensName } = useEnsName({
+  const { data: user, isFetching: isPendingGetUser } = useGetUser({ address });
+  const { data: ensName, isFetching: isPendingGetEnsName } = useEnsName({
     address: normalize(address || "") as `0x${string}`,
     chainId: mainnet.id,
   });
-  const { data: ensAvatar } = useEnsAvatar({
+  const { data: ensAvatar, isFetching: isPendingGetEnsAvatar } = useEnsAvatar({
     name: ensName || undefined,
     chainId: mainnet.id,
   });
 
-  const { mutateAsync: addOrUpdateUser, isPending } = useAddOrUpdateUser();
+  const { mutateAsync: addOrUpdateUser, isPending: isPendingUpdateUser } =
+    useAddOrUpdateUser();
   const onSubmit = async (data: SettingsFormValues) => {
     await addOrUpdateUser(data);
   };
+
+  const isPending =
+    isPendingGetUser ||
+    isPendingUpdateUser ||
+    isPendingGetEnsName ||
+    isPendingGetEnsAvatar;
 
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: defaultValues,
     disabled: isPending,
+    reValidateMode: "onChange",
+    mode: "onChange",
   });
 
   const { displayName, avatar } = form.watch();
 
+  const [updatedUserName, setUpdatedUserName] = useState(false);
+  const [updatedUserNameEns, setUpdatedUserNameEns] = useState(false);
   useEffect(() => {
-    if (!displayName && ensName) {
-      form.setValue("displayName", ensName);
+    if (!updatedUserName && user?.display_name) {
+      form.setValue("displayName", user.display_name);
+      setUpdatedUserName(true);
+      return;
     }
-  }, [displayName, ensName, form]);
 
-  useEffect(() => {
-    if (!avatar && ensAvatar) {
-      form.setValue("avatar", ensAvatar);
+    if (!updatedUserNameEns && !updatedUserName && ensName) {
+      form.setValue("displayName", ensName);
+      setUpdatedUserNameEns(true);
     }
-  }, [ensAvatar, avatar, form]);
+  }, [displayName, ensName, form, user]);
+
+  const [updatedAvatar, setUpdatedAvatar] = useState(false);
+  const [updatedEnsAvatar, setUpdatedEnsAvatar] = useState(false);
+  useEffect(() => {
+    if (!updatedAvatar && user?.avatar) {
+      form.setValue("avatar", user.avatar);
+      setUpdatedAvatar(true);
+      return;
+    }
+
+    if (!updatedEnsAvatar && !updatedAvatar && ensAvatar) {
+      form.setValue("avatar", ensAvatar);
+      setUpdatedEnsAvatar(true);
+    }
+  }, [ensAvatar, avatar, form, user]);
+
+  const submitDisabled =
+    form.formState.isSubmitting || !form.formState.isValid || isPending;
 
   return (
     <div>
@@ -107,9 +137,9 @@ export const SettingsForm = () => {
           {avatar && (
             <>
               <FormLabel>Preview</FormLabel>
-              <Image
+              <img
                 src={avatar}
-                alt=""
+                alt="Preview of the profile image"
                 width={100}
                 height={100}
                 className="rounded-full"
@@ -117,7 +147,7 @@ export const SettingsForm = () => {
             </>
           )}
 
-          <Button>Save changes</Button>
+          <Button disabled={submitDisabled}>Save changes</Button>
         </form>
       </Form>
     </div>

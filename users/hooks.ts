@@ -1,8 +1,15 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useAccount, useSignMessage } from "wagmi";
 import { SettingsFormValues } from "@/components/settings/settings-form";
 import { useStepProcessDialogContext } from "@/components/global/step-process-dialog";
-import { HYPERCERTS_API_URL_REST } from "@/configs/hypercerts";
+import {
+  HYPERCERTS_API_URL_GRAPH,
+  HYPERCERTS_API_URL_REST,
+} from "@/configs/hypercerts";
+import { graphql, readFragment } from "@/lib/graphql";
+import { UserFragment } from "@/users/fragments/user.fragments";
+import request from "graphql-request";
+import revalidatePathServerAction from "@/app/actions";
 
 export const useAddOrUpdateUser = () => {
   const { address } = useAccount();
@@ -71,6 +78,7 @@ export const useAddOrUpdateUser = () => {
           }
         });
         await setStep("Updating user", "completed");
+        await revalidatePathServerAction("/settings");
         setTimeout(() => {
           setOpen(false);
         }, 2000);
@@ -82,5 +90,39 @@ export const useAddOrUpdateUser = () => {
         );
       }
     },
+  });
+};
+
+export const useGetUser = ({ address }: { address?: string }) => {
+  return useQuery({
+    queryKey: ["user", address],
+    queryFn: async () => {
+      if (!address) {
+        return null;
+      }
+      const query = graphql(
+        `
+          query UserQuery($address: String!) {
+            users(where: { address: { eq: $address } }) {
+              count
+              data {
+                ...UserFragment
+              }
+            }
+          }
+        `,
+        [UserFragment],
+      );
+      const res = await request(HYPERCERTS_API_URL_GRAPH, query, {
+        address,
+      });
+      const userFragment = res.users?.data?.[0];
+      if (!userFragment) {
+        return undefined;
+      }
+
+      return readFragment(UserFragment, userFragment);
+    },
+    enabled: !!address,
   });
 };
