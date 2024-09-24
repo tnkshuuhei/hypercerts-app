@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useAccount, useSignMessage } from "wagmi";
+import { useAccount, useSignTypedData } from "wagmi";
 import { SettingsFormValues } from "@/components/settings/settings-form";
 import { useStepProcessDialogContext } from "@/components/global/step-process-dialog";
 import {
@@ -12,8 +12,8 @@ import request from "graphql-request";
 import revalidatePathServerAction from "@/app/actions";
 
 export const useAddOrUpdateUser = () => {
-  const { address } = useAccount();
-  const { signMessageAsync } = useSignMessage();
+  const { address, chainId } = useAccount();
+  const { signTypedDataAsync } = useSignTypedData();
   const {
     setDialogStep: setStep,
     setSteps,
@@ -24,6 +24,10 @@ export const useAddOrUpdateUser = () => {
     mutationFn: async (user: SettingsFormValues) => {
       if (!address) {
         throw new Error("No address found");
+      }
+
+      if (!chainId) {
+        throw new Error("No chainId found");
       }
 
       setSteps([
@@ -39,12 +43,32 @@ export const useAddOrUpdateUser = () => {
       setOpen(true);
 
       await setStep("Awaiting signature");
-      const message = `Updating user: ${address}`;
+
       let signature: string;
 
       try {
-        signature = await signMessageAsync({
-          message,
+        signature = await signTypedDataAsync({
+          account: address,
+          types: {
+            User: [
+              { name: "display_name", type: "string" },
+              { name: "avatar", type: "string" },
+            ],
+            UpdateRequest: [
+              { name: "user", type: "User" },
+              { name: "chainId", type: "uint256" },
+              { name: "address", type: "address" },
+            ],
+          },
+          primaryType: "UpdateRequest",
+          message: {
+            user: {
+              display_name: user.displayName || "",
+              avatar: user.avatar || "",
+            },
+            chainId: BigInt(chainId),
+            address,
+          },
         });
         if (!signature) {
           throw new Error("No signature found");
@@ -67,7 +91,7 @@ export const useAddOrUpdateUser = () => {
             display_name: user.displayName,
             avatar: user.avatar,
             signature,
-            message,
+            chain_id: chainId,
           }),
           headers: {
             "Content-Type": "application/json",
