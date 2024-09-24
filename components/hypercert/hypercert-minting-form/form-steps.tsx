@@ -20,10 +20,6 @@ import {
 } from "lucide-react";
 import { RefObject, useState } from "react";
 
-import {
-  HyperCertFormKeys,
-  HypercertFormValues,
-} from "@/app/hypercerts/new/page";
 import CreateAllowlistDialog from "@/components/allowlist/create-allowlist-dialog";
 import ConnectDialog from "@/components/connect-dialog";
 import { Badge } from "@/components/ui/badge";
@@ -50,6 +46,10 @@ import {
 import { toPng } from "html-to-image";
 import { FormattedUnits } from "@/components/formatted-units";
 import { DEFAULT_NUM_FRACTIONS } from "@/configs/hypercerts";
+import {
+  HyperCertFormKeys,
+  HypercertFormValues,
+} from "@/components/hypercert/hypercert-minting-form/index";
 
 interface FormStepsProps {
   form: UseFormReturn<HypercertFormValues>;
