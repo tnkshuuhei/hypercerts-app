@@ -57,6 +57,7 @@ interface FormStepsProps {
   setCurrentStep: (step: number) => void;
   cardRef: RefObject<HTMLDivElement>;
   reset: () => void;
+  isBlueprint?: boolean;
 }
 
 const GeneralInformation = ({ form }: FormStepsProps) => {
@@ -396,9 +397,24 @@ const calculatePercentageBigInt = (
   return (units * BigInt(100)) / total;
 };
 
-const ReviewAndSubmit = ({ form }: FormStepsProps) => {
+const ReviewAndSubmit = ({ form, isBlueprint }: FormStepsProps) => {
   return (
     <section className="space-y-8">
+      {isBlueprint && (
+        <FormField
+          control={form.control}
+          name="blueprint_minter_address"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Recipient of blueprint</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      )}
       <FormField
         control={form.control}
         name="acceptTerms"
@@ -467,6 +483,7 @@ const FormSteps = ({
   setCurrentStep,
   cardRef,
   reset,
+  isBlueprint,
 }: FormStepsProps) => {
   const isLastStep = currentStep === hypercertFormSteps.size;
   const { address } = useAccount();
@@ -563,6 +580,7 @@ const FormSteps = ({
           setCurrentStep={setCurrentStep}
           cardRef={cardRef}
           reset={reset}
+          isBlueprint={isBlueprint}
         />
       )}
 

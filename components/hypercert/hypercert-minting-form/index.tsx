@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useRef, useState } from "react";
 import useIsWriteable from "@/hooks/useIsWriteable";
 import { useMintHypercert } from "@/hypercerts/hooks/useMintHypercert";
@@ -16,8 +18,20 @@ import FormSteps from "@/components/hypercert/hypercert-minting-form/form-steps"
 import HypercertCard from "@/components/hypercert/hypercert-card";
 import { formatDate } from "@/lib/utils";
 import { z } from "zod";
+import { isAddress } from "viem";
 
 const formSchema = z.object({
+  blueprint_minter_address: z
+    .string()
+    .min(1, "Minter address required")
+    .refine(
+      (data) => {
+        return isAddress(data);
+      },
+      {
+        message: "Invalid address",
+      },
+    ),
   title: z.string().trim().min(1, "We need a title for your hypercert"),
   logo: z.string().url("Logo URL is not valid"),
   banner: z.string().url("Banner URL is not valid"),
@@ -85,6 +99,7 @@ export type HypercertFormValues = z.infer<typeof formSchema>;
 export type HyperCertFormKeys = keyof HypercertFormValues;
 
 const formDefaultValues: HypercertFormValues = {
+  blueprint_minter_address: "" as `0x${string}`,
   title: "",
   banner: "",
   description: "",
@@ -114,14 +129,24 @@ const getDefaultFormValues = (value: string): HypercertFormValues => {
   };
 };
 
-export function HypercertMintingForm() {
-  const [currentStep, setCurrentStep] = useState(1);
+export function HypercertMintingForm({
+  isBlueprint,
+}: {
+  isBlueprint?: boolean;
+}) {
+  const [currentStep, setCurrentStep] = useState(3);
   const [language, setLanguage] = useState("en-US");
   const {
     writeable,
     errors: writeableErrors,
     resetErrors: resetWriteableErrors,
   } = useIsWriteable();
+
+  const formSchemaUsed = isBlueprint
+    ? formSchema
+    : formSchema.omit({
+        blueprint_minter_address: true,
+      });
 
   const { mutateAsync: mintHypercert } = useMintHypercert();
   const [value, setValue] = useLocalStorage<HypercertFormValues>(
@@ -135,7 +160,7 @@ export function HypercertMintingForm() {
   );
 
   const form = useForm<HypercertFormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchemaUsed),
     defaultValues: value,
     mode: "onBlur",
   });
@@ -230,17 +255,23 @@ export function HypercertMintingForm() {
     //   }
     // }
 
-    await mintHypercert({
-      metaData: formattedMetadata.data!,
-      units: DEFAULT_NUM_FRACTIONS,
-      transferRestrictions: TransferRestrictions.FromCreatorOnly,
-      allowlistRecords:
-        values.allowlistURL ||
-        values.allowlistEntries?.map((entry) => ({
-          ...entry,
-          units: BigInt(entry.units),
-        })),
-    });
+    if (!isBlueprint) {
+      await mintHypercert({
+        metaData: formattedMetadata.data!,
+        units: DEFAULT_NUM_FRACTIONS,
+        transferRestrictions: TransferRestrictions.FromCreatorOnly,
+        allowlistRecords:
+          values.allowlistURL ||
+          values.allowlistEntries?.map((entry) => ({
+            ...entry,
+            units: BigInt(entry.units),
+          })),
+      });
+    } else {
+      toast({
+        title: "Minting blueprint",
+      });
+    }
   }
 
   const onSubmitInvalid = (errors: FieldErrors) => {
@@ -272,6 +303,7 @@ export function HypercertMintingForm() {
               setCurrentStep={setCurrentStep}
               cardRef={cardRef}
               reset={onReset}
+              isBlueprint={isBlueprint}
             />
           </form>
         </Form>
