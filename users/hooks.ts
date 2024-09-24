@@ -49,25 +49,24 @@ export const useAddOrUpdateUser = () => {
       try {
         signature = await signTypedDataAsync({
           account: address,
+          domain: {
+            name: "Hypercerts",
+            version: "1",
+            chainId: chainId,
+          },
           types: {
             User: [
-              { name: "display_name", type: "string" },
+              { name: "displayName", type: "string" },
               { name: "avatar", type: "string" },
             ],
-            UpdateRequest: [
-              { name: "user", type: "User" },
-              { name: "chainId", type: "uint256" },
-              { name: "address", type: "address" },
-            ],
+            UpdateRequest: [{ name: "user", type: "User" }],
           },
           primaryType: "UpdateRequest",
           message: {
             user: {
-              display_name: user.displayName || "",
+              displayName: user.displayName || "",
               avatar: user.avatar || "",
             },
-            chainId: BigInt(chainId),
-            address,
           },
         });
         if (!signature) {
