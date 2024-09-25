@@ -103,6 +103,17 @@ export const SettingsForm = () => {
   const submitDisabled =
     form.formState.isSubmitting || !form.formState.isValid || isPending;
 
+  console.log({
+    displayName,
+    avatar,
+    isPending,
+    isPendingGetUser,
+    isPendingUpdateUser,
+    isPendingGetEnsName,
+    isPendingGetEnsAvatar,
+    updatedUserName,
+  });
+
   return (
     <div>
       <Form {...form}>
@@ -144,9 +155,7 @@ export const SettingsForm = () => {
               <img
                 src={avatar}
                 alt="Preview of the profile image"
-                width={100}
-                height={100}
-                className="rounded-full"
+                className="rounded-full w-[100px] h-[100px]"
               />
             </>
           )}
