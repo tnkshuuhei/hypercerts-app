@@ -114,6 +114,8 @@ export const SettingsForm = () => {
     updatedUserName,
   });
 
+  const showAvatar = avatar && !form.formState.errors.avatar;
+
   return (
     <div>
       <Form {...form}>
@@ -149,7 +151,7 @@ export const SettingsForm = () => {
             )}
           />
 
-          {avatar && (
+          {showAvatar && (
             <>
               <FormLabel>Preview</FormLabel>
               <img
