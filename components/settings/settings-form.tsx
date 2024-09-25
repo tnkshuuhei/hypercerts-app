@@ -60,8 +60,7 @@ export const SettingsForm = () => {
     resolver: zodResolver(formSchema),
     defaultValues: defaultValues,
     disabled: isPending,
-    reValidateMode: "onChange",
-    mode: "onChange",
+    mode: "onBlur",
   });
 
   const { displayName, avatar } = form.watch();
@@ -112,9 +111,11 @@ export const SettingsForm = () => {
     isPendingGetEnsName,
     isPendingGetEnsAvatar,
     updatedUserName,
+    form,
   });
 
-  const showAvatar = avatar && !form.formState.errors.avatar;
+  const showAvatar =
+    avatar && !form.formState.isValidating && !form.formState.errors.avatar;
 
   return (
     <div>
