@@ -59,9 +59,9 @@ export const useAddOrUpdateUser = () => {
               { name: "displayName", type: "string" },
               { name: "avatar", type: "string" },
             ],
-            UpdateRequest: [{ name: "user", type: "User" }],
+            UserUpdateRequest: [{ name: "user", type: "User" }],
           },
-          primaryType: "UpdateRequest",
+          primaryType: "UserUpdateRequest",
           message: {
             user: {
               displayName: user.displayName || "",
@@ -78,7 +78,7 @@ export const useAddOrUpdateUser = () => {
           "error",
           error instanceof Error ? error.message : "Error signing message",
         );
-        return;
+        return null;
       }
 
       await setStep("Updating user");
@@ -141,7 +141,7 @@ export const useGetUser = ({ address }: { address?: string }) => {
       });
       const userFragment = res.users?.data?.[0];
       if (!userFragment) {
-        return undefined;
+        return null;
       }
 
       return readFragment(UserFragment, userFragment);
