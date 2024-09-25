@@ -70,12 +70,14 @@ export const SettingsForm = () => {
   const [updatedUserNameEns, setUpdatedUserNameEns] = useState(false);
   useEffect(() => {
     if (!updatedUserName && user?.display_name) {
+      console.log("Setting display name from graphql", user.display_name);
       form.setValue("displayName", user.display_name);
       setUpdatedUserName(true);
       return;
     }
 
     if (!updatedUserNameEns && !updatedUserName && ensName) {
+      console.log("Setting display name from ENS", ensName);
       form.setValue("displayName", ensName);
       setUpdatedUserNameEns(true);
     }
@@ -85,12 +87,14 @@ export const SettingsForm = () => {
   const [updatedEnsAvatar, setUpdatedEnsAvatar] = useState(false);
   useEffect(() => {
     if (!updatedAvatar && user?.avatar) {
+      console.log("Setting avatar from graphql", user.avatar);
       form.setValue("avatar", user.avatar);
       setUpdatedAvatar(true);
       return;
     }
 
     if (!updatedEnsAvatar && !updatedAvatar && ensAvatar) {
+      console.log("Setting avatar from ENS", ensAvatar);
       form.setValue("avatar", ensAvatar);
       setUpdatedEnsAvatar(true);
     }
