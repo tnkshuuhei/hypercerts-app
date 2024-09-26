@@ -16,7 +16,7 @@ export const HyperboardRow = ({
         <Link href={`/collections/${hyperboardId}`}>
           <h3 className="text-lg font-medium">{name}</h3>
         </Link>
-        <p className="text-sm text-gray-500">{description}</p>
+        <p className="text-sm text-slate-500">{description}</p>
       </div>
       <div className="w-1/2">
         <HyperboardWidget hyperboardId={hyperboardId} />
