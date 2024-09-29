@@ -1,20 +1,7 @@
 /* eslint-disable */
 /* prettier-ignore */
 
-/** An IntrospectionQuery representation of your schema.
- *
- * @remarks
- * This is an introspection of your schema saved as a file by GraphQLSP.
- * It will automatically be used by `gql.tada` to infer the types of your GraphQL documents.
- * If you need to reuse this data or update your `scalars`, update `tadaOutputLocation` to
- * instead save to a .ts instead of a .d.ts file.
- */
-export type introspection = {
-  name: never;
-  query: 'Query';
-  mutation: never;
-  subscription: never;
-  types: {
+export type introspection_types = {
     'AllowlistRecord': { kind: 'OBJECT'; name: 'AllowlistRecord'; fields: { 'claimed': { name: 'claimed'; type: { kind: 'SCALAR'; name: 'Boolean'; ofType: null; } }; 'entry': { name: 'entry'; type: { kind: 'SCALAR'; name: 'Float'; ofType: null; } }; 'hypercert_id': { name: 'hypercert_id'; type: { kind: 'SCALAR'; name: 'String'; ofType: null; } }; 'id': { name: 'id'; type: { kind: 'NON_NULL'; name: never; ofType: { kind: 'SCALAR'; name: 'ID'; ofType: null; }; } }; 'leaf': { name: 'leaf'; type: { kind: 'SCALAR'; name: 'String'; ofType: null; } }; 'proof': { name: 'proof'; type: { kind: 'LIST'; name: never; ofType: { kind: 'NON_NULL'; name: never; ofType: { kind: 'SCALAR'; name: 'String'; ofType: null; }; }; } }; 'root': { name: 'root'; type: { kind: 'SCALAR'; name: 'String'; ofType: null; } }; 'token_id': { name: 'token_id'; type: { kind: 'SCALAR'; name: 'EthBigInt'; ofType: null; } }; 'total_units': { name: 'total_units'; type: { kind: 'SCALAR'; name: 'EthBigInt'; ofType: null; } }; 'units': { name: 'units'; type: { kind: 'SCALAR'; name: 'EthBigInt'; ofType: null; } }; 'user_address': { name: 'user_address'; type: { kind: 'SCALAR'; name: 'String'; ofType: null; } }; }; };
     'AllowlistRecordFetchInput': { kind: 'INPUT_OBJECT'; name: 'AllowlistRecordFetchInput'; isOneOf: false; inputFields: [{ name: 'by'; type: { kind: 'INPUT_OBJECT'; name: 'AllowlistRecordSortOptions'; ofType: null; }; defaultValue: null }]; };
     'AllowlistRecordSortOptions': { kind: 'INPUT_OBJECT'; name: 'AllowlistRecordSortOptions'; isOneOf: false; inputFields: [{ name: 'hypercert_id'; type: { kind: 'ENUM'; name: 'SortOrder'; ofType: null; }; defaultValue: null }, { name: 'token_id'; type: { kind: 'ENUM'; name: 'SortOrder'; ofType: null; }; defaultValue: null }, { name: 'leaf'; type: { kind: 'ENUM'; name: 'SortOrder'; ofType: null; }; defaultValue: null }, { name: 'entry'; type: { kind: 'ENUM'; name: 'SortOrder'; ofType: null; }; defaultValue: null }, { name: 'user_address'; type: { kind: 'ENUM'; name: 'SortOrder'; ofType: null; }; defaultValue: null }, { name: 'claimed'; type: { kind: 'ENUM'; name: 'SortOrder'; ofType: null; }; defaultValue: null }, { name: 'proof'; type: { kind: 'ENUM'; name: 'SortOrder'; ofType: null; }; defaultValue: null }, { name: 'units'; type: { kind: 'ENUM'; name: 'SortOrder'; ofType: null; }; defaultValue: null }, { name: 'total_units'; type: { kind: 'ENUM'; name: 'SortOrder'; ofType: null; }; defaultValue: null }, { name: 'root'; type: { kind: 'ENUM'; name: 'SortOrder'; ofType: null; }; defaultValue: null }]; };
@@ -90,7 +77,22 @@ export type introspection = {
     'UUID': unknown;
     'User': { kind: 'OBJECT'; name: 'User'; fields: { 'address': { name: 'address'; type: { kind: 'NON_NULL'; name: never; ofType: { kind: 'SCALAR'; name: 'String'; ofType: null; }; } }; 'avatar': { name: 'avatar'; type: { kind: 'SCALAR'; name: 'String'; ofType: null; } }; 'display_name': { name: 'display_name'; type: { kind: 'SCALAR'; name: 'String'; ofType: null; } }; }; };
     'UserWhereInput': { kind: 'INPUT_OBJECT'; name: 'UserWhereInput'; isOneOf: false; inputFields: [{ name: 'address'; type: { kind: 'INPUT_OBJECT'; name: 'StringSearchOptions'; ofType: null; }; defaultValue: null }]; };
-  };
+};
+
+/** An IntrospectionQuery representation of your schema.
+ *
+ * @remarks
+ * This is an introspection of your schema saved as a file by GraphQLSP.
+ * It will automatically be used by `gql.tada` to infer the types of your GraphQL documents.
+ * If you need to reuse this data or update your `scalars`, update `tadaOutputLocation` to
+ * instead save to a .ts instead of a .d.ts file.
+ */
+export type introspection = {
+  name: never;
+  query: "Query";
+  mutation: never;
+  subscription: never;
+  types: introspection_types;
 };
 
 import * as gqlTada from "gql.tada";
