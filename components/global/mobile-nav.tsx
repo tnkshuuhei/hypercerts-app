@@ -16,9 +16,11 @@ import { siteConfig } from "@/configs/site";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { ArrowUpRight, Menu } from "lucide-react";
 import Link from "next/link";
+import { useAccount } from "wagmi";
 
 const MobileNav = () => {
   const isDesktop = useMediaQuery("(min-width: 768px)");
+  const { address } = useAccount();
 
   if (isDesktop) return null;
 
@@ -27,7 +29,7 @@ const MobileNav = () => {
       <MenubarMenu>
         <MenubarTrigger
           aria-label="Menu"
-          className="focus:bg-slate-200 data-[state=open]:bg-slate-200"
+          className="focus:bg-accent data-[state=open]:bg-accent"
         >
           <Menu size={24} className="mr-1" /> Menu
         </MenubarTrigger>
@@ -35,17 +37,21 @@ const MobileNav = () => {
           <Link href={siteConfig.links.explore} className="w-full h-full">
             <MenubarItem>Explore</MenubarItem>
           </Link>
-          <MenubarSub>
-            <MenubarSubTrigger>Create</MenubarSubTrigger>
-            <MenubarSubContent>
-              <Link
-                href={siteConfig.links.createHypercert}
-                className="w-full h-full"
-              >
-                <MenubarItem>New Hypercert</MenubarItem>
-              </Link>
-            </MenubarSubContent>
-          </MenubarSub>
+          <Link
+            href={siteConfig.links.createHypercert}
+            className="w-full h-full"
+          >
+            <MenubarItem>New hypercert</MenubarItem>
+          </Link>
+          {address && (
+            <Link
+              key={siteConfig.links.profile}
+              href={`${siteConfig.links.profile}/${address}`}
+              className="w-full h-full"
+            >
+              <MenubarItem>Profile</MenubarItem>
+            </Link>
+          )}
           <MenubarSeparator />
           <Link
             href={siteConfig.links.docs}

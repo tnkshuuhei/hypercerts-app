@@ -1,3 +1,5 @@
+"use client";
+
 import { HypercertMintingForm } from "@/components/hypercert/hypercert-minting-form";
 
 export default function NewHypercertPage() {

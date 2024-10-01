@@ -1,21 +1,21 @@
 "use client";
 
-import { ArrowUpRight, ChevronDown } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { ArrowUpRight } from "lucide-react";
 
 import ChainDisplay from "@/components/chain-display";
+import { buttonVariants } from "@/components/ui/button";
+import { WalletProfile } from "@/components/wallet-profile";
+import { siteConfig } from "@/configs/site";
 import Image from "next/image";
 import Link from "next/link";
-import { WalletProfile } from "@/components/wallet-profile";
-import { buttonVariants } from "@/components/ui/button";
-import { siteConfig } from "@/configs/site";
 import { usePathname } from "next/navigation";
 import { useAccount } from "wagmi";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const Navbar = () => {
   const currentPath = usePathname();
@@ -27,13 +27,13 @@ const Navbar = () => {
         <Link href="/">
           <div className="relative flex space-x-1">
             <Image
-              src="/hypercerts-logo.png"
+              src="/hypercerts-logo.svg"
               width={46}
               height={46}
               alt="Hypercerts mark"
-              className="w-6 h-6"
+              className="w-6 h-6 lg:w-8 lg:h-8"
             />
-            <span className="font-semibold text-base md:text-xl tracking-tight">
+            <span className="font-semibold text-base lg:text-2xl tracking-tight">
               Hypercerts
             </span>
           </div>
@@ -62,7 +62,7 @@ const Navbar = () => {
             <span className="hover:underline">Create</span>
           </Link>
 
-          {address && (
+          {address ? (
             <Link
               key={siteConfig.links.profile}
               href={`${siteConfig.links.profile}/${address}`}
@@ -74,6 +74,22 @@ const Navbar = () => {
             >
               <span className="hover:underline">My hypercerts</span>
             </Link>
+          ) : (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span
+                    className={`${buttonVariants({ variant: "link" })} opacity-50 cursor-help`}
+                  >
+                    My hypercerts
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-[300px]">
+                  Click the &quot;Connect Wallet&quot; button and sign in to
+                  access your hypercerts
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           )}
           <Link
             href={siteConfig.links.docs}

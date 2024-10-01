@@ -21,24 +21,21 @@ import { z } from "zod";
 import { isAddress } from "viem";
 
 const formSchema = z.object({
-  blueprint_minter_address: z
+  blueprint_minter_address: z.string().refine((data) => isAddress(data), {
+    message: "Invalid address",
+  }),
+  title: z
     .string()
-    .min(1, "Minter address required")
-    .refine(
-      (data) => {
-        return isAddress(data);
-      },
-      {
-        message: "Invalid address",
-      },
-    ),
-  title: z.string().trim().min(1, "We need a title for your hypercert"),
+    .trim()
+    .min(1, "We need a title for your hypercert")
+    .max(100, "Max 100 characters"),
   logo: z.string().url("Logo URL is not valid"),
   banner: z.string().url("Banner URL is not valid"),
   description: z
     .string()
     .trim()
-    .min(10, { message: "We need a longer description for your hypercert" }),
+    .min(10, { message: "We need a longer description for your hypercert" })
+    .max(5000, "max 5000 characters"),
   link: z
     .string()
     .url("Please enter a valid link")
@@ -47,9 +44,15 @@ const formSchema = z.object({
   cardImage: z.string().url("Card image could not be generated"),
   tags: z
     .array(z.string())
-    .refine((data) => data.filter((tag) => tag !== "").length > 0, {
-      message: "We need at least one tag",
-    }),
+    .min(1, "We need at least one tag")
+    .max(20, "Maximum 20 tags allowed")
+    .refine(
+      (data) => data.every((tag) => tag.trim() !== "" && tag.length <= 50),
+      {
+        message:
+          "Please ensure all tags are filled in and no longer than 50 characters",
+      },
+    ),
   projectDates: z
     .object(
       {
@@ -75,7 +78,10 @@ const formSchema = z.object({
       {
         message: "We need at least one contributor",
       },
-    ),
+    )
+    .refine((data) => data.every((contributor) => contributor.length <= 50), {
+      message: "Each contributor must be 50 characters or less",
+    }),
   acceptTerms: z.boolean().refine((data) => data, {
     message: "You must accept the terms and conditions",
   }),
@@ -134,19 +140,13 @@ export function HypercertMintingForm({
 }: {
   isBlueprint?: boolean;
 }) {
-  const [currentStep, setCurrentStep] = useState(3);
+  const [currentStep, setCurrentStep] = useState(1);
   const [language, setLanguage] = useState("en-US");
   const {
     writeable,
     errors: writeableErrors,
     resetErrors: resetWriteableErrors,
   } = useIsWriteable();
-
-  const formSchemaUsed = isBlueprint
-    ? formSchema
-    : formSchema.omit({
-        blueprint_minter_address: true,
-      });
 
   const { mutateAsync: mintHypercert } = useMintHypercert();
   const [value, setValue] = useLocalStorage<HypercertFormValues>(
@@ -158,6 +158,12 @@ export function HypercertMintingForm({
       deserializer: getDefaultFormValues,
     },
   );
+
+  const formSchemaUsed = isBlueprint
+    ? formSchema
+    : formSchema.omit({
+        blueprint_minter_address: true,
+      });
 
   const form = useForm<HypercertFormValues>({
     resolver: zodResolver(formSchemaUsed),
@@ -226,11 +232,10 @@ export function HypercertMintingForm({
       excludedWorkScope: [],
       rights: ["Public Display"],
       excludedRights: [],
-      workTimeframeStart: values.projectDates?.from?.getTime?.() / 1000 ?? null,
-      workTimeframeEnd: values.projectDates?.to?.getTime?.() / 1000 ?? null,
-      impactTimeframeStart:
-        values.projectDates?.from?.getTime?.() / 1000 ?? null,
-      impactTimeframeEnd: values.projectDates?.to?.getTime?.() / 1000 ?? null,
+      workTimeframeStart: values.projectDates?.from?.getTime?.() / 1000,
+      workTimeframeEnd: values.projectDates?.to?.getTime?.() / 1000,
+      impactTimeframeStart: values.projectDates?.from?.getTime?.() / 1000,
+      impactTimeframeEnd: values.projectDates?.to?.getTime?.() / 1000,
       contributors: values.contributors ?? [],
     });
 
@@ -254,7 +259,6 @@ export function HypercertMintingForm({
     //     return;
     //   }
     // }
-
     if (!isBlueprint) {
       await mintHypercert({
         metaData: formattedMetadata.data!,
@@ -288,6 +292,22 @@ export function HypercertMintingForm({
       }
     }
   };
+
+  // if (writeableErrors) {
+  //   Object.values(writeableErrors).forEach((error) => {
+  //     if (error) {
+  //       toast({
+  //         variant: "destructive",
+  //         title: "Sorry! We can't start the mint...",
+  //         description: error,
+  //       });
+  //     }
+  //   });
+  //   if (!writeable) {
+  //     resetWriteableErrors();
+  //     return;
+  //   }
+  // }
 
   return (
     <section className="flex flex-col-reverse lg:flex-row space-x-4 items-stretch md:justify-start">
