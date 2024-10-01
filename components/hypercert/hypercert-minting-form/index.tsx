@@ -19,6 +19,7 @@ import HypercertCard from "@/components/hypercert/hypercert-card";
 import { formatDate } from "@/lib/utils";
 import { z } from "zod";
 import { isAddress } from "viem";
+import { useCreateBlueprint } from "@/blueprints/hooks/createBlueprint";
 
 const formSchema = z.object({
   blueprint_minter_address: z.string().refine((data) => isAddress(data), {
@@ -149,6 +150,7 @@ export function HypercertMintingForm({
   } = useIsWriteable();
 
   const { mutateAsync: mintHypercert } = useMintHypercert();
+  const { mutateAsync: createBlueprint } = useCreateBlueprint();
   const [value, setValue] = useLocalStorage<HypercertFormValues>(
     "user-hypercert-create-form-data",
     formDefaultValues,
@@ -201,18 +203,20 @@ export function HypercertMintingForm({
   };
 
   async function onSubmit(values: HypercertFormValues) {
-    const errors = Object.entries(writeableErrors).filter(
-      ([_, error]) => error !== "",
-    );
-    if (errors.length > 0) {
-      errors.forEach(([category, error]) => {
-        toast({
-          title: "Cannot start mint...",
-          variant: "destructive",
-          description: `${category}: ${error}`,
+    if (!isBlueprint) {
+      const errors = Object.entries(writeableErrors).filter(
+        ([_, error]) => error !== "",
+      );
+      if (errors.length > 0) {
+        errors.forEach(([category, error]) => {
+          toast({
+            title: "Cannot start mint...",
+            variant: "destructive",
+            description: `${category}: ${error}`,
+          });
         });
-      });
-      return;
+        return;
+      }
     }
 
     const metadata: HypercertMetadata = {
@@ -272,8 +276,10 @@ export function HypercertMintingForm({
           })),
       });
     } else {
-      toast({
-        title: "Minting blueprint",
+      const { blueprint_minter_address, ...formValues } = values;
+      await createBlueprint({
+        formValues,
+        minterAddress: blueprint_minter_address,
       });
     }
   }

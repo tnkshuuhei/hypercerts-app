@@ -625,7 +625,7 @@ const FormSteps = ({
         )}
         {isLastStep && address && (
           <Button type="submit" disabled={!isCurrentStepValid()}>
-            Mint hypercert
+            {isBlueprint ? "Create blueprint" : "Mint hypercert"}
             <ArrowRightIcon className="w-4 h-4 ml-2" />
           </Button>
         )}
