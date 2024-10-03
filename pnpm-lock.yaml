@@ -24,8 +24,8 @@ importers:
         specifier: 0.3.36
         version: 0.3.36(@nomicfoundation/hardhat-ethers@3.0.8(ethers@6.13.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.11(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.7.26(@swc/helpers@0.5.5))(@types/node@20.16.5)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10)))(@swc/helpers@0.5.5)(@types/node@20.16.5)(bufferutil@4.0.8)(ethers@6.13.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(graphql@16.9.0)(rollup@4.22.2)(ts-node@10.9.2(@swc/core@1.7.26(@swc/helpers@0.5.5))(@types/node@20.16.5)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10)
       '@hypercerts-org/sdk':
-        specifier: 2.2.0-beta.3
-        version: 2.2.0-beta.3(@nomicfoundation/hardhat-ethers@3.0.8(ethers@6.13.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.11(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.7.26(@swc/helpers@0.5.5))(@types/node@20.16.5)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10)))(@swc/helpers@0.5.5)(@types/node@20.16.5)(bufferutil@4.0.8)(ethers@6.13.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(graphql@16.9.0)(rollup@4.22.2)(ts-node@10.9.2(@swc/core@1.7.26(@swc/helpers@0.5.5))(@types/node@20.16.5)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10)
+        specifier: 2.2.0
+        version: 2.2.0(@nomicfoundation/hardhat-ethers@3.0.8(ethers@6.13.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.11(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.7.26(@swc/helpers@0.5.5))(@types/node@20.16.5)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10)))(@swc/helpers@0.5.5)(@types/node@20.16.5)(bufferutil@4.0.8)(ethers@6.13.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(graphql@16.9.0)(rollup@4.22.2)(ts-node@10.9.2(@swc/core@1.7.26(@swc/helpers@0.5.5))(@types/node@20.16.5)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10)
       '@next/env':
         specifier: ^14.2.5
         version: 14.2.13
@@ -1403,6 +1403,9 @@ packages:
     engines: {node: '>= 16.15.1 <= 20.x'}
     peerDependencies:
       ethers: ^6.6.2
+
+  '@hypercerts-org/sdk@2.2.0':
+    resolution: {integrity: sha512-YoXEmeMgAaNukgnYUDl5J+1EarqDjOPMYFuqG0RJR2vrOJ6Gq3wW5iCusruz1EfZEdsRCRQP9uhnJu0YhOQL2w==}
 
   '@hypercerts-org/sdk@2.2.0-beta.3':
     resolution: {integrity: sha512-1viFJdMOAmQFGFsN8yDWkQqUa6LMFny4hYe9kPy63LO81A7e5s0jLDS24HldFx/og85Qs9nipJwXxGWTTTeqlw==}
@@ -9886,6 +9889,35 @@ snapshots:
       - c-kzg
       - debug
       - encoding
+      - graphql
+      - rollup
+      - supports-color
+      - ts-node
+      - typescript
+      - utf-8-validate
+
+  '@hypercerts-org/sdk@2.2.0(@nomicfoundation/hardhat-ethers@3.0.8(ethers@6.13.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.11(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.7.26(@swc/helpers@0.5.5))(@types/node@20.16.5)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10)))(@swc/helpers@0.5.5)(@types/node@20.16.5)(bufferutil@4.0.8)(ethers@6.13.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(graphql@16.9.0)(rollup@4.22.2)(ts-node@10.9.2(@swc/core@1.7.26(@swc/helpers@0.5.5))(@types/node@20.16.5)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10)':
+    dependencies:
+      '@graphql-typed-document-node/core': 3.2.0(graphql@16.9.0)
+      '@hypercerts-org/contracts': 2.0.0-alpha.9(@nomicfoundation/hardhat-ethers@3.0.8(ethers@6.13.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(hardhat@2.22.11(bufferutil@4.0.8)(ts-node@10.9.2(@swc/core@1.7.26(@swc/helpers@0.5.5))(@types/node@20.16.5)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10)))(@swc/core@1.7.26(@swc/helpers@0.5.5))(@types/node@20.16.5)(bufferutil@4.0.8)(ethers@6.13.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(ts-node@10.9.2(@swc/core@1.7.26(@swc/helpers@0.5.5))(@types/node@20.16.5)(typescript@5.6.2))(typescript@5.6.2)(utf-8-validate@5.0.10)
+      '@openzeppelin/merkle-tree': 1.0.7
+      '@swc/core': 1.7.26(@swc/helpers@0.5.5)
+      ajv: 8.17.1
+      axios: 1.7.7(debug@4.3.7)
+      dotenv: 16.4.5
+      rollup-plugin-swc3: 0.11.2(@swc/core@1.7.26(@swc/helpers@0.5.5))(rollup@4.22.2)
+      viem: 2.21.10(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)(zod@3.23.8)
+      zod: 3.23.8
+    transitivePeerDependencies:
+      - '@nomicfoundation/hardhat-ethers'
+      - '@swc/helpers'
+      - '@swc/wasm'
+      - '@types/node'
+      - bufferutil
+      - c-kzg
+      - debug
+      - encoding
+      - ethers
       - graphql
       - rollup
       - supports-color
