@@ -14,7 +14,7 @@ export default function ExploreEvaluationsFilterSelect() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const selectedValue = searchParams.get("filter") || "evaluated";
+  const selectedValue = searchParams.get("filter") || "all";
 
   const selectFilter = (value: string) => {
     const urlSearchParams = new URLSearchParams(searchParams);
