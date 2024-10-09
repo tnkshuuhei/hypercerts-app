@@ -80,12 +80,8 @@ export const useCreateBlueprint = () => {
       await setStep("Updating blueprint");
 
       try {
-        const {
-          cardImage,
-          acceptTerms,
-          confirmContributorsPermission,
-          ...form_values
-        } = formValues;
+        const { acceptTerms, confirmContributorsPermission, ...form_values } =
+          formValues;
         const body: BlueprintCreateRequest = {
           form_values,
           minter_address: minterAddress as `0x${string}`,
