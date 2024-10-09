@@ -1,4 +1,5 @@
 import { ResultOf, graphql } from "@/lib/graphql";
+import { HypercertFormValues } from "@/components/hypercert/hypercert-minting-form";
 
 export const BlueprintFragment = graphql(`
   fragment BlueprintFragment on Blueprint {
@@ -16,4 +17,6 @@ export const BlueprintFragment = graphql(`
   }
 `);
 
-export type BlueprintFragment = ResultOf<typeof BlueprintFragment>;
+export type BlueprintFragment = ResultOf<typeof BlueprintFragment> & {
+  form_values: HypercertFormValues;
+};

@@ -63,3 +63,33 @@ export async function getBlueprints({
     blueprints: readFragment(BlueprintFragment, blueprintsFragment),
   };
 }
+
+const queryForBlueprintById = graphql(
+  `
+    query Blueprint($id: Int, $first: Int, $offset: Int) {
+      blueprints(where: { id: { eq: $id } }, first: $first, offset: $offset) {
+        count
+        data {
+          ...BlueprintFragment
+        }
+      }
+    }
+  `,
+  [BlueprintFragment],
+);
+
+export async function getBlueprintById(id: number) {
+  const res = await request(HYPERCERTS_API_URL_GRAPH, queryForBlueprintById, {
+    id,
+  });
+
+  const blueprintsFragment = res.blueprints?.data?.[0];
+  if (!blueprintsFragment) {
+    return undefined;
+  }
+
+  return readFragment(
+    BlueprintFragment,
+    blueprintsFragment,
+  ) as BlueprintFragment;
+}

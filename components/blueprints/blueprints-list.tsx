@@ -49,7 +49,9 @@ const BlueprintListItem = ({ blueprint }: { blueprint: BlueprintFragment }) => {
 
         {!blueprint.minted && (
           <Button asChild>
-            <Link href={`/blueprints/${blueprint.id}`}>Claim</Link>
+            <Link href={`/hypercerts/new?blueprintId=${blueprint.id}`}>
+              Claim
+            </Link>
           </Button>
         )}
       </div>

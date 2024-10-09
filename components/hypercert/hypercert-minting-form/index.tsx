@@ -138,8 +138,10 @@ const getDefaultFormValues = (value: string): HypercertFormValues => {
 
 export function HypercertMintingForm({
   isBlueprint,
+  presetValues,
 }: {
   isBlueprint?: boolean;
+  presetValues?: HypercertFormValues;
 }) {
   const [currentStep, setCurrentStep] = useState(1);
   const [language, setLanguage] = useState("en-US");
@@ -169,7 +171,7 @@ export function HypercertMintingForm({
 
   const form = useForm<HypercertFormValues>({
     resolver: zodResolver(formSchemaUsed),
-    defaultValues: value,
+    defaultValues: presetValues ?? value,
     mode: "onBlur",
   });
 
