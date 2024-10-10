@@ -139,9 +139,11 @@ const getDefaultFormValues = (value: string): HypercertFormValues => {
 export function HypercertMintingForm({
   isBlueprint,
   presetValues,
+  blueprintId,
 }: {
   isBlueprint?: boolean;
   presetValues?: HypercertFormValues;
+  blueprintId?: number;
 }) {
   const [currentStep, setCurrentStep] = useState(1);
   const [language, setLanguage] = useState("en-US");
@@ -270,6 +272,7 @@ export function HypercertMintingForm({
         metaData: formattedMetadata.data!,
         units: DEFAULT_NUM_FRACTIONS,
         transferRestrictions: TransferRestrictions.FromCreatorOnly,
+        blueprintId,
         allowlistRecords:
           values.allowlistURL ||
           values.allowlistEntries?.map((entry) => ({

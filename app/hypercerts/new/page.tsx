@@ -10,8 +10,9 @@ export default async function NewHypercertPage({
   searchParams: { blueprintId?: string };
 }) {
   let formValues: HypercertFormValues | undefined;
+  let parsedId: number | undefined;
   if (searchParams.blueprintId) {
-    const parsedId = parseInt(searchParams.blueprintId);
+    parsedId = parseInt(searchParams.blueprintId);
     const fetchedBlueprint = await getBlueprintById(parsedId);
 
     if (!fetchedBlueprint) {
@@ -32,7 +33,7 @@ export default async function NewHypercertPage({
         New hypercert
       </h1>
       <div className="p-3"></div>
-      <HypercertMintingForm presetValues={formValues} />
+      <HypercertMintingForm presetValues={formValues} blueprintId={parsedId} />
     </main>
   );
 }
