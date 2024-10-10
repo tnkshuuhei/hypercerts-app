@@ -161,11 +161,12 @@ export const useMintHypercert = () => {
         throw new Error("No client found");
       }
 
+      const isBlueprint = !!blueprintId;
       setOpen(true);
       setSteps([
         { id: "preparing", description: "Preparing to mint hypercert..." },
         { id: "minting", description: "Minting hypercert on-chain..." },
-        ...(blueprintId
+        ...(isBlueprint
           ? [{ id: "blueprint", description: "Queueing blueprint mint..." }]
           : []),
         { id: "confirming", description: "Waiting for on-chain confirmation" },
