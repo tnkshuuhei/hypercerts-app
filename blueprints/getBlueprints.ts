@@ -60,7 +60,10 @@ export async function getBlueprints({
 
   return {
     count,
-    blueprints: readFragment(BlueprintFragment, blueprintsFragment),
+    blueprints: readFragment(
+      BlueprintFragment,
+      blueprintsFragment,
+    ) as BlueprintFragment[],
   };
 }
 
