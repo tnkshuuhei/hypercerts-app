@@ -146,13 +146,11 @@ export const SettingsForm = () => {
           {showAvatar && (
             <>
               <FormLabel>Preview</FormLabel>
-              <div className="h-40">
-                <img
-                  src={avatar}
-                  alt="Preview of the profile image"
-                  className="object-scale-down max-h-full"
-                />
-              </div>
+              <img
+                src={avatar}
+                alt="Preview of the profile image"
+                className="object-scale-down max-h-full"
+              />
             </>
           )}
 
