@@ -2,7 +2,6 @@ import { getCollectionsByAdminAddress } from "@/collections/getCollectionsByAdmi
 import { EmptySection } from "@/app/profile/[address]/sections";
 import { HyperboardRow } from "@/components/hyperboard/hyperboard-row";
 import { Suspense } from "react";
-import { defaultDescription } from "@/app/profile/[address]/tabs";
 import { CreateCollectionButton } from "@/components/collections/buttons";
 import { COLLECTIONS_PER_PAGE } from "@/configs/ui";
 import CollectionPagination from "@/components/collections/collection-pagination";
@@ -56,8 +55,10 @@ const CollectionsTabContentInner = async ({
           <HyperboardRow
             key={hyperboard.id}
             hyperboardId={hyperboard.id}
-            name={hyperboard.name}
-            description={defaultDescription}
+            name={hyperboard.name || ""}
+            description={
+              hyperboard.sections?.data?.[0]?.collection.description || ""
+            }
           />
         ))}
       </div>
