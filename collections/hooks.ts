@@ -138,6 +138,8 @@ export const useCreateHyperboard = () => {
         await revalidatePathServerAction([
           "/collections",
           `/profile/${address}`,
+          `/collections/${hyperboardId}`,
+          `/collections/edit/${hyperboardId}`,
         ]);
         if (!hyperboardId) {
           throw new Error("Hyperboard ID not found");
@@ -309,6 +311,8 @@ export const useUpdateHyperboard = () => {
         await revalidatePathServerAction([
           "/collections",
           `/profile/${address}`,
+          `/collections/edit/${hyperboardId}`,
+          `/collections/${hyperboardId}`,
         ]);
         if (!hyperboardId) {
           throw new Error("Hyperboard ID not found");
