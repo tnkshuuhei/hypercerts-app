@@ -67,7 +67,13 @@ export const useCreateHyperboard = () => {
             chainId: chainId,
           },
           types: {
-            Hyperboard: [{ name: "title", type: "string" }],
+            Hyperboard: [
+              { name: "title", type: "string" },
+              { name: "description", type: "string" },
+              { name: "borderColor", type: "string" },
+              { name: "hypercertIds", type: "string[]" },
+              { name: "factors", type: "uint256[]" },
+            ],
             HyperboardCreateRequest: [
               { name: "hyperboard", type: "Hyperboard" },
             ],
@@ -76,6 +82,10 @@ export const useCreateHyperboard = () => {
           message: {
             hyperboard: {
               title: data.title,
+              description: data.description,
+              borderColor: data.borderColor,
+              hypercertIds: data.hypercerts.map((hc) => hc.hypercertId),
+              factors: data.hypercerts.map((hc) => BigInt(hc.factor)),
             },
           },
         });
@@ -219,7 +229,14 @@ export const useUpdateHyperboard = () => {
             chainId: chainId,
           },
           types: {
-            Hyperboard: [{ name: "id", type: "string" }],
+            Hyperboard: [
+              { name: "id", type: "string" },
+              { name: "title", type: "string" },
+              { name: "description", type: "string" },
+              { name: "borderColor", type: "string" },
+              { name: "hypercertIds", type: "string[]" },
+              { name: "factors", type: "uint256[]" },
+            ],
             HyperboardUpdateRequest: [
               { name: "hyperboard", type: "Hyperboard" },
             ],
@@ -228,6 +245,11 @@ export const useUpdateHyperboard = () => {
           message: {
             hyperboard: {
               id: data.id,
+              title: data.title,
+              description: data.description,
+              borderColor: data.borderColor,
+              hypercertIds: data.hypercerts.map((hc) => hc.hypercertId),
+              factors: data.hypercerts.map((hc) => BigInt(hc.factor)),
             },
           },
         });
