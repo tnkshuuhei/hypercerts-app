@@ -51,7 +51,7 @@ const transferForm = z.object({
 export type BurnFormValues = z.infer<typeof transferForm>;
 
 export function BurnDrawer({ hypercert }: { hypercert: HypercertFull }) {
-  const { chainId } = useAccount();
+  const { chainId, chain } = useAccount();
   const { toast } = useToast();
   const { client } = useHypercertClient();
   const { address } = useAccount();
@@ -165,7 +165,7 @@ export function BurnDrawer({ hypercert }: { hypercert: HypercertFull }) {
   }
 
   if (txHash) {
-    const url = generateBlockExplorerLink(chainId, txHash);
+    const url = generateBlockExplorerLink(chain, txHash);
     return (
       <>
         <Drawer.Title className="font-serif text-3xl font-medium tracking-tight">
@@ -233,9 +233,9 @@ export function BurnDrawer({ hypercert }: { hypercert: HypercertFull }) {
                         {ownedFractions?.map((fraction) => (
                           <SelectItem
                             key={fraction.fraction_id}
-                            value={fraction.fraction_id}
+                            value={fraction.fraction_id!}
                           >
-                            {`${fraction.fraction_id.split("-")[2]} - `}
+                            {`${fraction.fraction_id?.split("-")[2]} - `}
                             <FormattedUnits>{fraction.units}</FormattedUnits>
                           </SelectItem>
                         ))}
