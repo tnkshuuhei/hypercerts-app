@@ -27,7 +27,7 @@ const footerIcons = [
   },
   {
     label: "Hypercerts Foundation",
-    url: "/",
+    url: "https://hypercerts.org",
     icon: "/hypercerts-logo.svg",
   },
   {
@@ -37,7 +37,7 @@ const footerIcons = [
   },
   {
     label: "Telegram",
-    url: "https://hypercerts.org/docs/",
+    url: "https://t.me/+YF9AYb6zCv1mNDJi",
     icon: "/social-icons/telegram.svg",
   },
 ];
@@ -51,8 +51,9 @@ const Footer = () => (
           href={item.url}
           title={item.label}
           key={item.label}
+          target="_blank"
         >
-          <Image src={item.icon} alt={item.label} width={40} height={40} />
+          <Image src={item.icon} alt={item.label} width={30} height={30} />
         </a>
       ))}
     </ul>
