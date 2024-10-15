@@ -25,7 +25,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { z } from "zod";
-import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -35,9 +34,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { FormattedUnits } from "@/components/formatted-units";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const transferForm = z.object({
-  fractionId: z.string().uuid().optional(),
+  fractionId: z.string(),
+  confirmed: z.boolean().optional(),
 });
 
 export type BurnFormValues = z.infer<typeof transferForm>;
@@ -48,6 +57,7 @@ export function BurnDrawer({ hypercert }: { hypercert: HypercertFull }) {
   const { client } = useHypercertClient();
   const { address } = useAccount();
   const [fractionIdToBurn, setFractionIdToBurn] = useState<string>("");
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
 
   // Global state
   const ownedFractions = address
@@ -64,6 +74,7 @@ export function BurnDrawer({ hypercert }: { hypercert: HypercertFull }) {
     resolver: zodResolver(transferForm),
     defaultValues: {
       fractionId: "",
+      confirmed: false,
     },
   });
   const {
@@ -77,6 +88,15 @@ export function BurnDrawer({ hypercert }: { hypercert: HypercertFull }) {
     console.log("handleSelectFraction", fractionId);
 
     setFractionIdToBurn(fractionId);
+  };
+
+  const handleBurnClick = () => {
+    setIsConfirmDialogOpen(true);
+  };
+
+  const handleConfirmBurn = () => {
+    setIsConfirmDialogOpen(false);
+    burn();
   };
 
   const errorToast = (message: string | undefined) => {
@@ -117,8 +137,37 @@ export function BurnDrawer({ hypercert }: { hypercert: HypercertFull }) {
     setIsBurning(false);
   };
 
+  const ConfirmationDialog = () => (
+    <Dialog open={isConfirmDialogOpen} onOpenChange={setIsConfirmDialogOpen}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle className="font-serif text-3xl font-medium tracking-tight">
+            Confirm burn action
+          </DialogTitle>
+          <DialogDescription>
+            Are you sure you want to burn this fraction? This action is
+            irreversible and will permanently destroy the fraction.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button
+            variant="outline"
+            onClick={() => setIsConfirmDialogOpen(false)}
+          >
+            Cancel
+          </Button>
+          <Button variant="destructive" onClick={handleConfirmBurn}>
+            Burn
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+
   if (!isChainIdSupported(chainId)) {
-    return <div>Please connect to a supported chain to transfer.</div>;
+    return (
+      <div>Please connect to a supported chain to execute transactions.</div>
+    );
   }
 
   if (txHash) {
@@ -126,9 +175,9 @@ export function BurnDrawer({ hypercert }: { hypercert: HypercertFull }) {
     return (
       <>
         <Drawer.Title className="font-serif text-3xl font-medium tracking-tight">
-          Transfer hypercert
+          Burn hypercert
         </Drawer.Title>
-        <p>Your fraction is being transferred!</p>
+        <p>Your fraction is being burned!</p>
         <a
           href={url}
           title={url}
@@ -156,7 +205,7 @@ export function BurnDrawer({ hypercert }: { hypercert: HypercertFull }) {
   return (
     <>
       <Drawer.Title className="font-serif text-3xl font-medium tracking-tight">
-        Burn a hypercert fraction
+        Burn an hypercert fraction
       </Drawer.Title>
 
       <p>Select the fraction you want to burn.</p>
@@ -181,7 +230,9 @@ export function BurnDrawer({ hypercert }: { hypercert: HypercertFull }) {
                     <Select {...field} onValueChange={handleSelectFraction}>
                       <SelectTrigger className="w-full">
                         <SelectValue
-                          placeholder={fractionIdToBurn || "Select fraction"}
+                          placeholder={
+                            fractionIdToBurn?.split("-")[2] || "Select fraction"
+                          }
                         />
                       </SelectTrigger>
                       <SelectContent>
@@ -190,21 +241,17 @@ export function BurnDrawer({ hypercert }: { hypercert: HypercertFull }) {
                             key={fraction.fraction_id}
                             value={fraction.fraction_id}
                           >
-                            {`${fraction.fraction_id.split("-")[2]} - ${fraction.units} units` ||
-                              ""}
+                            {`${fraction.fraction_id.split("-")[2]} - `}
+                            <FormattedUnits>{fraction.units}</FormattedUnits>
                           </SelectItem>
                         ))}
-                        {/*<SelectItem value="light">Light</SelectItem>*/}
-                        {/*<SelectItem value="dark">Dark</SelectItem>*/}
-                        {/*<SelectItem value="system">System</SelectItem>*/}
                       </SelectContent>
                     </Select>
                     {/*<Input {...field} disabled />*/}
                   </FormControl>
                   <FormMessage />
                   <FormDescription>
-                    The fraction ID of the hypercert fraction you want to
-                    transfer.
+                    The fraction ID of the hypercert fraction you want to burn.
                   </FormDescription>
                 </FormItem>
               )}
@@ -220,8 +267,9 @@ export function BurnDrawer({ hypercert }: { hypercert: HypercertFull }) {
           </Button>
         </Drawer.Close>
         <Button
+          variant="destructive"
           disabled={isDisabled}
-          onClick={burn}
+          onClick={handleBurnClick}
           className={cn("w-1/2", {
             "opacity-50 cursor-not-allowed": isDisabled,
           })}
@@ -230,6 +278,8 @@ export function BurnDrawer({ hypercert }: { hypercert: HypercertFull }) {
           {isBurning ? "Burning fraction" : "Burn fraction"}
         </Button>
       </div>
+
+      <ConfirmationDialog />
     </>
   );
 }
