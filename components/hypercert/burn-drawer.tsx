@@ -46,7 +46,6 @@ import {
 
 const transferForm = z.object({
   fractionId: z.string(),
-  confirmed: z.boolean().optional(),
 });
 
 export type BurnFormValues = z.infer<typeof transferForm>;
@@ -67,14 +66,11 @@ export function BurnDrawer({ hypercert }: { hypercert: HypercertFull }) {
       )
     : [];
 
-  console.log("ownedFractions", ownedFractions);
-
   // Local state
   const form = useForm<BurnFormValues>({
     resolver: zodResolver(transferForm),
     defaultValues: {
       fractionId: "",
-      confirmed: false,
     },
   });
   const {
@@ -85,8 +81,6 @@ export function BurnDrawer({ hypercert }: { hypercert: HypercertFull }) {
   const [txHash, setTxHash] = useState<string>("");
 
   const handleSelectFraction = (fractionId: string) => {
-    console.log("handleSelectFraction", fractionId);
-
     setFractionIdToBurn(fractionId);
   };
 

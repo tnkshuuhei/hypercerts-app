@@ -14,7 +14,7 @@ import { isChainIdSupported } from "@/lib/isChainIdSupported";
 import { useAccount } from "wagmi";
 import { useToast } from "../ui/use-toast";
 import { useHypercertClient } from "@/hooks/use-hypercert-client";
-import { getAddress } from "viem";
+import { getAddress, isAddress } from "viem";
 import {
   Form,
   FormControl,
@@ -35,14 +35,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { FormattedUnits } from "@/components/formatted-units";
 
 const transferForm = z.object({
-  fractionId: z.string().uuid().optional(),
+  fractionId: z.string().optional(),
   recipient: z
     .string()
     .trim()
     .min(1, "Recipient is required")
-    .max(42, "Max. 42 characters"),
+    .refine((value) => isAddress(value), {
+      message: "Invalid address",
+    }),
 });
 
 export type TransferCreateFormValues = z.infer<typeof transferForm>;
@@ -62,19 +65,14 @@ export function TransferDrawer({ hypercert }: { hypercert: HypercertFull }) {
       )
     : [];
 
-  console.log("ownedFractions", ownedFractions);
-
   // Local state
   const form = useForm<TransferCreateFormValues>({
     resolver: zodResolver(transferForm),
     defaultValues: {
       fractionId: "",
-      recipient: "",
     },
   });
   const {
-    register,
-    handleSubmit,
     formState: { errors },
   } = form;
 
@@ -84,8 +82,6 @@ export function TransferDrawer({ hypercert }: { hypercert: HypercertFull }) {
   const recipient = form.watch("recipient");
 
   const handleSelectFraction = (fractionId: string) => {
-    console.log("handleSelectFraction", fractionId);
-
     setFractionIdToTransfer(fractionId);
   };
 
@@ -162,12 +158,12 @@ export function TransferDrawer({ hypercert }: { hypercert: HypercertFull }) {
 
   // At least one of the sections must be evaluated, and if any section is invalid,
   // a comment is required.
-  let isDisabled = !fractionIdToTransfer;
+  let isDisabled = !fractionIdToTransfer || !recipient;
 
   return (
     <>
       <Drawer.Title className="font-serif text-3xl font-medium tracking-tight">
-        Transfer a hypercert fraction
+        Transfer an hypercert fraction
       </Drawer.Title>
 
       <p>Select the fraction you want to transfer and the recipient address.</p>
@@ -193,7 +189,8 @@ export function TransferDrawer({ hypercert }: { hypercert: HypercertFull }) {
                       <SelectTrigger className="w-full">
                         <SelectValue
                           placeholder={
-                            fractionIdToTransfer || "Select fraction"
+                            fractionIdToTransfer?.split("-")[2] ||
+                            "Select fraction"
                           }
                         />
                       </SelectTrigger>
@@ -203,21 +200,17 @@ export function TransferDrawer({ hypercert }: { hypercert: HypercertFull }) {
                             key={fraction.fraction_id}
                             value={fraction.fraction_id}
                           >
-                            {`${fraction.fraction_id.split("-")[2]} - ${fraction.units} units` ||
-                              ""}
+                            {`${fraction.fraction_id.split("-")[2]} - `}
+                            <FormattedUnits>{fraction.units}</FormattedUnits>
                           </SelectItem>
                         ))}
-                        {/*<SelectItem value="light">Light</SelectItem>*/}
-                        {/*<SelectItem value="dark">Dark</SelectItem>*/}
-                        {/*<SelectItem value="system">System</SelectItem>*/}
                       </SelectContent>
                     </Select>
                     {/*<Input {...field} disabled />*/}
                   </FormControl>
                   <FormMessage />
                   <FormDescription>
-                    The fraction ID of the hypercert fraction you want to
-                    transfer.
+                    Select the fraction you want to transfer.
                   </FormDescription>
                 </FormItem>
               )}
