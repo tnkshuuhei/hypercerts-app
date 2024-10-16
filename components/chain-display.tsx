@@ -30,6 +30,8 @@ const chainIcon = (chain: Chain) => {
       return "/chain-icons/arbitrum_sepolia.png";
     case 42220:
       return "/chain-icons/celo.png";
+    case 314159:
+      return "/chain-icons/filecoin_calibration.png";
     case 11155111:
       return "/chain-icons/ethereum_sepolia.png";
     default:
