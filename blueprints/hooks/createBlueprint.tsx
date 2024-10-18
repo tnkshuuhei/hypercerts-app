@@ -5,6 +5,7 @@ import { useStepProcessDialogContext } from "@/components/global/step-process-di
 import { hypercertApiSigningDomain } from "@/configs/constants";
 import { HYPERCERTS_API_URL_REST } from "@/configs/hypercerts";
 import revalidatePathServerAction from "@/app/actions";
+import { useRouter } from "next/navigation";
 
 export interface BlueprintCreateRequest {
   form_values: unknown;
@@ -21,7 +22,9 @@ export const useCreateBlueprint = () => {
     setDialogStep: setStep,
     setSteps,
     setOpen,
+    setExtraContent,
   } = useStepProcessDialogContext();
+  const { push } = useRouter();
 
   return useMutation({
     mutationKey: ["createBlueprint"],
@@ -80,10 +83,24 @@ export const useCreateBlueprint = () => {
       await setStep("Creating blueprint");
 
       try {
-        const { acceptTerms, confirmContributorsPermission, ...form_values } =
-          formValues;
+        const {
+          acceptTerms,
+          confirmContributorsPermission,
+          allowlistEntries,
+          ...form_values
+        } = formValues;
         const body: BlueprintCreateRequest = {
-          form_values,
+          form_values: {
+            ...form_values,
+            ...(allowlistEntries
+              ? {
+                  allowlistEntries: allowlistEntries?.map((entry) => ({
+                    address: entry.address,
+                    units: entry.units.toString(),
+                  })),
+                }
+              : {}),
+          },
           minter_address: minterAddress as `0x${string}`,
           admin_address: address,
           signature: signature as `0x${string}`,
@@ -100,12 +117,18 @@ export const useCreateBlueprint = () => {
             throw new Error("Error creating blueprint");
           }
         });
+        setExtraContent(
+          <div className="flex flex-col spacy-y-2">
+            <p className="text-sm font-medium">Blueprint sent successfully</p>
+          </div>,
+        );
         await setStep("Updating blueprint", "completed");
         await revalidatePathServerAction([
           "/blueprints",
           `/profile/${address}`,
         ]);
         setTimeout(() => {
+          push(`/profile/${address}?tab=blueprints-created`);
           setOpen(false);
         }, 2000);
       } catch (error) {
