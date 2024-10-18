@@ -9,6 +9,9 @@ export const subTabs = [
   { key: "marketplace-listings", triggerLabel: "Listings" },
   { key: "marketplace-bought", triggerLabel: "Bought" },
   { key: "marketplace-sold", triggerLabel: "Sold" },
+  { key: "blueprints-claimable", triggerLabel: "To be minted" },
+  { key: "blueprints-claimed", triggerLabel: "Minted" },
+  { key: "blueprints-created", triggerLabel: "Sent" },
 ] as const;
 
 export type ProfileSubTabKey =
@@ -36,13 +39,15 @@ const mainTabs: {
     triggerLabel: "Marketplace",
     defaultSubTabKey: "marketplace-listings",
   },
+  {
+    prefix: "blueprints",
+    triggerLabel: "Blueprints",
+    defaultSubTabKey: "blueprints-claimable",
+  },
 ];
 
 export const createTabRoute = (address: string, tabKey: ProfileSubTabKey) =>
   `/profile/${address}?tab=${tabKey}`;
-
-export const defaultDescription =
-  "libp2p is an open source project for building network applications free from runtime and address services. You can help define the specification, create applications using libp2p, and craft examples and tutorials to get involved.";
 
 const ProfileTabSection = ({
   address,

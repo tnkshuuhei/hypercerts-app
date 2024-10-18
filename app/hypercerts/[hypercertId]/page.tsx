@@ -18,6 +18,9 @@ import { Separator } from "@/components/ui/separator";
 import { getHypercert } from "@/hypercerts/getHypercert";
 import { getOrders } from "@/marketplace/getOpenOrders";
 import Image from "next/image";
+import TransferButton from "@/components/hypercert/transfer-button";
+import { FlameIcon } from "lucide-react";
+import BurnButton from "@/components/hypercert/burn-button";
 
 type Props = {
   params: { hypercertId: string };
@@ -38,7 +41,11 @@ export async function generateMetadata(
     title: hypercert?.metadata?.name || "Untitled Hypercert",
     description: hypercert?.metadata?.description || "",
     openGraph: {
-      images: [`/api/hypercerts/${hypercertId}/image`, ...previousImages],
+      images: [
+        `/api/hypercerts/${hypercertId}/image`,
+        "/hypercerts-opengraph.jpg",
+        ...previousImages,
+      ],
     },
   };
 }
@@ -87,8 +94,8 @@ async function HypercertPageInner({
   return (
     <section className="flex flex-col space-y-4">
       <article className="space-y-4 lg:flex lg:space-y-0 lg:space-x-6">
-        <div className="h-[300px] lg:h-[350px] min-w-[300px] lg:min-w-[500px] max-w-[500px]">
-          <div className="relative w-full h-full bg-accent border border-slate-300 rounded-lg overflow-hidden ">
+        <div className="h-[300px] lg:h-[350px] min-w-[300px] lg:min-w-[500px] max-w-[500px] flex flex-col">
+          <div className="relative w-full flex-grow bg-accent border border-slate-300 rounded-lg overflow-hidden">
             <Image
               src={`/api/hypercerts/${hypercertId}/image`}
               alt={hypercert?.metadata?.name || ""}
@@ -96,6 +103,10 @@ async function HypercertPageInner({
               sizes="500px"
               className="object-contain object-top p-2"
             />
+          </div>
+          <div className="flex flex-row items-center space-x-2 mt-2">
+            <TransferButton hypercert={hypercert} />
+            <BurnButton hypercert={hypercert} />
           </div>
         </div>
         <section className="space-y-4">

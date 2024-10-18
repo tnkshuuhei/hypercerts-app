@@ -7,6 +7,7 @@ import EthAddress from "@/components/eth-address";
 import { HypercertsTabContent } from "@/app/profile/[address]/hypercerts-tab-content";
 import { CollectionsTabContent } from "@/app/profile/[address]/collections-tab-content";
 import { MarketplaceTabContent } from "@/app/profile/[address]/marketplace-tab-content";
+import { BlueprintsTabContent } from "@/app/profile/[address]/blueprint-tab-content";
 
 export default function ProfilePage({
   params,
@@ -45,6 +46,13 @@ export default function ProfilePage({
           <MarketplaceTabContent
             address={address}
             activeTab={tab as ProfileSubTabKey}
+          />
+        )}
+        {mainTab === "blueprints" && (
+          <BlueprintsTabContent
+            address={address}
+            activeTab={tab as ProfileSubTabKey}
+            searchParams={searchParams}
           />
         )}
       </section>

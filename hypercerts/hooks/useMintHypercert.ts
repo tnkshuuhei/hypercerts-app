@@ -14,6 +14,8 @@ import type { Chain, TransactionReceipt } from "viem";
 import { waitForTransactionReceipt } from "viem/actions";
 import { useAccount, useWalletClient } from "wagmi";
 import { generateBlockExplorerLink } from "@/lib/utils";
+import { useQueueMintBlueprint } from "@/blueprints/hooks/queueMintBlueprint";
+import revalidatePathServerAction from "@/app/actions";
 
 const createExtraContent = (
   receipt: TransactionReceipt,
@@ -78,9 +80,10 @@ const createExtraContent = (
 export const useMintHypercert = () => {
   const { client } = useHypercertClient();
   const { data: walletClient } = useWalletClient();
-  const { chain } = useAccount();
+  const { chain, address } = useAccount();
   const { setDialogStep, setSteps, setOpen, setTitle, setExtraContent } =
     useStepProcessDialogContext();
+  const { mutateAsync: queueMintBlueprint } = useQueueMintBlueprint();
 
   return useMutation({
     mutationKey: ["MINT_HYPERCERT"],
@@ -139,6 +142,11 @@ export const useMintHypercert = () => {
 
       await setDialogStep("done", "completed");
 
+      await revalidatePathServerAction([
+        "/collections",
+        "/collections/edit/[collectionId]",
+        `/profile/${address}`,
+      ]);
       return { hypercertId, receipt, chain };
     },
     mutationFn: async ({
@@ -146,21 +154,27 @@ export const useMintHypercert = () => {
       units,
       transferRestrictions,
       allowlistRecords,
+      blueprintId,
     }: {
       metaData: HypercertMetadata;
       units: bigint;
       transferRestrictions: TransferRestrictions;
       allowlistRecords?: AllowlistEntry[] | string;
+      blueprintId?: number;
     }) => {
       if (!client) {
         setOpen(false);
         throw new Error("No client found");
       }
 
+      const isBlueprint = !!blueprintId;
       setOpen(true);
       setSteps([
         { id: "preparing", description: "Preparing to mint hypercert..." },
         { id: "minting", description: "Minting hypercert on-chain..." },
+        ...(isBlueprint
+          ? [{ id: "blueprint", description: "Queueing blueprint mint..." }]
+          : []),
         { id: "confirming", description: "Waiting for on-chain confirmation" },
         { id: "route", description: "Creating your new hypercert's link..." },
         { id: "done", description: "Minting complete!" },
@@ -188,6 +202,21 @@ export const useMintHypercert = () => {
 
       if (!hash) {
         throw new Error("No transaction hash returned");
+      }
+
+      if (blueprintId) {
+        try {
+          await setDialogStep("blueprint", "active");
+          await queueMintBlueprint({
+            blueprintId,
+            txHash: hash,
+          });
+        } catch (error: unknown) {
+          console.error("Error queueing blueprint mint:", error);
+          throw new Error(
+            `Failed to queue blueprint mint: ${error instanceof Error ? error.message : "Unknown error"}`,
+          );
+        }
       }
 
       return hash;

@@ -20,10 +20,6 @@ import {
 } from "lucide-react";
 import { RefObject, useState } from "react";
 
-import {
-  HyperCertFormKeys,
-  HypercertFormValues,
-} from "@/app/hypercerts/new/page";
 import CreateAllowlistDialog from "@/components/allowlist/create-allowlist-dialog";
 import ConnectDialog from "@/components/connect-dialog";
 import { Badge } from "@/components/ui/badge";
@@ -50,6 +46,10 @@ import {
 import { toPng } from "html-to-image";
 import { FormattedUnits } from "@/components/formatted-units";
 import { DEFAULT_NUM_FRACTIONS } from "@/configs/hypercerts";
+import {
+  HyperCertFormKeys,
+  HypercertFormValues,
+} from "@/components/hypercert/hypercert-minting-form/index";
 // import Image from "next/image";
 
 interface FormStepsProps {
@@ -58,6 +58,7 @@ interface FormStepsProps {
   setCurrentStep: (step: number) => void;
   cardRef: RefObject<HTMLDivElement>;
   reset: () => void;
+  isBlueprint?: boolean;
 }
 
 const GeneralInformation = ({ form }: FormStepsProps) => {
@@ -222,7 +223,7 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
                 onChange={(e) => {
                   const tags = e.target.value
                     .split(",")
-                    .map((tag) => tag.toLowerCase().slice(0, 50));
+                    .map((tag) => tag.slice(0, 50));
                   field.onChange(tags.length > 0 ? tags.slice(0, 20) : []);
                 }}
               />
@@ -259,9 +260,7 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
                 onChange={(e) => {
                   const contributors = e.target.value
                     .split(",")
-                    .map((contributor) =>
-                      contributor.trim().toLowerCase().slice(0, 50),
-                    );
+                    .map((contributor) => contributor.slice(0, 50));
                   field.onChange(contributors.length > 0 ? contributors : []);
                 }}
               />
@@ -397,9 +396,24 @@ const calculatePercentageBigInt = (
   return (units * BigInt(100)) / total;
 };
 
-const ReviewAndSubmit = ({ form }: FormStepsProps) => {
+const ReviewAndSubmit = ({ form, isBlueprint }: FormStepsProps) => {
   return (
     <section className="space-y-8">
+      {isBlueprint && (
+        <FormField
+          control={form.control}
+          name="blueprint_minter_address"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Recipient of blueprint</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      )}
       <FormField
         control={form.control}
         name="acceptTerms"
@@ -468,6 +482,7 @@ const FormSteps = ({
   setCurrentStep,
   cardRef,
   reset,
+  isBlueprint,
 }: FormStepsProps) => {
   const isLastStep = currentStep === hypercertFormSteps.size;
   const { address } = useAccount();
@@ -578,6 +593,7 @@ const FormSteps = ({
           setCurrentStep={setCurrentStep}
           cardRef={cardRef}
           reset={reset}
+          isBlueprint={isBlueprint}
         />
       )}
 
@@ -607,7 +623,7 @@ const FormSteps = ({
         )}
         {isLastStep && address && (
           <Button type="submit" disabled={!isCurrentStepValid()}>
-            Mint hypercert
+            {isBlueprint ? "Create blueprint" : "Mint hypercert"}
             <ArrowRightIcon className="w-4 h-4 ml-2" />
           </Button>
         )}
