@@ -7,21 +7,19 @@ import {
   TooltipTrigger,
 } from "../ui/tooltip";
 
-import { Button } from "@/components/ui/button";
-import { Drawer } from "vaul";
 import { HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
 import { isChainIdSupported } from "@/lib/isChainIdSupported";
 import { useAccount } from "wagmi";
-import { TransferDrawer } from "@/components/hypercert/transfer-drawer";
-import { ArrowUpRight, SendHorizonal } from "lucide-react";
+import { SendHorizonal } from "lucide-react";
 
 export default function TransferButton({
   hypercert,
+  onClick,
 }: {
   hypercert: HypercertFull;
+  onClick?: () => void;
 }) {
-  const { isConnected, address } = useAccount();
-  const { chainId } = useAccount();
+  const { isConnected, address, chainId } = useAccount();
   const owners = hypercert.fractions?.data?.map(
     (fraction) => fraction.owner_address,
   );
@@ -46,30 +44,14 @@ export default function TransferButton({
 
   const enabled = address && owner && isChainIdSupported(chainId);
 
-  if (enabled) {
-    return (
-      <Drawer.Root direction="right">
-        <Drawer.Trigger asChild>
-          <SendHorizonal className="w-6 h-6 ml-1 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 duration-200" />
-        </Drawer.Trigger>
-        <Drawer.Portal>
-          <Drawer.Overlay className="fixed inset-0 bg-black/40" />
-          <Drawer.Content className="bg-white flex flex-col rounded-t-[10px] h-full w-[500px] mt-24 fixed bottom-0 right-0">
-            <div className="p-4 bg-white flex-1 h-full max-w-md mx-auto flex flex-col gap-5">
-              <TransferDrawer hypercert={hypercert} />
-            </div>
-          </Drawer.Content>
-        </Drawer.Portal>
-      </Drawer.Root>
-    );
-  }
-
   return (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <div>
-            <SendHorizonal className="w-6 h-6 ml-1 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 duration-200 stroke-slate-500" />
+          <div onClick={enabled ? onClick : undefined}>
+            <SendHorizonal
+              className={`w-6 h-6 ml-1 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 duration-200 ${enabled ? "" : "stroke-slate-500"}`}
+            />
           </div>
         </TooltipTrigger>
         <TooltipContent>{getTooltipMessage()}</TooltipContent>

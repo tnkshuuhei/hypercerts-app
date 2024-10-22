@@ -102,12 +102,14 @@ async function HypercertPageInner({
               className="object-contain object-top p-2"
             />
           </div>
-          <MutationButtons hypercert={hypercert} />
         </div>
         <section className="space-y-4">
-          <h1 className="font-serif text-3xl lg:text-4xl tracking-tight line-clamp-2 text-ellipsis w-full">
-            {hypercert?.metadata?.name || "[Untitled]"}
-          </h1>
+          <div className="flex flex-row w-full">
+            <h1 className="font-serif text-3xl lg:text-4xl tracking-tight line-clamp-2 text-ellipsis w-full">
+              {hypercert?.metadata?.name || "[Untitled]"}
+            </h1>
+            <MutationButtons hypercert={hypercert} />
+          </div>
           <Creator hypercert={hypercert} />
           <ReadMore text={hypercert?.metadata?.description} length={280} />
           <ExternalUrl url={hypercert?.metadata?.external_url} />
