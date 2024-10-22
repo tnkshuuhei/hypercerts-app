@@ -176,6 +176,7 @@ export function TransferDrawer({ hypercert }: { hypercert: HypercertFull }) {
           <form
             onSubmit={() => {
               console.log("submit");
+              transfer();
             }}
           >
             <FormField

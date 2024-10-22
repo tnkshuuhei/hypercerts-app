@@ -18,9 +18,7 @@ import { Separator } from "@/components/ui/separator";
 import { getHypercert } from "@/hypercerts/getHypercert";
 import { getOrders } from "@/marketplace/getOpenOrders";
 import Image from "next/image";
-import TransferButton from "@/components/hypercert/transfer-button";
-import { FlameIcon } from "lucide-react";
-import BurnButton from "@/components/hypercert/burn-button";
+import MutationButtons from "@/components/hypercert/mutation-buttons";
 
 type Props = {
   params: { hypercertId: string };
@@ -104,10 +102,7 @@ async function HypercertPageInner({
               className="object-contain object-top p-2"
             />
           </div>
-          <div className="flex flex-row items-center space-x-2 mt-2">
-            <TransferButton hypercert={hypercert} />
-            <BurnButton hypercert={hypercert} />
-          </div>
+          <MutationButtons hypercert={hypercert} />
         </div>
         <section className="space-y-4">
           <h1 className="font-serif text-3xl lg:text-4xl tracking-tight line-clamp-2 text-ellipsis w-full">

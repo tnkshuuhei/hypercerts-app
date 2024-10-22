@@ -50,17 +50,13 @@ export default function TransferButton({
     return (
       <Drawer.Root direction="right">
         <Drawer.Trigger asChild>
-          <div>
-            <SendHorizonal className="w-6 h-6 ml-1 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 duration-200" />
-          </div>
+          <SendHorizonal className="w-6 h-6 ml-1 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 duration-200" />
         </Drawer.Trigger>
         <Drawer.Portal>
           <Drawer.Overlay className="fixed inset-0 bg-black/40" />
           <Drawer.Content className="bg-white flex flex-col rounded-t-[10px] h-full w-[500px] mt-24 fixed bottom-0 right-0">
-            <div className="p-4 bg-white flex-1 h-full">
-              <div className="max-w-md mx-auto flex flex-col gap-5">
-                <TransferDrawer hypercert={hypercert} />
-              </div>
+            <div className="p-4 bg-white flex-1 h-full max-w-md mx-auto flex flex-col gap-5">
+              <TransferDrawer hypercert={hypercert} />
             </div>
           </Drawer.Content>
         </Drawer.Portal>
