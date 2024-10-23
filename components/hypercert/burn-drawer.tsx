@@ -2,7 +2,7 @@
 
 import "@yaireo/tagify/dist/tagify.css"; // Tagify CSS
 import { ArrowUpRight, LoaderCircle } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "../ui/button";
 import { Drawer } from "vaul";
@@ -25,6 +25,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { z } from "zod";
+import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -44,17 +45,16 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-const transferForm = z.object({
+const burnForm = z.object({
   fractionId: z.string(),
 });
 
-export type BurnFormValues = z.infer<typeof transferForm>;
+export type BurnFormValues = z.infer<typeof burnForm>;
 
 export function BurnDrawer({ hypercert }: { hypercert: HypercertFull }) {
-  const { chainId, chain } = useAccount();
+  const { chainId, chain, address } = useAccount();
   const { toast } = useToast();
   const { client } = useHypercertClient();
-  const { address } = useAccount();
   const [fractionIdToBurn, setFractionIdToBurn] = useState<string>("");
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
 
@@ -68,7 +68,7 @@ export function BurnDrawer({ hypercert }: { hypercert: HypercertFull }) {
 
   // Local state
   const form = useForm<BurnFormValues>({
-    resolver: zodResolver(transferForm),
+    resolver: zodResolver(burnForm),
     defaultValues: {
       fractionId: "",
     },
@@ -79,6 +79,13 @@ export function BurnDrawer({ hypercert }: { hypercert: HypercertFull }) {
 
   const [isBurning, setIsBurning] = useState(false);
   const [txHash, setTxHash] = useState<string>("");
+
+  useEffect(() => {
+    if (ownedFractions && ownedFractions.length === 1) {
+      setFractionIdToBurn(ownedFractions[0].fraction_id!);
+      form.setValue("fractionId", ownedFractions[0].fraction_id!);
+    }
+  }, [ownedFractions, form]);
 
   const handleSelectFraction = (fractionId: string) => {
     setFractionIdToBurn(fractionId);
@@ -108,7 +115,7 @@ export function BurnDrawer({ hypercert }: { hypercert: HypercertFull }) {
     setIsBurning(true);
     try {
       if (!fractionIdToBurn) {
-        throw new Error("Recipient and fraction to transfer are required");
+        throw new Error("Fraction to burn is required");
       }
 
       const tokenIdFromFraction = fractionIdToBurn.split("-")[2];
@@ -176,7 +183,7 @@ export function BurnDrawer({ hypercert }: { hypercert: HypercertFull }) {
           href={url}
           title={url}
           target="_blank"
-          rel="norefferer"
+          rel="noreferrer"
           className="flex items-center group text-blue-600 px-2 py-1 bg-blue-50 hover:bg-blue-100 w-max rounded-lg text-sm font-medium"
         >
           <span>
@@ -192,14 +199,74 @@ export function BurnDrawer({ hypercert }: { hypercert: HypercertFull }) {
     );
   }
 
-  // At least one of the sections must be evaluated, and if any section is invalid,
-  // a comment is required.
+  const renderFractionSelection = () => {
+    if (!ownedFractions || ownedFractions.length === 0) {
+      return <p>You don&apos;t own any fractions of this hypercert.</p>;
+    }
+
+    if (ownedFractions.length === 1) {
+      const fraction = ownedFractions[0];
+      return (
+        <FormItem>
+          <FormLabel>Fraction ID</FormLabel>
+          <FormControl>
+            <Input
+              value={`${fraction.fraction_id?.split("-")[2]} - ${fraction.units} units`}
+              disabled
+            />
+          </FormControl>
+          <FormDescription>
+            This is the only fraction you own of this hypercert.
+          </FormDescription>
+        </FormItem>
+      );
+    }
+
+    return (
+      <FormField
+        control={form.control}
+        name="fractionId"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Fraction ID</FormLabel>
+            <FormControl>
+              <Select {...field} onValueChange={handleSelectFraction}>
+                <SelectTrigger className="w-full">
+                  <SelectValue
+                    placeholder={
+                      fractionIdToBurn?.split("-")[2] || "Select fraction"
+                    }
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {ownedFractions.map((fraction) => (
+                    <SelectItem
+                      key={fraction.fraction_id}
+                      value={fraction.fraction_id!}
+                    >
+                      {`${fraction.fraction_id?.split("-")[2]} - `}
+                      <FormattedUnits>{fraction.units}</FormattedUnits>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </FormControl>
+            <FormMessage />
+            <FormDescription>
+              Select the fraction you want to burn.
+            </FormDescription>
+          </FormItem>
+        )}
+      />
+    );
+  };
+
   let isDisabled = !fractionIdToBurn;
 
   return (
     <>
       <Drawer.Title className="font-serif text-3xl font-medium tracking-tight">
-        Burn an hypercert fraction
+        Burn a hypercert fraction
       </Drawer.Title>
 
       <p>Select the fraction you want to burn.</p>
@@ -209,68 +276,30 @@ export function BurnDrawer({ hypercert }: { hypercert: HypercertFull }) {
           Fraction info
         </h5>
         <Form {...form}>
-          <form
-            onSubmit={() => {
-              console.log("submit");
-            }}
-          >
-            <FormField
-              control={form.control}
-              name="fractionId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Fraction ID</FormLabel>
-                  <FormControl>
-                    <Select {...field} onValueChange={handleSelectFraction}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue
-                          placeholder={
-                            fractionIdToBurn?.split("-")[2] || "Select fraction"
-                          }
-                        />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {ownedFractions?.map((fraction) => (
-                          <SelectItem
-                            key={fraction.fraction_id}
-                            value={fraction.fraction_id!}
-                          >
-                            {`${fraction.fraction_id?.split("-")[2]} - `}
-                            <FormattedUnits>{fraction.units}</FormattedUnits>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {/*<Input {...field} disabled />*/}
-                  </FormControl>
-                  <FormMessage />
-                  <FormDescription>
-                    The fraction ID of the hypercert fraction you want to burn.
-                  </FormDescription>
-                </FormItem>
-              )}
-            />
+          <form onSubmit={form.handleSubmit(handleBurnClick)}>
+            {renderFractionSelection()}
+            <div className="flex gap-5 justify-center w-full mt-4">
+              <Drawer.Close asChild>
+                <Button variant="outline" className="w-1/2">
+                  Cancel
+                </Button>
+              </Drawer.Close>
+              <Button
+                type="submit"
+                variant="destructive"
+                disabled={isDisabled}
+                className={cn("w-1/2", {
+                  "opacity-50 cursor-not-allowed": isDisabled,
+                })}
+              >
+                {isBurning && (
+                  <LoaderCircle className="h-4 w-4 animate-spin mr-1" />
+                )}
+                {isBurning ? "Burning fraction" : "Burn fraction"}
+              </Button>
+            </div>
           </form>
         </Form>
-      </div>
-
-      <div className="flex gap-5 justify-center w-full">
-        <Drawer.Close asChild>
-          <Button variant="outline" className="w-1/2">
-            Cancel
-          </Button>
-        </Drawer.Close>
-        <Button
-          variant="destructive"
-          disabled={isDisabled}
-          onClick={handleBurnClick}
-          className={cn("w-1/2", {
-            "opacity-50 cursor-not-allowed": isDisabled,
-          })}
-        >
-          {isBurning && <LoaderCircle className="h-4 w-4 animate-spin mr-1" />}
-          {isBurning ? "Burning fraction" : "Burn fraction"}
-        </Button>
       </div>
 
       <ConfirmationDialog />

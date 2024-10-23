@@ -2,7 +2,7 @@
 
 import "@yaireo/tagify/dist/tagify.css"; // Tagify CSS
 import { ArrowUpRight, LoaderCircle } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "../ui/button";
 import { Drawer } from "vaul";
@@ -51,10 +51,9 @@ const transferForm = z.object({
 export type TransferCreateFormValues = z.infer<typeof transferForm>;
 
 export function TransferDrawer({ hypercert }: { hypercert: HypercertFull }) {
-  const { chainId, chain } = useAccount();
+  const { chainId, chain, address } = useAccount();
   const { toast } = useToast();
   const { client } = useHypercertClient();
-  const { address } = useAccount();
   const [fractionIdToTransfer, setFractionIdToTransfer] = useState<string>("");
 
   // Global state
@@ -80,6 +79,13 @@ export function TransferDrawer({ hypercert }: { hypercert: HypercertFull }) {
   const [txHash, setTxHash] = useState<string>("");
 
   const recipient = form.watch("recipient");
+
+  useEffect(() => {
+    if (ownedFractions && ownedFractions.length === 1) {
+      setFractionIdToTransfer(ownedFractions[0].fraction_id!);
+      form.setValue("fractionId", ownedFractions[0].fraction_id!);
+    }
+  }, [ownedFractions, form]);
 
   const handleSelectFraction = (fractionId: string) => {
     setFractionIdToTransfer(fractionId);
@@ -155,15 +161,74 @@ export function TransferDrawer({ hypercert }: { hypercert: HypercertFull }) {
       </>
     );
   }
-
-  // At least one of the sections must be evaluated, and if any section is invalid,
-  // a comment is required.
   let isDisabled = !fractionIdToTransfer || !recipient;
+
+  const renderFractionSelection = () => {
+    if (!ownedFractions || ownedFractions.length === 0) {
+      return <p>You don&apos;t own any fractions of this hypercert.</p>;
+    }
+
+    if (ownedFractions.length === 1) {
+      const fraction = ownedFractions[0];
+      return (
+        <FormItem>
+          <FormLabel>Fraction ID</FormLabel>
+          <FormControl>
+            <Input
+              value={`${fraction.fraction_id?.split("-")[2]} - ${fraction.units} units`}
+              disabled
+            />
+          </FormControl>
+          <FormDescription>
+            This is the only fraction you own of this hypercert.
+          </FormDescription>
+        </FormItem>
+      );
+    }
+
+    return (
+      <FormField
+        control={form.control}
+        name="fractionId"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Fraction ID</FormLabel>
+            <FormControl>
+              <Select {...field} onValueChange={handleSelectFraction}>
+                <SelectTrigger className="w-full">
+                  <SelectValue
+                    placeholder={
+                      fractionIdToTransfer?.split("-")[2] || "Select fraction"
+                    }
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {ownedFractions.map((fraction) => (
+                    <SelectItem
+                      key={fraction.fraction_id}
+                      value={fraction.fraction_id!}
+                    >
+                      {`${fraction.fraction_id?.split("-")[2]} - `}
+                      <FormattedUnits>{fraction.units}</FormattedUnits>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </FormControl>
+            <FormMessage />
+            <FormDescription>
+              Select the fraction you want to transfer.
+            </FormDescription>
+          </FormItem>
+        )}
+      />
+    );
+  };
 
   return (
     <>
       <Drawer.Title className="font-serif text-3xl font-medium tracking-tight">
-        Transfer an hypercert fraction
+        Transfer a hypercert fraction
       </Drawer.Title>
 
       <p>Select the fraction you want to transfer and the recipient address.</p>
@@ -173,48 +238,8 @@ export function TransferDrawer({ hypercert }: { hypercert: HypercertFull }) {
           Fraction info
         </h5>
         <Form {...form}>
-          <form
-            onSubmit={() => {
-              console.log("submit");
-            }}
-          >
-            <FormField
-              control={form.control}
-              name="fractionId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Fraction ID</FormLabel>
-                  <FormControl>
-                    <Select {...field} onValueChange={handleSelectFraction}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue
-                          placeholder={
-                            fractionIdToTransfer?.split("-")[2] ||
-                            "Select fraction"
-                          }
-                        />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {ownedFractions?.map((fraction) => (
-                          <SelectItem
-                            key={fraction.fraction_id}
-                            value={fraction.fraction_id!}
-                          >
-                            {`${fraction.fraction_id?.split("-")[2]} - `}
-                            <FormattedUnits>{fraction.units}</FormattedUnits>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {/*<Input {...field} disabled />*/}
-                  </FormControl>
-                  <FormMessage />
-                  <FormDescription>
-                    Select the fraction you want to transfer.
-                  </FormDescription>
-                </FormItem>
-              )}
-            />
+          <form onSubmit={form.handleSubmit(transfer)}>
+            {renderFractionSelection()}
             <FormField
               control={form.control}
               name="recipient"
@@ -231,28 +256,27 @@ export function TransferDrawer({ hypercert }: { hypercert: HypercertFull }) {
                 </FormItem>
               )}
             />
+            <div className="flex gap-5 justify-center w-full mt-4">
+              <Drawer.Close asChild>
+                <Button variant="outline" className="w-1/2">
+                  Cancel
+                </Button>
+              </Drawer.Close>
+              <Button
+                type="submit"
+                disabled={isDisabled}
+                className={cn("w-1/2", {
+                  "opacity-50 cursor-not-allowed": isDisabled,
+                })}
+              >
+                {isTransferring && (
+                  <LoaderCircle className="h-4 w-4 animate-spin mr-1" />
+                )}
+                {isTransferring ? "Transferring fraction" : "Transfer fraction"}
+              </Button>
+            </div>
           </form>
         </Form>
-      </div>
-
-      <div className="flex gap-5 justify-center w-full">
-        <Drawer.Close asChild>
-          <Button variant="outline" className="w-1/2">
-            Cancel
-          </Button>
-        </Drawer.Close>
-        <Button
-          disabled={isDisabled}
-          onClick={transfer}
-          className={cn("w-1/2", {
-            "opacity-50 cursor-not-allowed": isDisabled,
-          })}
-        >
-          {isTransferring && (
-            <LoaderCircle className="h-4 w-4 animate-spin mr-1" />
-          )}
-          {isTransferring ? "Transferring fraction" : "Transfer fraction"}
-        </Button>
       </div>
     </>
   );
