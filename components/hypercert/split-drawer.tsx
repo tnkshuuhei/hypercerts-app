@@ -39,9 +39,11 @@ import { Progress } from "@/components/ui/progress";
 
 function QuickAddButtons({
   totalUnits,
+  remainingUnits,
   onAdd,
 }: {
   totalUnits: bigint;
+  remainingUnits: bigint;
   onAdd: (units: string) => void;
 }) {
   const addPercentage = (percentage: number) => {
@@ -49,35 +51,57 @@ function QuickAddButtons({
     onAdd(units.toString());
   };
 
+  const isPossibleToAddPercentage = (percentage: number) => {
+    const units = (totalUnits * BigInt(percentage)) / BigInt(100);
+    return units <= remainingUnits;
+  };
+
   return (
-    <div className="flex space-x-2">
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        onClick={() => addPercentage(25)}
-      >
-        <Plus className="h-4 w-4 mr-2" />
-        25%
-      </Button>
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        onClick={() => addPercentage(50)}
-      >
-        <Plus className="h-4 w-4 mr-2" />
-        50%
-      </Button>
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        onClick={() => addPercentage(75)}
-      >
-        <Plus className="h-4 w-4 mr-2" />
-        75%
-      </Button>
+    <div className="flex flex-col">
+      <h5 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
+        ADD FRACTION
+      </h5>
+      <div className="flex space-x-2">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={!isPossibleToAddPercentage(25)}
+          onClick={() => addPercentage(25)}
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          25%
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={!isPossibleToAddPercentage(50)}
+          onClick={() => addPercentage(50)}
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          50%
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={!isPossibleToAddPercentage(75)}
+          onClick={() => addPercentage(75)}
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          75%
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => addPercentage(0)}
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Custom
+        </Button>
+      </div>
     </div>
   );
 }
@@ -245,6 +269,20 @@ export function SplitDrawer({ hypercert }: { hypercert: HypercertFull }) {
     allocatedUnits === BigInt(0) ||
     allocatedUnits > totalUnits;
 
+  const renderTotalUnits = () => {
+    if (selectedFraction) {
+      return (
+        <div>
+          <h5 className="text-sm">Total units </h5>
+          <span className="text-sm text-slate-500">
+            {formatBigInt(totalUnits)} units
+          </span>
+        </div>
+      );
+    }
+    return null;
+  };
+
   const renderFractionSelection = () => {
     if (!ownedFractions || ownedFractions.length === 0) {
       return <p>You don&apos;t own any fractions of this hypercert.</p>;
@@ -333,6 +371,7 @@ export function SplitDrawer({ hypercert }: { hypercert: HypercertFull }) {
             className="space-y-4 w-full"
           >
             {renderFractionSelection()}
+            {renderTotalUnits()}
             {fields.map((field, index) => (
               <div key={field.id} className="flex items-end space-x-2">
                 <FormField
@@ -341,7 +380,19 @@ export function SplitDrawer({ hypercert }: { hypercert: HypercertFull }) {
                   render={({ field }) => (
                     <FormItem className="flex-1">
                       <FormLabel>
-                        {index === 0 ? "Remaining Units" : `Fraction ${index}`}
+                        {index === 0 ? (
+                          <p>
+                            Fraction 1{" "}
+                            <span className="text-slate-500">
+                              (units remaining)
+                            </span>
+                          </p>
+                        ) : (
+                          <p>
+                            Fraction {index + 1}{" "}
+                            <span className="text-slate-500">NEW</span>
+                          </p>
+                        )}
                       </FormLabel>
                       <div className="flex items-center space-x-2">
                         <FormControl>
@@ -386,42 +437,13 @@ export function SplitDrawer({ hypercert }: { hypercert: HypercertFull }) {
             <div className="flex items-center space-x-2 mt-4">
               <QuickAddButtons
                 totalUnits={totalUnits}
+                remainingUnits={remainingUnits}
                 onAdd={(units) => {
                   if (fields.length < 15) {
                     append({ units });
                   }
                 }}
               />
-
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => append({ units: "" })}
-                disabled={fields.length >= 15}
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Custom
-              </Button>
-            </div>
-
-            <div className="space-y-2">
-              <FormLabel>Distribution</FormLabel>
-              <Progress
-                value={
-                  totalUnits
-                    ? Number(
-                        ((allocatedUnits + remainingUnits) * BigInt(100)) /
-                          totalUnits,
-                      )
-                    : 0
-                }
-                className="w-full"
-              />
-              <FormDescription>
-                Allocated: {formatBigInt(allocatedUnits + remainingUnits)} /{" "}
-                {formatBigInt(totalUnits)} units
-              </FormDescription>
             </div>
 
             <div className="flex gap-5 justify-center w-full mt-4">
