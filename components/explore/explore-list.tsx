@@ -1,15 +1,13 @@
+import { use, cache } from "react";
 import {
   GetAllHypercertsParams,
   getAllHypercerts,
   isClaimsFilter,
   isClaimsOrderBy,
 } from "@/hypercerts/getAllHypercerts";
-
-import ExploreListSkeleton from "./explore-list-skeleton";
 import ExplorePagination from "./explore-pagination";
 import { HYPERCERTS_PER_PAGE } from "@/configs/ui";
 import { InfoSection } from "@/app/profile/[address]/sections";
-import { Suspense } from "react";
 import HypercertWindow from "@/components/hypercert/hypercert-window";
 
 function HypercertsListNoResults() {
@@ -20,7 +18,12 @@ function HypercertsListLoadError() {
   return <InfoSection>We couldn&apos;t find any hypercerts...</InfoSection>;
 }
 
-async function ExploreListInner({
+const getHypercertsData = cache(async (params: GetAllHypercertsParams) => {
+  const hypercerts = await getAllHypercerts(params);
+  return hypercerts;
+});
+
+export default function ExploreList({
   searchParams,
 }: {
   searchParams: Record<string, string>;
@@ -33,20 +36,13 @@ async function ExploreListInner({
   const params: GetAllHypercertsParams = {
     first: HYPERCERTS_PER_PAGE,
     offset: HYPERCERTS_PER_PAGE * (currentPage - 1),
+    chainId: chain || undefined,
+    search: search || undefined,
+    filter: isClaimsFilter(filter) ? filter : undefined,
+    orderBy: isClaimsOrderBy(orderBy) ? orderBy : undefined,
   };
-  if (chain) {
-    params.chainId = chain;
-  }
-  if (search) {
-    params.search = search;
-  }
-  if (isClaimsFilter(filter)) {
-    params.filter = filter;
-  }
-  if (isClaimsOrderBy(orderBy)) {
-    params.orderBy = orderBy;
-  }
-  const hypercerts = await getAllHypercerts(params);
+
+  const hypercerts = use(getHypercertsData(params));
   const displayCurrency = searchParams?.currency;
 
   if (!hypercerts) {
@@ -65,36 +61,18 @@ async function ExploreListInner({
         </div>
       )}
       <div className="grid grid-cols-1 md:grid-cols-[repeat(auto-fit,_minmax(16.875rem,_18.75rem))] gap-4 py-4">
-        {hypercerts?.data?.map((hypercert) => {
-          return (
-            <HypercertWindow
-              key={hypercert.hypercert_id}
-              hypercert={hypercert}
-              priceDisplayCurrency={displayCurrency}
-            />
-          );
-        })}
+        {hypercerts?.data?.map((hypercert) => (
+          <HypercertWindow
+            key={hypercert.hypercert_id}
+            hypercert={hypercert}
+            priceDisplayCurrency={displayCurrency}
+          />
+        ))}
       </div>
       <ExplorePagination
         searchParams={searchParams}
         hypercertsCount={hypercerts.count}
       />
     </div>
-  );
-}
-
-export default async function ExploreList({
-  searchParams,
-}: {
-  searchParams: Record<string, string>;
-}) {
-  const suspenseKey = new URLSearchParams(searchParams).toString();
-  return (
-    <Suspense
-      fallback={<ExploreListSkeleton length={HYPERCERTS_PER_PAGE} />}
-      key={suspenseKey}
-    >
-      <ExploreListInner {...{ searchParams }} />
-    </Suspense>
   );
 }

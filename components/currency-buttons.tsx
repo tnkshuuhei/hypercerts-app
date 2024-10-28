@@ -1,23 +1,26 @@
 "use client";
 
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { DEFAULT_DISPLAY_CURRENCY } from "@/configs/hypercerts";
 
-export const CurrencyButtons = ({ className }: { className?: string }) => {
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const router = useRouter();
+interface CurrencyButtonsProps {
+  value?: string;
+  className?: string;
+}
 
-  const urlSearchParams = new URLSearchParams(searchParams);
-  const value = urlSearchParams.get("currency") || DEFAULT_DISPLAY_CURRENCY;
+export const CurrencyButtons = ({ value, className }: CurrencyButtonsProps) => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const currentValue = value || DEFAULT_DISPLAY_CURRENCY;
 
   const onClickCurrency = (currency: string) => {
-    urlSearchParams.set("currency", currency);
-    router.push(`${pathname}?${urlSearchParams.toString()}`, {
-      scroll: false,
-    });
+    const params = new URLSearchParams(searchParams);
+    params.set("currency", currency);
+    params.set("p", "1"); // Reset to first page when changing currency
+    router.push(`?${params.toString()}`);
   };
 
   const sharedClasses = cn(
@@ -32,13 +35,13 @@ export const CurrencyButtons = ({ className }: { className?: string }) => {
   return (
     <div className={cn("flex", className)}>
       <Button
-        className={cn(value === "usd" ? activeClass : inactiveClass)}
+        className={cn(currentValue === "usd" ? activeClass : inactiveClass)}
         onClick={() => onClickCurrency("usd")}
       >
         USD
       </Button>
       <Button
-        className={cn(value === "token" ? activeClass : inactiveClass)}
+        className={cn(currentValue === "token" ? activeClass : inactiveClass)}
         onClick={() => onClickCurrency("token")}
       >
         Token
