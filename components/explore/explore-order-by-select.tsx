@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Select,
   SelectContent,
@@ -7,27 +8,28 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-export default function ExploreOrderBySelect() {
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
+interface ExploreOrderBySelectProps {
+  value?: string;
+}
+
+export default function ExploreOrderBySelect({
+  value,
+}: ExploreOrderBySelectProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const selectedValue = searchParams.get("orderBy") || "created_desc";
+  const selectedValue = value || "created_desc";
 
-  const orderBy = (value: string) => {
-    const urlSearchParams = new URLSearchParams(searchParams);
-    urlSearchParams.set("orderBy", value);
-    router.push(`${pathname}?${urlSearchParams.toString()}`);
+  const handleChange = (newValue: string) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("orderBy", newValue);
+    params.set("p", "1"); // Reset to first page when changing order
+    router.push(`?${params.toString()}`);
   };
 
   return (
-    <Select
-      defaultValue="created_desc"
-      onValueChange={orderBy}
-      value={selectedValue}
-    >
+    <Select value={selectedValue} onValueChange={handleChange}>
       <SelectTrigger className="w-full">
         <SelectValue placeholder="Sort by" />
       </SelectTrigger>
