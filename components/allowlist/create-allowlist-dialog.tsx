@@ -75,7 +75,7 @@ export default function Component({
 
   const setPercentage = (e: ChangeEvent<HTMLInputElement>, i: number) => {
     const value = e.target.value;
-    // Allow only numbers and up to two decimal places
+    // Allow numbers with up to two decimal places
     if (/^\d*\.?\d{0,2}$/.test(value) || value === "") {
       setAllowList((allowList) =>
         allowList.map((item, index) =>
@@ -126,9 +126,9 @@ export default function Component({
         return {
           address: entry.address,
           units:
-            (BigInt(Math.round(parseFloat(entry.percentage) * 10000)) *
+            (BigInt(Math.round(parseFloat(entry.percentage) * 1000000)) *
               totalUnits) /
-            BigInt(1000000),
+            BigInt(100000000),
         };
       });
       if (!parsedAllowList) {
