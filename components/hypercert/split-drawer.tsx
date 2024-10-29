@@ -388,10 +388,7 @@ export function SplitDrawer({ hypercert }: { hypercert: HypercertFull }) {
                             </span>
                           </p>
                         ) : (
-                          <p>
-                            Fraction {index + 1}{" "}
-                            <span className="text-slate-500">NEW</span>
-                          </p>
+                          <p>Fraction {index + 1} </p>
                         )}
                       </FormLabel>
                       <div className="flex items-center space-x-2">

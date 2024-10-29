@@ -88,7 +88,7 @@ export default function MutationButtons({ hypercert }: MutationButtonsProps) {
   );
 
   return (
-    <div className="flex flex-row items-center space-x-2 mt-2">
+    <div className="flex flex-row items-center space-x-2">
       <div className="hidden md:flex space-x-2">
         {renderButton(SendHorizontal, handleTransferClick)}
       </div>
@@ -101,13 +101,13 @@ export default function MutationButtons({ hypercert }: MutationButtonsProps) {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem onSelect={handleTransferClick} disabled={!enabled}>
-            <SendHorizontal className="mr-2 w-6 h-6" /> Transfer
+            Transfer
           </DropdownMenuItem>
           <DropdownMenuItem onSelect={handleSplitClick} disabled={!enabled}>
-            <Split className="mr-2 w-6 h-6" /> Split
+            Split
           </DropdownMenuItem>
           <DropdownMenuItem onSelect={handleBurnClick} disabled={!enabled}>
-            <FlameIcon className="mr-2 w-6 h-6" /> Burn
+            Burn
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
