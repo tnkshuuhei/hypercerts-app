@@ -5,22 +5,22 @@ import "@yaireo/tagify/dist/tagify.css"; // Tagify CSS
 import { ArrowUpRight, LoaderCircle } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
-import { AllEvaluationStates } from "../../eas/types/all-evaluation-states.type";
+import { AllEvaluationStates } from "@/eas/types/all-evaluation-states.type";
 import { Button } from "../ui/button";
 import { Drawer } from "vaul";
 import EvaluateToggle from "./evaluate-toggle";
-import { HypercertFull } from "../../hypercerts/fragments/hypercert-full.fragment";
+import { HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
 import { Textarea } from "../ui/textarea";
-import { clearCacheAfterEvaluation } from "../../app/actions/clearCacheAfterEvaluation";
-import { cn } from "../../lib/utils";
-import { createAttestation } from "../../eas/createAttestation";
-import { errorHasMessage } from "../../lib/errorHasMessage";
-import { errorHasReason } from "../../lib/errorHasReason";
-import { getEasConfig } from "../../eas/getEasConfig";
-import { isChainIdSupported } from "../../lib/isChainIdSupported";
+import { clearCacheAfterEvaluation } from "@/app/actions/clearCacheAfterEvaluation";
+import { cn } from "@/lib/utils";
+import { createAttestation } from "@/eas/createAttestation";
+import { errorHasMessage } from "@/lib/errorHasMessage";
+import { errorHasReason } from "@/lib/errorHasReason";
+import { getEasConfig } from "@/eas/getEasConfig";
+import { isChainIdSupported } from "@/lib/isChainIdSupported";
 import { useAccount } from "wagmi";
-import { useEthersSigner } from "../../ethers/hooks/useEthersSigner";
-import { useGlobalState } from "../../lib/state";
+import { useEthersSigner } from "@/ethers/hooks/useEthersSigner";
+import { useGlobalState } from "@/lib/state";
 import { useToast } from "../ui/use-toast";
 
 function isAnySectionEvaluated(state: AllEvaluationStates) {

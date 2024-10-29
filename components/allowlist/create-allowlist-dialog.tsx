@@ -1,3 +1,5 @@
+"use client";
+
 import { ChangeEvent, useEffect, useState } from "react";
 import {
   Dialog,
@@ -9,11 +11,11 @@ import {
 import { LoaderCircle, MinusCircle, PlusCircle } from "lucide-react";
 import { isAddress } from "viem";
 
-import { Button } from "../ui/button";
-import { Input } from "../ui/input";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { errorHasMessage } from "@/lib/errorHasMessage";
-import { toast } from "../ui/use-toast";
+import { toast } from "@/components/ui/use-toast";
 import { useValidateAllowlist } from "@/hypercerts/hooks/useCreateAllowLists";
 import { AllowlistEntry } from "@hypercerts-org/sdk";
 
@@ -24,7 +26,7 @@ type AllowListItem = {
   percentage?: string;
 };
 
-export default function CreateAllowlistDialog({
+export default function Component({
   setAllowlistEntries,
   setOpen,
   open,
@@ -72,16 +74,20 @@ export default function CreateAllowlistDialog({
   };
 
   const setPercentage = (e: ChangeEvent<HTMLInputElement>, i: number) => {
-    setAllowList((allowList) =>
-      allowList.map((item, index) =>
-        index === i
-          ? {
-              ...item,
-              percentage: e.target.value,
-            }
-          : item,
-      ),
-    );
+    const value = e.target.value;
+    // Allow only numbers and up to two decimal places
+    if (/^\d*\.?\d{0,2}$/.test(value) || value === "") {
+      setAllowList((allowList) =>
+        allowList.map((item, index) =>
+          index === i
+            ? {
+                ...item,
+                percentage: value,
+              }
+            : item,
+        ),
+      );
+    }
   };
 
   const isPercentageValid = (unit: string) => {
@@ -97,7 +103,7 @@ export default function CreateAllowlistDialog({
   };
 
   const percentageSum = allowList.reduce(
-    (acc, item) => acc + Number.parseFloat(item.percentage || ""),
+    (acc, item) => acc + Number.parseFloat(item.percentage || "0"),
     0,
   );
 
@@ -120,7 +126,9 @@ export default function CreateAllowlistDialog({
         return {
           address: entry.address,
           units:
-            (BigInt(parseFloat(entry.percentage)) * totalUnits) / BigInt(100),
+            (BigInt(Math.round(parseFloat(entry.percentage) * 10000)) *
+              totalUnits) /
+            BigInt(1000000),
         };
       });
       if (!parsedAllowList) {
@@ -150,7 +158,9 @@ export default function CreateAllowlistDialog({
         );
       }
       return (
-        <div className="text-red-600 text-sm">Couldnt create allow list</div>
+        <div className="text-red-600 text-sm">
+          Couldn&apos;t create allow list
+        </div>
       );
     }
     if (validateAllowlistResponse && validateAllowlistResponse.status >= 400) {
@@ -162,12 +172,14 @@ export default function CreateAllowlistDialog({
   };
 
   const percentageError =
-    percentageSum !== 100 &&
+    Math.abs(percentageSum - 100) > 0.01 &&
     allowList[0].percentage !== "" &&
     allowList[0].percentage !== undefined;
 
   const createButtonDisabled =
-    allowList.length === 0 || percentageSum !== 100 || !allAddressesValid;
+    allowList.length === 0 ||
+    Math.abs(percentageSum - 100) > 0.01 ||
+    !allAddressesValid;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -180,8 +192,9 @@ export default function CreateAllowlistDialog({
         <DialogDescription className="flex flex-col gap-3">
           <div>
             Add addresses and the percentage of total units each address is
-            allowed to mint. Hypercerts are created with a total supply of 1
-            ether (10^18 units).
+            allowed to mint. Percentages can be specified up to two decimal
+            places. Hypercerts are created with a total supply of 1 ether (10^18
+            units).
           </div>
           <div>
             Once created, your allowlist will be stored on IPFS and linked to
@@ -209,7 +222,7 @@ export default function CreateAllowlistDialog({
                 />
                 <Input
                   type="text"
-                  placeholder="100"
+                  placeholder="100.00"
                   value={item.percentage}
                   className={cn(
                     "w-20 text-right",
@@ -225,7 +238,7 @@ export default function CreateAllowlistDialog({
           ))}
           {percentageError && (
             <div className="text-red-600 text-sm">
-              Sum of percentages must be 100
+              Sum of percentages must be 100.00
             </div>
           )}
           <div className="flex items-center gap-2">
