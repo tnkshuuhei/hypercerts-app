@@ -50,6 +50,7 @@ import {
   HyperCertFormKeys,
   HypercertFormValues,
 } from "@/components/hypercert/hypercert-minting-form/index";
+
 // import Image from "next/image";
 
 interface FormStepsProps {
@@ -142,6 +143,11 @@ const GeneralInformation = ({ form }: FormStepsProps) => {
       />
     </section>
   );
+};
+
+const formatNumber = (num: number | bigint): string => {
+  const formatted = Number(num).toFixed(4);
+  return formatted.replace(/\.?0+$/, "");
 };
 
 const DatesAndPeople = ({ form }: FormStepsProps) => {
@@ -370,11 +376,11 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
                     >
                       <TableCell className="pl-0">{entry.address}</TableCell>
                       <TableCell>
-                        {calculatePercentageBigInt(entry.units).toString()}%
+                        {formatNumber(calculatePercentageBigInt(entry.units))}%
                       </TableCell>
                       <TableCell className="pr-0">
-                        <FormattedUnits>
-                          {entry.units.toString()}
+                        <FormattedUnits decimals={2}>
+                          {formatNumber(entry.units)}
                         </FormattedUnits>
                       </TableCell>
                     </TableRow>
@@ -393,7 +399,7 @@ const calculatePercentageBigInt = (
   units: bigint,
   total: bigint = DEFAULT_NUM_FRACTIONS,
 ) => {
-  return (units * BigInt(100)) / total;
+  return Number((units * BigInt(10000)) / total) / 100;
 };
 
 const ReviewAndSubmit = ({ form, isBlueprint }: FormStepsProps) => {
