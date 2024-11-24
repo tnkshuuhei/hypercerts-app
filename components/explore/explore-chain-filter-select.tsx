@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Select,
   SelectContent,
@@ -7,32 +8,29 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { SUPPORTED_CHAINS } from "@/configs/constants";
 
-export default function ChainFilterSelect() {
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
+interface ChainFilterSelectProps {
+  value?: string;
+}
+
+export default function ChainFilterSelect({ value }: ChainFilterSelectProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const selectedValue = searchParams.get("chain") || "all";
-
-  const selectFilter = (value: string) => {
-    const urlSearchParams = new URLSearchParams(searchParams);
-    if (value === "all") {
-      urlSearchParams.delete("chain");
+  const handleChange = (newValue: string) => {
+    const params = new URLSearchParams(searchParams);
+    if (newValue === "all") {
+      params.delete("chain");
     } else {
-      urlSearchParams.set("chain", value);
+      params.set("chain", newValue);
     }
-    router.push(`${pathname}?${urlSearchParams.toString()}`);
+    params.set("p", "1"); // Reset page when changing filter
+    router.push(`?${params.toString()}`);
   };
 
   return (
-    <Select
-      defaultValue="timestamp_desc"
-      onValueChange={selectFilter}
-      value={selectedValue}
-    >
+    <Select value={value || "all"} onValueChange={handleChange}>
       <SelectTrigger className="w-full">
         <SelectValue placeholder="All chains" />
       </SelectTrigger>

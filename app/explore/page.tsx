@@ -1,7 +1,10 @@
+import { Suspense } from "react";
 import ExploreFiltersLayout from "@/components/explore/explore-filters-layout";
 import ExploreList from "@/components/explore/explore-list";
 import ExploreSearchBar from "@/components/explore/explore-search-bar";
 import { Metadata } from "next";
+import ExploreListSkeleton from "@/components/explore/explore-list-skeleton";
+import { HYPERCERTS_PER_PAGE } from "@/configs/ui";
 
 export const metadata: Metadata = {
   title: "Explore",
@@ -9,7 +12,7 @@ export const metadata: Metadata = {
     "The best place to discover and contribute to hypercerts and hyperboards.",
 };
 
-export default async function ExplorePageInner({
+export default function ExplorePage({
   searchParams,
 }: {
   searchParams: Record<string, string>;
@@ -23,7 +26,12 @@ export default async function ExplorePageInner({
         <ExploreSearchBar />
         <ExploreFiltersLayout />
       </section>
-      <ExploreList {...{ searchParams }} />
+      <Suspense
+        key={new URLSearchParams(searchParams).toString()}
+        fallback={<ExploreListSkeleton length={HYPERCERTS_PER_PAGE} />}
+      >
+        <ExploreList searchParams={searchParams} />
+      </Suspense>
     </main>
   );
 }

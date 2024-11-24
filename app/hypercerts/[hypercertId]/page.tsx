@@ -1,28 +1,42 @@
 import { Metadata, ResolvingMetadata } from "next";
-import { Fragment, Suspense } from "react";
+import { Suspense } from "react";
+import dynamic from "next/dynamic";
+import Image from "next/image";
 
-import { CurrencyButtons } from "@/components/currency-buttons";
-import Contributors from "@/components/hypercert/contributors";
-import Creator from "@/components/hypercert/creator";
-import EvaluateButton from "@/components/hypercert/evaluate-button";
-import EvaluationsList from "@/components/hypercert/evaluations-list";
-import ExternalUrl from "@/components/hypercert/external-url";
-import Fractions from "@/components/hypercert/fractions";
-import PageSkeleton from "@/components/hypercert/page-skeleton";
-import WorkScope from "@/components/hypercert/scope";
-import TimeFrame from "@/components/hypercert/time-frame";
-import HypercertListingsList from "@/components/marketplace/hypercert-listings-list";
-import { ListForSaleButton } from "@/components/marketplace/list-for-sale-button";
-import ReadMore from "@/components/read-more";
-import { Separator } from "@/components/ui/separator";
 import { getHypercert } from "@/hypercerts/getHypercert";
 import { getOrders } from "@/marketplace/getOpenOrders";
-import Image from "next/image";
-import MutationButtons from "@/components/hypercert/mutation-buttons";
+
+import { CurrencyButtons } from "@/components/currency-buttons";
+import { Separator } from "@/components/ui/separator";
+import PageSkeleton from "@/components/hypercert/page-skeleton";
+import ReadMore from "@/components/read-more";
+import { ListForSaleButton } from "@/components/marketplace/list-for-sale-button";
+
+const Contributors = dynamic(
+  () => import("@/components/hypercert/contributors"),
+);
+const Creator = dynamic(() => import("@/components/hypercert/creator"));
+const EvaluateButton = dynamic(
+  () => import("@/components/hypercert/evaluate-button"),
+);
+const EvaluationsList = dynamic(
+  () => import("@/components/hypercert/evaluations-list"),
+);
+const ExternalUrl = dynamic(
+  () => import("@/components/hypercert/external-url"),
+);
+const Fractions = dynamic(() => import("@/components/hypercert/fractions"));
+const WorkScope = dynamic(() => import("@/components/hypercert/scope"));
+const TimeFrame = dynamic(() => import("@/components/hypercert/time-frame"));
+const HypercertListingsList = dynamic(
+  () => import("@/components/marketplace/hypercert-listings-list"),
+);
+const MutationButtons = dynamic(
+  () => import("@/components/hypercert/mutation-buttons"),
+);
 
 type Props = {
   params: { hypercertId: string };
-  searchParams: { [key: string]: string | string[] | undefined };
 };
 
 export async function generateMetadata(
@@ -30,10 +44,8 @@ export async function generateMetadata(
   parent: ResolvingMetadata,
 ): Promise<Metadata> {
   const { hypercertId } = params;
-
   const hypercert = await getHypercert(hypercertId);
 
-  // optionally access and extend (rather than replace) parent metadata
   const previousImages = (await parent).openGraph?.images || [];
   return {
     title: hypercert?.metadata?.name || "Untitled Hypercert",
@@ -48,11 +60,57 @@ export async function generateMetadata(
   };
 }
 
-async function HypercertPageInner({
-  params,
+function ErrorState({ hypercertId }: { hypercertId: string }) {
+  return (
+    <section className="flex flex-col space-y-4">
+      <section className="space-y-4 lg:flex lg:space-y-0 lg:space-x-8">
+        <div className="flex justify-between">
+          <h2 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
+            Oops! Something went wrong...
+          </h2>
+        </div>
+      </section>
+      <section className="flex flex-col space-y-4">
+        <h1 className="font-serif text-3xl lg:text-5xl tracking-tight">
+          Hypercert not found.
+        </h1>
+        <Separator />
+        <pre className="uppercase text-sm text-slate-500 font-medium tracking-wider">
+          {`ID: ${hypercertId}`}
+        </pre>
+        <p className="md:text-lg">
+          If this hypercert was freshly minted try refreshing in 30 seconds.
+          Please try again or contact us at{" "}
+          <a href="mailto:support@hypercerts.org">support@hypercerts.org</a>.
+        </p>
+      </section>
+    </section>
+  );
+}
+
+function HypercertImage({
+  hypercertId,
+  name,
 }: {
-  params: { hypercertId: string };
+  hypercertId: string;
+  name: string;
 }) {
+  return (
+    <div className="h-[300px] lg:h-[350px] min-w-[300px] lg:min-w-[500px] max-w-[500px] flex flex-col">
+      <div className="relative w-full flex-grow bg-accent border border-slate-300 rounded-lg overflow-hidden">
+        <Image
+          src={`/api/hypercerts/${hypercertId}/image`}
+          alt={name || ""}
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          className="object-contain object-top p-2"
+        />
+      </div>
+    </div>
+  );
+}
+
+async function HypercertPageInner({ params }: Props) {
   const { hypercertId } = params;
   const hypercert = await getHypercert(hypercertId);
   const orders = await getOrders({
@@ -62,50 +120,19 @@ async function HypercertPageInner({
   });
 
   if (!hypercert) {
-    return (
-      <section className="flex flex-col space-y-4">
-        <section className="space-y-4 lg:flex lg:space-y-0 lg:space-x-8">
-          <div className="flex justify-between">
-            <h3 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
-              Oops! Something went wrong...
-            </h3>
-          </div>
-        </section>
-        <section className="flex flex-col space-y-4">
-          <h1 className="font-serif text-3xl lg:text-5xl tracking-tight">
-            Hypercert not found.
-          </h1>
-          <Separator />
-          <pre className="uppercase text-sm text-slate-500 font-medium tracking-wider">
-            {`ID: ${hypercertId}`}
-          </pre>
-          <p className="md:text-lg">
-            If this hypercert was freshly minted try refreshing in 30 seconds.
-            Please try again or contact us at{" "}
-            <a href="mailto:support@hypercerts.org">support@hypercerts.org</a>.
-          </p>
-        </section>
-      </section>
-    );
+    return <ErrorState hypercertId={hypercertId} />;
   }
 
   return (
     <section className="flex flex-col space-y-4">
       <article className="space-y-4 lg:flex lg:space-y-0 lg:space-x-6">
-        <div className="h-[300px] lg:h-[350px] min-w-[300px] lg:min-w-[500px] max-w-[500px] flex flex-col">
-          <div className="relative w-full flex-grow bg-accent border border-slate-300 rounded-lg overflow-hidden">
-            <Image
-              src={`/api/hypercerts/${hypercertId}/image`}
-              alt={hypercert?.metadata?.name || ""}
-              fill
-              sizes="500px"
-              className="object-contain object-top p-2"
-            />
-          </div>
-        </div>
-        <section className="space-y-4">
-          <div className="flex flex-row w-full">
-            <h1 className="font-serif text-3xl lg:text-4xl tracking-tight line-clamp-2 text-ellipsis w-full">
+        <HypercertImage
+          hypercertId={hypercertId}
+          name={hypercert?.metadata?.name || ""}
+        />
+        <section className="space-y-4 w-full">
+          <div className="flex flex-row w-full align-center justify-between">
+            <h1 className="font-serif text-3xl lg:text-4xl tracking-tight line-clamp-2 text-ellipsis">
               {hypercert?.metadata?.name || "[Untitled]"}
             </h1>
             <MutationButtons hypercert={hypercert} />
@@ -114,16 +141,16 @@ async function HypercertPageInner({
           <ReadMore text={hypercert?.metadata?.description} length={280} />
           <ExternalUrl url={hypercert?.metadata?.external_url} />
           {(hypercert?.metadata?.work_timeframe_from as string) && (
-            <Fragment>
+            <>
               <Separator />
-              <h5 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
+              <h2 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
                 TIME OF WORK
-              </h5>
+              </h2>
               <TimeFrame
                 from={hypercert.metadata?.work_timeframe_from}
                 to={hypercert.metadata?.work_timeframe_to}
               />
-            </Fragment>
+            </>
           )}
         </section>
       </article>
@@ -131,54 +158,46 @@ async function HypercertPageInner({
       <Separator />
       <section className="space-y-4 lg:flex lg:space-y-0 lg:space-x-8">
         {hypercert?.metadata?.contributors && (
-          <Fragment>
-            <Contributors hypercert={hypercert} />
-          </Fragment>
+          <Contributors hypercert={hypercert} />
         )}
-
         <Fractions hypercert={hypercert} />
       </section>
       {hypercert?.metadata?.work_scope && (
-        <Fragment>
+        <>
           <Separator />
           <WorkScope hypercert={hypercert} />
-        </Fragment>
+        </>
       )}
       <Separator />
       <div className="flex justify-between">
-        <h5 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
+        <h2 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
           Evaluations
-        </h5>
+        </h2>
         <EvaluateButton hypercert={hypercert} />
       </div>
       <EvaluationsList hypercert={hypercert} />
       <Separator />
       <div className="flex justify-between">
-        <h5 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
+        <h2 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
           Marketplace
-        </h5>
-
+        </h2>
         <div className="flex gap-2">
           <CurrencyButtons />
           <ListForSaleButton hypercert={hypercert} />
         </div>
       </div>
-      <HypercertListingsList hypercert={hypercert} orders={orders?.data} />
+      <Suspense fallback={<div>Loading...</div>}>
+        <HypercertListingsList hypercert={hypercert} orders={orders?.data} />
+      </Suspense>
     </section>
   );
 }
 
-export default async function HypercertPage({
-  params,
-}: {
-  params: {
-    hypercertId: string;
-  };
-}) {
+export default async function HypercertPage({ params }: Props) {
   return (
     <main className="flex flex-col p-8 md:px-24 md:pt-14 pb-24 space-y-4 flex-1">
       <Suspense fallback={<PageSkeleton />} key={params.hypercertId}>
-        <HypercertPageInner {...{ params }} />
+        <HypercertPageInner params={params} />
       </Suspense>
     </main>
   );

@@ -1,5 +1,3 @@
-"use client";
-
 import {
   Select,
   SelectContent,
@@ -7,37 +5,39 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
-export default function ExploreEvaluationsFilterSelect() {
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
+interface ExploreEvaluationsFilterSelectProps {
+  value: string;
+}
+
+export default function ExploreEvaluationsFilterSelect({
+  value,
+}: ExploreEvaluationsFilterSelectProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const selectedValue = searchParams.get("filter") || "all";
+  const selectedValue = value || "all";
 
-  const selectFilter = (value: string) => {
-    const urlSearchParams = new URLSearchParams(searchParams);
-    if (value === "all") {
-      urlSearchParams.delete("filter");
+  const handleChange = (newValue: string) => {
+    const params = new URLSearchParams(searchParams);
+    if (newValue === "all") {
+      params.delete("filter");
     } else {
-      urlSearchParams.set("filter", value);
+      params.set("filter", newValue);
     }
-    router.push(`${pathname}?${urlSearchParams.toString()}`);
+    params.set("p", "1"); // Reset page when changing filter
+    router.push(`?${params.toString()}`);
   };
 
   return (
-    <Select
-      defaultValue="timestamp_desc"
-      onValueChange={selectFilter}
-      value={selectedValue}
-    >
+    <Select value={value || "all"} onValueChange={handleChange}>
       <SelectTrigger className="w-full">
-        <SelectValue placeholder="All chains" />
+        <SelectValue placeholder="All Hypercerts" />
       </SelectTrigger>
       <SelectContent className="w-full">
         <SelectItem value="all">All Hypercerts</SelectItem>
-        <SelectItem value="evaluated"> Only evaluated</SelectItem>
+        <SelectItem value="evaluated">Only evaluated</SelectItem>
       </SelectContent>
     </Select>
   );

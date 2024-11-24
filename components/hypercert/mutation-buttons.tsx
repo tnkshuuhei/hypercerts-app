@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { FlameIcon, MoreHorizontal, SendHorizontal } from "lucide-react";
+import { FlameIcon, MoreHorizontal, SendHorizontal, Split } from "lucide-react";
 import type { HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
 import { Drawer } from "vaul";
 import { TransferDrawer } from "@/components/hypercert/transfer-drawer";
@@ -20,6 +20,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { SplitDrawer } from "@/components/hypercert/split-drawer";
 
 type MutationButtonsProps = {
   hypercert: HypercertFull;
@@ -28,6 +29,7 @@ type MutationButtonsProps = {
 export default function MutationButtons({ hypercert }: MutationButtonsProps) {
   const [isTransferDrawerOpen, setIsTransferDrawerOpen] = useState(false);
   const [isBurnDrawerOpen, setIsBurnDrawerOpen] = useState(false);
+  const [isSplitDrawerOpen, setIsSplitDrawerOpen] = useState(false);
   const { isConnected, address, chainId } = useAccount();
 
   const owners = hypercert.fractions?.data?.map(
@@ -43,6 +45,10 @@ export default function MutationButtons({ hypercert }: MutationButtonsProps) {
 
   const handleBurnClick = () => {
     if (enabled) setIsBurnDrawerOpen(true);
+  };
+
+  const handleSplitClick = () => {
+    if (enabled) setIsSplitDrawerOpen(true);
   };
 
   const getTooltipMessage = () => {
@@ -82,7 +88,7 @@ export default function MutationButtons({ hypercert }: MutationButtonsProps) {
   );
 
   return (
-    <div className="flex flex-row items-center space-x-2 mt-2">
+    <div className="flex flex-row items-center space-x-2">
       <div className="hidden md:flex space-x-2">
         {renderButton(SendHorizontal, handleTransferClick)}
       </div>
@@ -95,10 +101,13 @@ export default function MutationButtons({ hypercert }: MutationButtonsProps) {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem onSelect={handleTransferClick} disabled={!enabled}>
-            <SendHorizontal className="mr-2 w-6 h-6" /> Transfer
+            Transfer
+          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={handleSplitClick} disabled={!enabled}>
+            Split
           </DropdownMenuItem>
           <DropdownMenuItem onSelect={handleBurnClick} disabled={!enabled}>
-            <FlameIcon className="mr-2 w-6 h-6" /> Burn
+            Burn
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -112,6 +121,17 @@ export default function MutationButtons({ hypercert }: MutationButtonsProps) {
           <Drawer.Content className="bg-white flex flex-col h-full w-[500px] mt-24 fixed bottom-0 right-0">
             <div className="p-4 bg-white flex-1 h-full max-w-md mx-auto flex flex-col gap-5">
               <TransferDrawer hypercert={hypercert} />
+            </div>
+          </Drawer.Content>
+        </Drawer.Portal>
+      </Drawer.Root>
+
+      <Drawer.Root open={isSplitDrawerOpen} onOpenChange={setIsSplitDrawerOpen}>
+        <Drawer.Portal>
+          <Drawer.Overlay className="fixed inset-0 bg-black/40" />
+          <Drawer.Content className="bg-white flex flex-col h-full w-[500px] mt-24 fixed bottom-0 right-0">
+            <div className="p-4 bg-white flex-1 h-full max-w-md mx-auto flex flex-col gap-5">
+              <SplitDrawer hypercert={hypercert} />
             </div>
           </Drawer.Content>
         </Drawer.Portal>
