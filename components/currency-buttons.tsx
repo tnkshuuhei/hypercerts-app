@@ -6,15 +6,14 @@ import { cn } from "@/lib/utils";
 import { DEFAULT_DISPLAY_CURRENCY } from "@/configs/hypercerts";
 
 interface CurrencyButtonsProps {
-  value?: string;
   className?: string;
 }
 
-export const CurrencyButtons = ({ value, className }: CurrencyButtonsProps) => {
+export const CurrencyButtons = ({ className }: CurrencyButtonsProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const currentValue = value || DEFAULT_DISPLAY_CURRENCY;
+  const currentValue = searchParams.get("currency") || DEFAULT_DISPLAY_CURRENCY;
 
   const onClickCurrency = (currency: string) => {
     const params = new URLSearchParams(searchParams);

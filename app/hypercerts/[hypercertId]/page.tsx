@@ -186,7 +186,9 @@ async function HypercertPageInner({ params }: Props) {
           <ListForSaleButton hypercert={hypercert} />
         </div>
       </div>
-      <HypercertListingsList hypercert={hypercert} orders={orders?.data} />
+      <Suspense fallback={<div>Loading...</div>}>
+        <HypercertListingsList hypercert={hypercert} orders={orders?.data} />
+      </Suspense>
     </section>
   );
 }
