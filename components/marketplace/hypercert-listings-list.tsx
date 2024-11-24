@@ -72,6 +72,8 @@ export default function HypercertListingsList({
   const displayCurrency =
     urlSearchParams.get("currency") || DEFAULT_DISPLAY_CURRENCY;
 
+  console.log(displayCurrency);
+
   const hypercertOnConnectedChain =
     client?.isClaimOrFractionOnConnectedChain(hypercert?.hypercert_id!) ||
     false;
