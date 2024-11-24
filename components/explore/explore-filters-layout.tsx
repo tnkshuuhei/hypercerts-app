@@ -10,6 +10,8 @@ const ExploreFiltersLayout = () => {
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const searchParams = useSearchParams();
 
+  // TODO: Consistent passing or properties to the filters
+  // TODO: Generalized filter component for all explore/profile pages
   const FiltersContent = (
     <>
       <ExploreChainFilterSelect value={searchParams.get("chain") || ""} />
@@ -17,7 +19,7 @@ const ExploreFiltersLayout = () => {
         value={searchParams.get("filter") || ""}
       />
       <ExploreOrderBySelect value={searchParams.get("orderBy") || ""} />
-      <CurrencyButtons value={searchParams.get("currency") || ""} />
+      <CurrencyButtons />
     </>
   );
 
@@ -38,7 +40,7 @@ const ExploreFiltersLayout = () => {
             />
           </div>
           <div className="flex space-x-2 w-full">
-            <CurrencyButtons value={searchParams.get("currency") || ""} />
+            <CurrencyButtons />
             <ExploreOrderBySelect value={searchParams.get("orderBy") || ""} />
           </div>
         </div>
