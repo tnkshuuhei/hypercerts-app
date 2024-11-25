@@ -201,6 +201,24 @@ export default function HypercertListingsList({
         }
       },
     }),
+    columnHelper.accessor("id", {
+      id: "buy",
+      header: "Action",
+      cell: (row) => {
+        const order = row.row.original;
+        if (order.signer === address || order.invalidated) {
+          return null;
+        }
+        return (
+          <Button
+            onClick={() => onRowClick(order)}
+            disabled={!hypercertOnConnectedChain}
+          >
+            Buy
+          </Button>
+        );
+      },
+    }),
     ...(hasInvalidatedOrdersForCurrentUser
       ? [
           columnHelper.accessor("invalidated", {
@@ -313,24 +331,6 @@ export default function HypercertListingsList({
                   </div>
                 );
               }
-            },
-          }),
-          columnHelper.accessor("id", {
-            id: "buy",
-            header: "Action",
-            cell: (row) => {
-              const order = row.row.original;
-              if (order.signer === address || order.invalidated) {
-                return null;
-              }
-              return (
-                <Button
-                  onClick={() => onRowClick(order)}
-                  disabled={!hypercertOnConnectedChain}
-                >
-                  Buy
-                </Button>
-              );
             },
           }),
         ]
