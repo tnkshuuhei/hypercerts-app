@@ -52,6 +52,7 @@ import { OrderValidatorCode } from "@hypercerts-org/marketplace-sdk";
 import { useCancelOrder, useDeleteOrder } from "@/marketplace/hooks";
 import { useSearchParams } from "next/navigation";
 import { DEFAULT_DISPLAY_CURRENCY } from "@/configs/hypercerts";
+import { BuyButton } from "./buy-button";
 
 export default function HypercertListingsList({
   orders,
@@ -200,6 +201,25 @@ export default function HypercertListingsList({
         }
       },
     }),
+    columnHelper.accessor("id", {
+      id: "buy",
+      header: "Action",
+      cell: (row) => {
+        const order = row.row.original;
+        if (order.signer === address || order.invalidated) {
+          return null;
+        }
+        return (
+          <Button
+            onClick={() => onRowClick(order)}
+            disabled={!hypercertOnConnectedChain}
+            className="w-full"
+          >
+            Buy
+          </Button>
+        );
+      },
+    }),
     ...(hasInvalidatedOrdersForCurrentUser
       ? [
           columnHelper.accessor("invalidated", {
@@ -252,64 +272,66 @@ export default function HypercertListingsList({
                 OrderValidatorCode.USER_ORDER_NONCE_EXECUTED_OR_CANCELLED.toString(),
               );
 
-              if (!isCancelled) {
+              if (order.signer === address) {
+                if (!isCancelled) {
+                  return (
+                    <div className="flex">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              disabled={cancelDisabled}
+                              className="ml-2"
+                              onClick={async (e) => {
+                                e.preventDefault();
+                                await cancelOrder({
+                                  nonce,
+                                  chainId: Number(order.chainId),
+                                  tokenId: order.itemIds[0],
+                                });
+                              }}
+                              size={"sm"}
+                            >
+                              <XIcon />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent className="max-w-[300px]">
+                            {cancelDisabled
+                              ? "Connect to the correct chain to invalidate the listing."
+                              : "Invalidate the listing permanently."}
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
+                  );
+                }
+
                 return (
                   <div className="flex">
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <Button
-                            disabled={cancelDisabled}
                             className="ml-2"
                             onClick={async (e) => {
                               e.preventDefault();
-                              await cancelOrder({
-                                nonce,
-                                chainId: Number(order.chainId),
-                                tokenId: order.itemIds[0],
+                              await deleteOrder({
+                                orderId: order.id,
                               });
                             }}
                             size={"sm"}
                           >
-                            <XIcon />
+                            <TrashIcon />
                           </Button>
                         </TooltipTrigger>
                         <TooltipContent className="max-w-[300px]">
-                          {cancelDisabled
-                            ? "Connect to the correct chain to invalidate the listing."
-                            : "Invalidate the listing permanently."}
+                          Click to permanently remove listing.
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
                   </div>
                 );
               }
-
-              return (
-                <div className="flex">
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          className="ml-2"
-                          onClick={async (e) => {
-                            e.preventDefault();
-                            await deleteOrder({
-                              orderId: order.id,
-                            });
-                          }}
-                          size={"sm"}
-                        >
-                          <TrashIcon />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent className="max-w-[300px]">
-                        Click to permanently remove listing.
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </div>
-              );
             },
           }),
         ]
@@ -380,43 +402,18 @@ export default function HypercertListingsList({
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
-                    className={cn(classes, {
+                    className={cn({
                       "bg-red-100": row.original.invalidated,
                     })}
                   >
-                    {row.getVisibleCells().map((cell) => {
-                      if (
-                        cell.column.columnDef.id !== "invalidated" &&
-                        cell.column.columnDef.id !== "cancel-order"
-                      ) {
-                        return (
-                          <TableCell
-                            key={cell.id}
-                            onClick={() => {
-                              if (
-                                hypercertOnConnectedChain &&
-                                !row.original.invalidated
-                              ) {
-                                onRowClick(row.original);
-                              }
-                            }}
-                          >
-                            {flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext(),
-                            )}
-                          </TableCell>
-                        );
-                      }
-                      return (
-                        <TableCell key={cell.id}>
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext(),
-                          )}
-                        </TableCell>
-                      );
-                    })}
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )}
+                      </TableCell>
+                    ))}
                   </TableRow>
                 ))
               ) : (
@@ -425,7 +422,7 @@ export default function HypercertListingsList({
                     colSpan={columns.length}
                     className="h-24 text-center"
                   >
-                    No results.
+                    No listings available.
                   </TableCell>
                 </TableRow>
               )}
