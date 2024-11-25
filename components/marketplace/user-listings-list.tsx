@@ -438,7 +438,7 @@ export default function UserListingsList({
                     colSpan={columns.length}
                     className="h-24 text-center"
                   >
-                    No results.
+                    No listings available.
                   </TableCell>
                 </TableRow>
               )}
