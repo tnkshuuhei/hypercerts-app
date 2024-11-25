@@ -460,10 +460,6 @@ export default function HypercertListingsList({
         >
           <DialogContent className="gap-5 max-w-2xl">
             <DialogHeader>
-              <div className="bg-orange-400/70 p-3 mb-2 rounded-sm">
-                Hypercerts marketplace features are in beta. Please use with
-                caution.
-              </div>
               <DialogTitle className="font-serif text-3xl font-medium tracking-tight">
                 Buy hypercert fraction
               </DialogTitle>
