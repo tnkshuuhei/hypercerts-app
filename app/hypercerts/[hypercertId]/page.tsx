@@ -11,6 +11,8 @@ import { Separator } from "@/components/ui/separator";
 import PageSkeleton from "@/components/hypercert/page-skeleton";
 import ReadMore from "@/components/read-more";
 import { ListForSaleButton } from "@/components/marketplace/list-for-sale-button";
+import { Button } from "@/components/ui/button"; // Add this import
+import { BuyButton } from "@/components/marketplace/buy-button";
 
 const Contributors = dynamic(
   () => import("@/components/hypercert/contributors"),
@@ -135,7 +137,10 @@ async function HypercertPageInner({ params }: Props) {
             <h1 className="font-serif text-3xl lg:text-4xl tracking-tight line-clamp-2 text-ellipsis">
               {hypercert?.metadata?.name || "[Untitled]"}
             </h1>
-            <MutationButtons hypercert={hypercert} />
+            <div className="flex space-x-2">
+              <BuyButton />
+              <MutationButtons hypercert={hypercert} />
+            </div>
           </div>
           <Creator hypercert={hypercert} />
           <ReadMore text={hypercert?.metadata?.description} length={280} />
@@ -176,6 +181,7 @@ async function HypercertPageInner({ params }: Props) {
         <EvaluateButton hypercert={hypercert} />
       </div>
       <EvaluationsList hypercert={hypercert} />
+
       <Separator />
       <div className="flex justify-between">
         <h2 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
@@ -187,7 +193,9 @@ async function HypercertPageInner({ params }: Props) {
         </div>
       </div>
       <Suspense fallback={<div>Loading...</div>}>
-        <HypercertListingsList hypercert={hypercert} orders={orders?.data} />
+        <div id="marketplace-listings">
+          <HypercertListingsList hypercert={hypercert} orders={orders?.data} />
+        </div>
       </Suspense>
     </section>
   );
