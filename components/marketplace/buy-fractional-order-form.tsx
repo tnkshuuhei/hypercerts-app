@@ -19,12 +19,15 @@ import {
   getCurrencyByAddress,
   getPricePerPercent,
   getPricePerUnit,
-  getTotalPriceFromPercentage,
 } from "@/marketplace/utils";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { parseUnits } from "viem";
 import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
+import {
+  DEFAULT_NUM_FRACTIONS,
+  DEFAULT_NUM_FRACTIONS_DECIMALS,
+} from "@/configs/hypercerts";
 
 const formSchema = z
   .object({
@@ -83,13 +86,17 @@ export const BuyFractionalOrderForm = ({
   const getUnitsToBuy = (percentageAmount: string) => {
     try {
       const hypercertUnits = BigInt(hypercert.units || 0);
-      const percentageAsBigInt = BigInt(Number(percentageAmount) * 100);
+      const percentageAsBigInt = parseUnits(
+        percentageAmount,
+        DEFAULT_NUM_FRACTIONS_DECIMALS,
+      );
       const unitsToBuy =
-        (hypercertUnits * percentageAsBigInt) / BigInt(100 * 100);
-      return unitsToBuy.toString();
+        (hypercertUnits * percentageAsBigInt) /
+        (BigInt(100) * DEFAULT_NUM_FRACTIONS);
+      return unitsToBuy < BigInt(0) ? BigInt(0) : unitsToBuy;
     } catch (e) {
       console.error(e);
-      return "0";
+      return BigInt(0);
     }
   };
 
@@ -153,12 +160,15 @@ export const BuyFractionalOrderForm = ({
   const percentageAmount = form.watch("percentageAmount");
   const pricePerPercent = form.watch("pricePerPercent");
 
+  const unitsToBuy = getUnitsToBuy(percentageAmount);
+  const pricePerUnit = getPricePerUnit(
+    pricePerPercent,
+    BigInt(hypercert.units || 0),
+  );
+
   const totalPrice = formatPrice(
     order.chainId,
-    getTotalPriceFromPercentage(
-      BigInt(pricePerPercent),
-      Number(percentageAmount),
-    ),
+    unitsToBuy * pricePerUnit,
     currency.address,
     true,
   );
@@ -169,10 +179,7 @@ export const BuyFractionalOrderForm = ({
     currency.address,
   );
 
-  const unitsToBuy =
-    BigInt(getUnitsToBuy(percentageAmount)) > BigInt(0)
-      ? getUnitsToBuy(percentageAmount)
-      : "0";
+  const disabled = !form.formState.isValid || unitsToBuy === BigInt(0);
 
   return (
     <Form {...form}>
@@ -189,7 +196,7 @@ export const BuyFractionalOrderForm = ({
             <div className="text-sm text-slate-500">
               You will buy{" "}
               <b>
-                <FormattedUnits>{unitsToBuy}</FormattedUnits>
+                <FormattedUnits>{unitsToBuy.toString()}</FormattedUnits>
               </b>{" "}
               units , for a total of <b>{totalPrice}</b>. (min:{" "}
               {minPercentageAmount}%, max: {maxPercentageAmount}%)
@@ -238,6 +245,7 @@ export const BuyFractionalOrderForm = ({
         variant={"outline"}
         type="button"
         onClick={form.handleSubmit(onSubmit)}
+        disabled={disabled}
       >
         Execute order
       </Button>
