@@ -614,6 +614,14 @@ export const useBuyFractionalMakerAsk = () => {
   });
 };
 
+export interface CancelOrderParams {
+  nonce: bigint;
+  tokenId: string;
+  chainId: number;
+  hypercertId: string;
+  ownerAddress: string;
+}
+
 export const useCancelOrder = () => {
   const { client: hec } = useHypercertExchangeClient();
 
@@ -623,11 +631,9 @@ export const useCancelOrder = () => {
       nonce,
       tokenId,
       chainId,
-    }: {
-      nonce: bigint;
-      tokenId: string;
-      chainId: number;
-    }) => {
+      hypercertId,
+      ownerAddress,
+    }: CancelOrderParams) => {
       if (!hec) {
         throw new Error("No client");
       }
@@ -636,7 +642,11 @@ export const useCancelOrder = () => {
       await tx.wait();
 
       await hec.api.updateOrderValidity([BigInt(tokenId)], chainId);
-      document.location.reload();
+
+      await revalidatePathServerAction([
+        `/hypercerts/${hypercertId}`,
+        `/profile/${ownerAddress}`,
+      ]);
     },
     onError: (e) => {
       console.error(e);
@@ -649,19 +659,32 @@ export const useCancelOrder = () => {
   });
 };
 
+export interface DeleteOrderParams {
+  orderId: string;
+  hypercertId: string;
+  ownerAddress: string;
+}
+
 export const useDeleteOrder = () => {
   const { client: hec } = useHypercertExchangeClient();
 
   return useMutation({
     mutationKey: ["deleteOrder"],
-    mutationFn: async ({ orderId }: { orderId: string }) => {
+    mutationFn: async ({
+      orderId,
+      hypercertId,
+      ownerAddress,
+    }: DeleteOrderParams) => {
       if (!hec) {
         throw new Error("No client");
       }
 
       const success = await hec.deleteOrder(orderId);
       if (success) {
-        document.location.reload();
+        await revalidatePathServerAction([
+          `/hypercerts/${hypercertId}`,
+          `/profile/${ownerAddress}`,
+        ]);
       } else {
         throw new Error(`Could not delete listing ${orderId}`);
       }

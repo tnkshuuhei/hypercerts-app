@@ -11,7 +11,6 @@ import { Button } from "@/components/ui/button";
 import { MarketplaceOrder } from "@/marketplace/types";
 import React from "react";
 import { useBuyFractionalMakerAsk } from "@/marketplace/hooks";
-import { type HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
 import { FormattedUnits } from "@/components/formatted-units";
 import {
   decodeFractionalOrderParams,
@@ -28,6 +27,7 @@ import {
   DEFAULT_NUM_FRACTIONS,
   DEFAULT_NUM_FRACTIONS_DECIMALS,
 } from "@/configs/hypercerts";
+import { HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
 
 const formSchema = z
   .object({
@@ -183,72 +183,71 @@ export const BuyFractionalOrderForm = ({
 
   return (
     <Form {...form}>
-      <FormField
-        name={"percentageAmount"}
-        render={() => (
-          <FormItem>
-            <h5 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
-              % to buy
-            </h5>
-            <FormControl>
-              <Input {...form.register("percentageAmount")} />
-            </FormControl>
-            <div className="text-sm text-slate-500">
-              You will buy{" "}
-              <b>
-                <FormattedUnits>{unitsToBuy.toString()}</FormattedUnits>
-              </b>{" "}
-              units , for a total of <b>{totalPrice}</b>. (min:{" "}
-              {minPercentageAmount}%, max: {maxPercentageAmount}%)
-            </div>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="percentageAmount"
+          render={({ field }) => (
+            <FormItem>
+              <h5 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
+                % to buy
+              </h5>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <div className="text-sm text-slate-500">
+                You will buy{" "}
+                <b>
+                  <FormattedUnits>{unitsToBuy.toString()}</FormattedUnits>
+                </b>{" "}
+                units , for a total of <b>{totalPrice}</b>. (min:{" "}
+                {minPercentageAmount}%, max: {maxPercentageAmount}%)
+              </div>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-      <FormField
-        name={"pricePerPercent"}
-        render={() => (
-          <FormItem>
-            <h5 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
-              Price per %
-            </h5>
-            <FormControl>
-              <Input
-                value={formatPrice(
-                  order.chainId,
-                  BigInt(pricePerPercent),
-                  currency.address,
-                )}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  form.setValue(
-                    "pricePerPercent",
-                    parseUnits(value, currency.decimals).toString(),
-                  );
-                }}
-              />
-            </FormControl>
-            <div className="text-sm text-slate-500">
-              You can voluntarily increase the price. (min:{" "}
-              <b>
-                {formattedMinPrice} {currency.symbol}
-              </b>
-              ).
-            </div>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+        <FormField
+          control={form.control}
+          name="pricePerPercent"
+          render={({ field }) => (
+            <FormItem>
+              <h5 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
+                Price per %
+              </h5>
+              <FormControl>
+                <Input
+                  {...field}
+                  value={formatPrice(
+                    order.chainId,
+                    BigInt(field.value),
+                    currency.address,
+                  )}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    field.onChange(
+                      parseUnits(value, currency.decimals).toString(),
+                    );
+                  }}
+                />
+              </FormControl>
+              <div className="text-sm text-slate-500">
+                You can voluntarily increase the price. (min:{" "}
+                <b>
+                  {formattedMinPrice} {currency.symbol}
+                </b>
+                ).
+              </div>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-      <Button
-        variant={"outline"}
-        type="button"
-        onClick={form.handleSubmit(onSubmit)}
-        disabled={disabled}
-      >
-        Execute order
-      </Button>
+        <Button variant="outline" type="submit" disabled={disabled}>
+          Execute order
+        </Button>
+      </form>
     </Form>
   );
 };

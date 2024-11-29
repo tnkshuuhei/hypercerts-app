@@ -7,18 +7,8 @@ import request from "graphql-request";
 
 const ordersQuery = graphql(
   `
-    query OrdersQuery(
-      $chainId: BigInt
-      $signer: String
-      $hypercert_id: String
-    ) {
-      orders(
-        where: {
-          chainId: { eq: $chainId }
-          signer: { eq: $signer }
-          hypercert_id: { eq: $hypercert_id }
-        }
-      ) {
+    query OrdersQuery($where: OrderWhereInput) {
+      orders(where: $where) {
         count
         data {
           ...OrderFragment
@@ -30,23 +20,33 @@ const ordersQuery = graphql(
 );
 
 interface GetOrdersParams {
-  filter: {
-    chainId?: bigint;
+  filter?: {
+    chainId?: bigint | number | string;
     signer?: `0x${string}`;
     hypercertId?: string;
   };
 }
 
 export async function getOrders({ filter }: GetOrdersParams) {
-  const res = await request(HYPERCERTS_API_URL_GRAPH, ordersQuery, {
-    chainId: filter.chainId?.toString(),
-    signer: filter.signer,
-    hypercert_id: filter.hypercertId,
-  });
+  const where: Record<string, any> = {};
 
-  // TODO: Throw error?
-  if (!res.orders?.data) {
-    return undefined;
+  if (filter?.chainId) {
+    where.chainId = { eq: filter.chainId.toString() };
+  }
+  if (filter?.signer) {
+    where.signer = { eq: filter.signer };
+  }
+  if (filter?.hypercertId) {
+    where.hypercert_id = { eq: filter.hypercertId };
+  }
+
+  const res = await request(HYPERCERTS_API_URL_GRAPH, ordersQuery, { where });
+
+  if (!res.orders?.data || !res.orders?.count) {
+    return {
+      count: 0,
+      data: [],
+    };
   }
 
   const processedFragments = res.orders.data.map((order) => {
