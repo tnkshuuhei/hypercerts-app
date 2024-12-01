@@ -155,7 +155,7 @@ export async function getAllHypercerts({
   chainId,
 }: GetAllHypercertsParams) {
   const res = await request(HYPERCERTS_API_URL_GRAPH, query, {
-    first: first + offset,
+    first,
     offset,
     sort: createOrderBy({ orderBy }),
     where: createFilter({ search, filter, chainId }),
