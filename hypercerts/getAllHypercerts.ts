@@ -118,6 +118,34 @@ export type GetAllHypercertsParams = {
   chainId?: number;
 };
 
+// 42220-0x16bA53B74c234C870c61EFC04cD418B8f2865959-24840612785228507832826346342519079436288
+// 42220-0x16bA53B74c234C870c61EFC04cD418B8f2865959-24500330418307569369362971735087311224832
+// 42220-0x16bA53B74c234C870c61EFC04cD418B8f2865959-24160048051386630905899597127655543013376
+// 42220-0x16bA53B74c234C870c61EFC04cD418B8f2865959-23819765684465692442436222520223774801920
+// 42220-0x16bA53B74c234C870c61EFC04cD418B8f2865959-23479483317544753978972847912792006590464
+// 42220-0x16bA53B74c234C870c61EFC04cD418B8f2865959-23139200950623815515509473305360238379008
+
+// TODO: Remove this once we have a proper way to filter out hypercerts that have been burned
+const filteredIds = new Set<string>();
+filteredIds.add(
+  "42220-0x16bA53B74c234C870c61EFC04cD418B8f2865959-24840612785228507832826346342519079436288",
+);
+filteredIds.add(
+  "42220-0x16bA53B74c234C870c61EFC04cD418B8f2865959-24500330418307569369362971735087311224832",
+);
+filteredIds.add(
+  "42220-0x16bA53B74c234C870c61EFC04cD418B8f2865959-24160048051386630905899597127655543013376",
+);
+filteredIds.add(
+  "42220-0x16bA53B74c234C870c61EFC04cD418B8f2865959-23819765684465692442436222520223774801920",
+);
+filteredIds.add(
+  "42220-0x16bA53B74c234C870c61EFC04cD418B8f2865959-23479483317544753978972847912792006590464",
+);
+filteredIds.add(
+  "42220-0x16bA53B74c234C870c61EFC04cD418B8f2865959-23139200950623815515509473305360238379008",
+);
+
 export async function getAllHypercerts({
   first,
   offset,
@@ -127,23 +155,37 @@ export async function getAllHypercerts({
   chainId,
 }: GetAllHypercertsParams) {
   const res = await request(HYPERCERTS_API_URL_GRAPH, query, {
-    first,
+    first: first + offset,
     offset,
     sort: createOrderBy({ orderBy }),
     where: createFilter({ search, filter, chainId }),
   });
 
-  // TODO: Throw error?
   if (!res.hypercerts?.data) {
-    return undefined;
+    return {
+      count: 0,
+      data: [],
+    };
   }
 
-  const processedFragments = res.hypercerts.data.map((hypercert) => {
-    return readFragment(HypercertListFragment, hypercert);
-  });
+  const data = res.hypercerts.data.reduce<NonNullable<HypercertListFragment>[]>(
+    (acc, hypercert) => {
+      const hcData = readFragment(HypercertListFragment, hypercert);
+      if (hcData?.hypercert_id && !filteredIds.has(hcData.hypercert_id)) {
+        acc.push(hcData);
+      }
+      return acc;
+    },
+    [],
+  );
+
+  const totalCount = Math.max(
+    0,
+    (res.hypercerts.count ?? 0) - filteredIds.size,
+  );
 
   return {
-    count: res.hypercerts.count,
-    data: processedFragments,
+    count: totalCount,
+    data,
   };
 }
