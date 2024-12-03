@@ -9,7 +9,6 @@ import EvaluateButton from "@/components/hypercert/evaluate-button";
 import { CurrencyButtons } from "@/components/currency-buttons";
 import { ListForSaleButton } from "@/components/marketplace/list-for-sale-button";
 import ErrorState from "@/components/global/error-state";
-import { getOrders } from "@/marketplace/getOpenOrders";
 import { getHypercertAttestations } from "@/attestations/getHypercertAttestations";
 import EvaluationsList from "@/components/hypercert/evaluations-list";
 import HypercertListingsList from "@/components/marketplace/hypercert-listings-list";
