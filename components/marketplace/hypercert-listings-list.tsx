@@ -1,4 +1,4 @@
-import { cache, Suspense, use } from "react";
+import { cache, Suspense } from "react";
 import { HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
 import {
   getAllListings,
@@ -36,8 +36,6 @@ export default async function HypercertListingsList({
 }) {
   const currentPage = Number(searchParams?.listings) || 1;
   const offset = Math.max(0, LISTINGS_PER_PAGE * (currentPage - 1));
-
-  console.log({ first: LISTINGS_PER_PAGE, offset });
 
   const orders = await getListingsData({
     filter: {

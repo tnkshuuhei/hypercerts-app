@@ -18,7 +18,7 @@ export default function NestedPagination({
   itemsPerPage,
   basePath = "",
   parameterName = "p",
-  currentPage,
+  currentPage = 1,
 }: PaginationProps) {
   const totalPages = Math.ceil((totalItems || 0) / itemsPerPage);
   const pageNumber = currentPage || Number(searchParams[parameterName]) || 1;
