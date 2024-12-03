@@ -1,4 +1,4 @@
-import { EmptySection } from "@/app/profile/[address]/sections";
+import { EmptySection } from "@/components/global/sections";
 import UnclaimedHypercertListItem from "./unclaimed-hypercert-list-item";
 import { AllowListRecord } from "@/allowlists/getAllowListRecordsForAddressByClaimed";
 

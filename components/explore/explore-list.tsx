@@ -5,10 +5,10 @@ import {
   isClaimsFilter,
   isClaimsOrderBy,
 } from "@/hypercerts/getAllHypercerts";
-import ExplorePagination from "./explore-pagination";
 import { HYPERCERTS_PER_PAGE } from "@/configs/ui";
-import { InfoSection } from "@/app/profile/[address]/sections";
+import { InfoSection } from "@/components/global/sections";
 import HypercertWindow from "@/components/hypercert/hypercert-window";
+import Pagination from "../pagination";
 
 function HypercertsListNoResults() {
   return "No results found";
@@ -69,9 +69,11 @@ export default function ExploreList({
           />
         ))}
       </div>
-      <ExplorePagination
+      <Pagination
         searchParams={searchParams}
-        hypercertsCount={hypercerts.count}
+        totalItems={hypercerts.count}
+        itemsPerPage={HYPERCERTS_PER_PAGE}
+        basePath="/explore"
       />
     </div>
   );

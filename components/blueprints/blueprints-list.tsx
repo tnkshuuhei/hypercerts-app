@@ -5,7 +5,7 @@ import { HypercertFormValues } from "@/components/hypercert/hypercert-minting-fo
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { getUnixTime } from "date-fns";
-import { EmptySection } from "@/app/profile/[address]/sections";
+import { EmptySection } from "@/components/global/sections";
 
 export const BlueprintsList = ({
   blueprints,

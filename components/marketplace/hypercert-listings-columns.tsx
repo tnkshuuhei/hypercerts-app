@@ -13,9 +13,9 @@ import {
   decodeFractionalOrderParams,
   getCurrencyByAddress,
 } from "@/marketplace/utils";
-import { ArrowUpDown, RefreshCwIcon, TrashIcon, XIcon } from "lucide-react";
+import { ArrowUpDown, RefreshCwIcon, XIcon } from "lucide-react";
 import { OrderValidatorCode } from "@hypercerts-org/marketplace-sdk";
-import { CancelOrderParams, DeleteOrderParams } from "@/marketplace/hooks";
+import { CancelOrderParams } from "@/marketplace/hooks";
 
 const columnHelper = createColumnHelper<OrderFragment>();
 
@@ -23,20 +23,14 @@ export const createListingsColumns = ({
   address,
   chainId,
   displayCurrency,
-  hypercertOnConnectedChain,
   refreshOrderValidity,
   cancelOrder,
-  deleteOrder,
-  onRowClick,
 }: {
   address: string;
   chainId: number;
   displayCurrency: string;
-  hypercertOnConnectedChain: boolean;
   refreshOrderValidity: (tokenId: string) => Promise<void>;
   cancelOrder: (params: CancelOrderParams) => Promise<void>;
-  deleteOrder: (params: DeleteOrderParams) => Promise<void>;
-  onRowClick: (order: OrderFragment) => void;
 }) => [
   columnHelper.accessor("signer", {
     cell: (row) => (
@@ -107,23 +101,6 @@ export const createListingsColumns = ({
         console.error(e);
         return <div>Invalid</div>;
       }
-    },
-  }),
-  columnHelper.accessor("id", {
-    id: "buy",
-    header: "Action",
-    cell: (row) => {
-      const order = row.row.original;
-      if (order.signer === address || order.invalidated) return null;
-      return (
-        <Button
-          onClick={() => onRowClick(order)}
-          disabled={!hypercertOnConnectedChain}
-          className="w-full"
-        >
-          Buy
-        </Button>
-      );
     },
   }),
   columnHelper.accessor("invalidated", {
@@ -204,33 +181,7 @@ export const createListingsColumns = ({
           );
         }
 
-        return (
-          <div className="flex">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    className="ml-2"
-                    onClick={async (e) => {
-                      e.preventDefault();
-                      await deleteOrder({
-                        orderId: order.id,
-                        hypercertId: order.hypercert_id,
-                        ownerAddress: order.signer,
-                      });
-                    }}
-                    size="sm"
-                  >
-                    <TrashIcon />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent className="max-w-[300px]">
-                  Click to permanently remove listing.
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
-        );
+        return null;
       }
     },
   }),

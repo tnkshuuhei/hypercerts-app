@@ -16,6 +16,7 @@ import HypercertListingsList from "@/components/marketplace/hypercert-listings-l
 
 type Props = {
   params: { hypercertId: string };
+  searchParams: Record<string, string>;
 };
 
 export async function generateMetadata(
@@ -38,12 +39,12 @@ export async function generateMetadata(
     },
   };
 }
-export default async function HypercertPage({ params }: Props) {
+export default async function HypercertPage({ params, searchParams }: Props) {
   const { hypercertId } = params;
-  const [hypercert, evaluations, orders] = await Promise.all([
+
+  const [hypercert, evaluations] = await Promise.all([
     getHypercert(hypercertId),
     getHypercertAttestations(hypercertId),
-    getOrders({ filter: { hypercertId } }),
   ]);
 
   if (!hypercert) {
@@ -75,13 +76,12 @@ export default async function HypercertPage({ params }: Props) {
           <ListForSaleButton hypercert={hypercert} />
         </div>
       </div>
-      <Suspense fallback={<PageSkeleton />}>
-        <HypercertListingsList
-          initialOrders={orders?.data}
-          hypercertId={hypercertId}
-          initialHypercert={hypercert}
-        />
-      </Suspense>
+      <HypercertListingsList
+        hypercertId={hypercertId}
+        initialHypercert={hypercert}
+        searchParams={searchParams}
+        invalidated={false}
+      />
     </main>
   );
 }

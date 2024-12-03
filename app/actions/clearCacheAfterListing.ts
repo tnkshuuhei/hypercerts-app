@@ -7,7 +7,6 @@ export async function clearCacheAfterListing(hypercertId: string | null) {
     return;
   }
 
-  // Clear cache on successful attestation
   revalidatePath("/explore");
   revalidatePath(`/hypercerts/${hypercertId}`);
 }

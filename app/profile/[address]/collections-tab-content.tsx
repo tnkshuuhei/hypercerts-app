@@ -22,14 +22,19 @@ const CollectionsTabContentInner = async ({
     return null;
   }
 
-  const { hyperboards, count } = result;
+  const { hyperboards } = result;
 
   return (
     <div>
       <HyperboardsOverview profileAddress={address} hyperboards={hyperboards} />
 
       <div className="mt-5">
-        <Pagination count={count || 0} />
+        <Pagination
+          searchParams={searchParams}
+          totalItems={result.count || 0}
+          itemsPerPage={COLLECTIONS_PER_PAGE}
+          basePath={`/profile/${address}/collections`}
+        />
       </div>
     </div>
   );
