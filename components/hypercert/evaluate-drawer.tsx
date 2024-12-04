@@ -9,7 +9,6 @@ import { AllEvaluationStates } from "@/eas/types/all-evaluation-states.type";
 import { Button } from "../ui/button";
 import { Drawer } from "vaul";
 import EvaluateToggle from "./evaluate-toggle";
-import { HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
 import { Textarea } from "../ui/textarea";
 import { clearCacheAfterEvaluation } from "@/app/actions/clearCacheAfterEvaluation";
 import { cn } from "@/lib/utils";
@@ -18,7 +17,6 @@ import { errorHasMessage } from "@/lib/errorHasMessage";
 import { errorHasReason } from "@/lib/errorHasReason";
 import { getEasConfig } from "@/eas/getEasConfig";
 import { isChainIdSupported } from "@/lib/isChainIdSupported";
-import { useAccount } from "wagmi";
 import { useEthersSigner } from "@/ethers/hooks/useEthersSigner";
 import { useGlobalState } from "@/lib/state";
 import { useToast } from "../ui/use-toast";
@@ -41,11 +39,11 @@ function isAnySectionInvalid(state: AllEvaluationStates) {
   );
 }
 
-export function EvaluateDrawer({ hypercert }: { hypercert: HypercertFull }) {
-  const { chainId } = useAccount();
+export function EvaluateDrawer({ hypercertId }: { hypercertId: string }) {
   const { toast } = useToast();
   const tagifyRef = useRef<Tagify<Tagify.BaseTagData>>();
-  const rpcSigner = useEthersSigner({ chainId });
+  const [chainId, contractAddress, tokenId] = hypercertId.split("-");
+  const rpcSigner = useEthersSigner({ chainId: +chainId });
 
   // Global state
   const whitelistAttestTags = useGlobalState(
@@ -94,16 +92,16 @@ export function EvaluateDrawer({ hypercert }: { hypercert: HypercertFull }) {
   };
 
   const attest = async () => {
-    if (!rpcSigner || !chainId || !hypercert.contract?.contract_address) {
+    if (!rpcSigner || !chainId || !contractAddress) {
       return;
     }
     setIsAttesting(true);
     try {
       const { uid } = await createAttestation({
-        chainId: chainId,
-        contractAddress: hypercert.contract.contract_address,
+        chainId: +chainId,
+        contractAddress: contractAddress,
         rpcSigner,
-        tokenId: hypercert.token_id as string,
+        tokenId: tokenId,
         allEvaluationStates,
         tags: tagifyRef.current?.value.map((tag) => tag.value) || [],
         comments,
@@ -140,9 +138,9 @@ export function EvaluateDrawer({ hypercert }: { hypercert: HypercertFull }) {
   }
 
   if (uid) {
-    clearCacheAfterEvaluation(hypercert.hypercert_id);
+    clearCacheAfterEvaluation(hypercertId);
 
-    const easConfig = getEasConfig(chainId);
+    const easConfig = getEasConfig(+chainId);
     const url = `${easConfig?.explorerUrl}/attestation/view/${uid}`;
     return (
       <>

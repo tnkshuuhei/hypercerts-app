@@ -1,38 +1,40 @@
 "use client";
 
-import { HYPERCERTS_PER_PAGE } from "@/configs/ui";
-import PaginationButton from "../pagination-button";
-import { useRouter } from "next/navigation";
 import { useCallback } from "react";
+import PaginationButton from "./pagination-button";
 
-interface ExplorePaginationProps {
+interface PaginationProps {
   searchParams: Record<string, string>;
-  hypercertsCount: number;
+  totalItems: number;
+  itemsPerPage: number;
+  basePath?: string;
+  parameterName?: string;
+  currentPage?: number;
 }
 
-export default function ExplorePagination({
+export default function NestedPagination({
   searchParams,
-  hypercertsCount,
-}: ExplorePaginationProps) {
-  const router = useRouter();
-  const totalPages = Math.ceil((hypercertsCount || 0) / HYPERCERTS_PER_PAGE);
-  const currentPage = Number(searchParams?.p) || 1;
+  totalItems,
+  itemsPerPage,
+  basePath = "",
+  parameterName = "p",
+  currentPage = 1,
+}: PaginationProps) {
+  const totalPages = Math.ceil((totalItems || 0) / itemsPerPage);
+  const pageNumber = currentPage || Number(searchParams[parameterName]) || 1;
 
   const getPageHref = useCallback(
     (page: number) => {
       const urlSearchParams = new URLSearchParams(searchParams);
-      urlSearchParams.set("p", page.toString());
-      return `/explore?${urlSearchParams.toString()}`;
+      urlSearchParams.set(parameterName, page.toString());
+      return `${basePath}?${urlSearchParams.toString()}`;
     },
-    [searchParams],
+    [searchParams, basePath, parameterName],
   );
 
-  const navigateToPage = useCallback(
-    (page: number) => {
-      router.push(getPageHref(page));
-    },
-    [router, getPageHref],
-  );
+  if (pageNumber > totalPages) {
+    return null;
+  }
 
   const renderPageNumbers = () => {
     const pageNumbers = [];
@@ -59,8 +61,10 @@ export default function ExplorePagination({
     return pageNumbers;
   };
 
+  if (totalPages <= 1) return null;
+
   return (
-    <div className="flex flex-col sm:flex-row gap-4 items-center justify-between w-full">
+    <div className="flex flex-col sm:flex-row gap-4 items-center justify-between w-full mt-4">
       <div className="flex items-center justify-start gap-2">
         {currentPage > 1 && (
           <>

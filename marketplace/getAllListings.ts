@@ -1,5 +1,3 @@
-import "server-only";
-
 import { graphql, readFragment } from "@/lib/graphql";
 import { OrderFragment } from "@/marketplace/fragments/order.fragment";
 import { HYPERCERTS_API_URL_GRAPH } from "@/configs/hypercerts";
@@ -7,8 +5,8 @@ import request from "graphql-request";
 
 const ordersQuery = graphql(
   `
-    query OrdersQuery($where: OrderWhereInput) {
-      orders(where: $where) {
+    query OrdersQuery($where: OrderWhereInput, $first: Int, $offset: Int) {
+      orders(where: $where, first: $first, offset: $offset) {
         count
         data {
           ...OrderFragment
@@ -19,15 +17,22 @@ const ordersQuery = graphql(
   [OrderFragment],
 );
 
-interface GetOrdersParams {
+export interface GetAllListingsParams {
+  first: number;
+  offset: number;
   filter?: {
-    chainId?: bigint | number | string;
-    signer?: `0x${string}`;
+    chainId?: number;
     hypercertId?: string;
+    signer?: `0x${string}`;
+    invalidated?: boolean;
   };
 }
 
-export async function getOrders({ filter }: GetOrdersParams) {
+export async function getAllListings({
+  first,
+  offset,
+  filter,
+}: GetAllListingsParams) {
   const where: Record<string, any> = {};
 
   if (filter?.chainId) {
@@ -39,8 +44,15 @@ export async function getOrders({ filter }: GetOrdersParams) {
   if (filter?.hypercertId) {
     where.hypercert_id = { eq: filter.hypercertId };
   }
+  if (filter?.invalidated !== undefined) {
+    where.invalidated = { eq: filter.invalidated };
+  }
 
-  const res = await request(HYPERCERTS_API_URL_GRAPH, ordersQuery, { where });
+  const res = await request(HYPERCERTS_API_URL_GRAPH, ordersQuery, {
+    first,
+    offset,
+    where,
+  });
 
   if (!res.orders?.data || !res.orders?.count) {
     return {

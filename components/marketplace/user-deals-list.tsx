@@ -3,7 +3,7 @@
 import React from "react";
 import { SaleFragment } from "@/marketplace/fragments/sale.fragment";
 import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
-import { EmptySection } from "@/app/profile/[address]/sections";
+import { EmptySection } from "@/components/global/sections";
 import HypercertDealWindow, {
   HypercertDealMiniDisplayProps,
 } from "@/components/hypercert/hypercert-deal-window";

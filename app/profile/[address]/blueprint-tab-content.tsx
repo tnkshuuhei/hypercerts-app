@@ -81,8 +81,10 @@ const BlueprintTabContentInner = async ({
       {currentCount !== 0 && (
         <div className="mt-5">
           <Pagination
-            count={currentCount || 0}
-            pageSize={BLUEPRINTS_PER_PAGE}
+            searchParams={searchParams}
+            totalItems={currentCount || 0}
+            itemsPerPage={BLUEPRINTS_PER_PAGE}
+            basePath={`/profile/${address}/blueprints`}
           />
         </div>
       )}

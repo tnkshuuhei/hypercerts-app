@@ -31,33 +31,25 @@ const query = graphql(
 );
 
 export async function getHypercertAttestations(hypercertId: string) {
-  const idParts = hypercertId.split("-");
-  const chainId = idParts[0];
-  const contractAddress = idParts[1];
-  const tokenId = idParts[2];
+  const [chainId, contractAddress, tokenId] = hypercertId.split("-");
 
   const res = await request(HYPERCERTS_API_URL_GRAPH, query, {
-    chainId: chainId,
-    contractAddress: contractAddress,
-    tokenId: tokenId,
+    chainId,
+    contractAddress,
+    tokenId,
   });
-  const attestations = res.attestations?.data?.[0];
 
-  if (!attestations) {
-    return undefined;
+  if (!res.attestations?.data || !res.attestations?.count) {
+    return {
+      count: 0,
+      data: [],
+    };
   }
-
-  // TODO: Throw error?
-  if (!res.attestations?.data) {
-    return undefined;
-  }
-
-  const processedFragments = res.attestations.data.map((attestation) => {
-    return readFragment(AttestationListFragment, attestation);
-  });
 
   return {
     count: res.attestations.count,
-    data: processedFragments,
+    data: res.attestations.data.map((attestation) =>
+      readFragment(AttestationListFragment, attestation),
+    ),
   };
 }

@@ -1,58 +1,89 @@
 "use client";
 
-import { COLLECTIONS_PER_PAGE } from "@/configs/ui";
-import { usePathname, useSearchParams } from "next/navigation";
-import PaginationButton from "@/components/pagination-button";
+import { useCallback } from "react";
+import PaginationButton from "./pagination-button";
+
+interface PaginationProps {
+  searchParams: Record<string, string>;
+  totalItems: number;
+  itemsPerPage: number;
+  basePath?: string;
+}
 
 export default function Pagination({
-  count,
-  pageSize = COLLECTIONS_PER_PAGE,
-}: {
-  count: number;
-  pageSize?: number;
-}) {
-  const pathName = usePathname();
-  const searchParams = useSearchParams();
-  const totalPages = Math.ceil((count || 0) / pageSize);
-  const currentPage = Number(searchParams.get("p")) || 1;
+  searchParams,
+  totalItems,
+  itemsPerPage,
+  basePath = "",
+}: PaginationProps) {
+  const totalPages = Math.ceil((totalItems || 0) / itemsPerPage);
+  const currentPage = Number(searchParams?.p) || 1;
 
-  const urlSearchParams = new URLSearchParams(searchParams);
-  const href = (toPage: number) => {
-    urlSearchParams.set("p", toPage.toString());
-    return `${pathName}?${urlSearchParams.toString()}`;
+  const getPageHref = useCallback(
+    (page: number) => {
+      const urlSearchParams = new URLSearchParams(searchParams);
+      urlSearchParams.set("p", page.toString());
+      return `${basePath}?${urlSearchParams.toString()}`;
+    },
+    [searchParams, basePath],
+  );
+
+  const renderPageNumbers = () => {
+    const pageNumbers = [];
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pageNumbers.push(
+        <PaginationButton
+          key={i}
+          href={getPageHref(i)}
+          active={i === currentPage}
+        >
+          {i}
+        </PaginationButton>,
+      );
+    }
+
+    return pageNumbers;
   };
 
+  if (totalPages <= 1) return null;
+
   return (
-    <div className="flex flex-col sm:flex-row gap-4 items-center justify-between w-full">
+    <div className="flex flex-col sm:flex-row gap-4 items-center justify-between w-full mt-4">
       <div className="flex items-center justify-start gap-2">
         {currentPage > 1 && (
-          <PaginationButton arrow="left" href={href(1)}>
-            First
-          </PaginationButton>
-        )}
-
-        {currentPage > 1 && (
-          <PaginationButton arrow="left" href={href(currentPage - 1)}>
-            Previous
-          </PaginationButton>
+          <>
+            <PaginationButton href={getPageHref(1)} arrow="left">
+              First
+            </PaginationButton>
+            <PaginationButton href={getPageHref(currentPage - 1)} arrow="left">
+              Previous
+            </PaginationButton>
+          </>
         )}
       </div>
 
-      <div className="pt-1 text-sm text-gray-500 whitespace-nowrap">
-        {currentPage} of {totalPages}
+      <div className="flex items-center justify-center gap-2">
+        {renderPageNumbers()}
       </div>
 
       <div className="flex items-center justify-end gap-2">
         {currentPage < totalPages && (
-          <PaginationButton arrow="right" href={href(currentPage + 1)}>
-            Next
-          </PaginationButton>
-        )}
-
-        {currentPage < totalPages && (
-          <PaginationButton arrow="right" href={href(totalPages)}>
-            Last
-          </PaginationButton>
+          <>
+            <PaginationButton href={getPageHref(currentPage + 1)} arrow="right">
+              Next
+            </PaginationButton>
+            <PaginationButton href={getPageHref(totalPages)} arrow="right">
+              Last
+            </PaginationButton>
+          </>
         )}
       </div>
     </div>

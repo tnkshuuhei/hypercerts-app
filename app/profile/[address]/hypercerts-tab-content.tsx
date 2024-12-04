@@ -1,7 +1,7 @@
 import { getHypercertsByCreator } from "@/hypercerts/getHypercertsByCreator";
 import { getAllowListRecordsForAddressByClaimed } from "@/allowlists/getAllowListRecordsForAddressByClaimed";
 import HypercertWindow from "@/components/hypercert/hypercert-window";
-import { EmptySection } from "@/app/profile/[address]/sections";
+import { EmptySection } from "@/components/global/sections";
 import UnclaimedHypercertsList from "@/components/profile/unclaimed-hypercerts-list";
 import { Suspense } from "react";
 import ExploreListSkeleton from "@/components/explore/explore-list-skeleton";
