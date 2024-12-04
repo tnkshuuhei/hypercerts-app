@@ -1,14 +1,14 @@
-import { cache, Suspense } from "react";
+import PageSkeleton from "@/components/hypercert/page-skeleton";
+import { LISTINGS_PER_PAGE } from "@/configs/ui";
 import { HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
 import {
   getAllListings,
   GetAllListingsParams,
 } from "@/marketplace/getAllListings";
-import { LISTINGS_PER_PAGE } from "@/configs/ui";
-import HypercertListingsTable from "./hypercert-listings-table";
-import PageSkeleton from "@/components/hypercert/page-skeleton";
-import NestedPagination from "../nested-pagination";
+import { cache, Suspense } from "react";
 import { InfoSection } from "../global/sections";
+import NestedPagination from "../nested-pagination";
+import HypercertListingsTable from "./hypercert-listings-table";
 
 function ListingsListNoResults() {
   return "No listings found";
@@ -23,7 +23,7 @@ const getListingsData = cache(async (params: GetAllListingsParams) => {
   return listings;
 });
 
-export default async function HypercertListingsList({
+export default async function HypercertListings({
   hypercertId,
   initialHypercert,
   searchParams,

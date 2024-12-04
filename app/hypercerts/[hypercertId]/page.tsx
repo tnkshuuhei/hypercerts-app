@@ -11,7 +11,7 @@ import { ListForSaleButton } from "@/components/marketplace/list-for-sale-button
 import ErrorState from "@/components/global/error-state";
 import { getHypercertAttestations } from "@/attestations/getHypercertAttestations";
 import EvaluationsList from "@/components/hypercert/evaluations-list";
-import HypercertListingsList from "@/components/marketplace/hypercert-listings-list";
+import HypercertListings from "@/components/marketplace/hypercert-listings";
 
 type Props = {
   params: { hypercertId: string };
@@ -75,7 +75,7 @@ export default async function HypercertPage({ params, searchParams }: Props) {
           <ListForSaleButton hypercert={hypercert} />
         </div>
       </div>
-      <HypercertListingsList
+      <HypercertListings
         hypercertId={hypercertId}
         initialHypercert={hypercert}
         searchParams={searchParams}

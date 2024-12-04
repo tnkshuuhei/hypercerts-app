@@ -1,4 +1,5 @@
-import { useForm } from "react-hook-form";
+import { FormattedUnits } from "@/components/formatted-units";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -7,11 +8,14 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { MarketplaceOrder } from "@/marketplace/types";
-import React from "react";
+import {
+  DEFAULT_NUM_FRACTIONS,
+  DEFAULT_NUM_FRACTIONS_DECIMALS,
+} from "@/configs/hypercerts";
+import { HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
+import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
 import { useBuyFractionalMakerAsk } from "@/marketplace/hooks";
-import { FormattedUnits } from "@/components/formatted-units";
+import { MarketplaceOrder } from "@/marketplace/types";
 import {
   decodeFractionalOrderParams,
   formatPrice,
@@ -19,15 +23,10 @@ import {
   getPricePerPercent,
   getPricePerUnit,
 } from "@/marketplace/utils";
-import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 import { parseUnits } from "viem";
-import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
-import {
-  DEFAULT_NUM_FRACTIONS,
-  DEFAULT_NUM_FRACTIONS_DECIMALS,
-} from "@/configs/hypercerts";
-import { HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
+import z from "zod";
 
 const formSchema = z
   .object({
@@ -69,12 +68,14 @@ export type BuyFractionalOrderFormValues = z.infer<typeof formSchema>;
 
 export const BuyFractionalOrderForm = ({
   order,
-  onCompleted,
   hypercert,
+  onBuyOrder,
+  onCompleted,
 }: {
   order: MarketplaceOrder;
-  onCompleted?: () => void;
   hypercert: HypercertFull;
+  onBuyOrder: (orderId: string) => void;
+  onCompleted?: () => void;
 }) => {
   const { minUnitAmount, maxUnitAmount, minUnitsToKeep } =
     decodeFractionalOrderParams(order.additionalParameters);
@@ -147,14 +148,20 @@ export const BuyFractionalOrderForm = ({
       hypercertUnits,
     ).toString();
 
-    await buyFractionalMakerAsk({
-      order,
-      unitAmount,
-      pricePerUnit,
-      hypercertName: hypercert?.metadata?.name,
-      totalUnitsInHypercert: hypercertUnits,
-    });
-    onCompleted?.();
+    onBuyOrder(order.orderNonce);
+
+    try {
+      await buyFractionalMakerAsk({
+        order,
+        unitAmount,
+        pricePerUnit,
+        hypercertName: hypercert?.metadata?.name,
+        totalUnitsInHypercert: hypercertUnits,
+      });
+      onCompleted?.();
+    } catch (error) {
+      console.error("Error buying fractional order:", error);
+    }
   };
 
   const percentageAmount = form.watch("percentageAmount");
