@@ -4,27 +4,34 @@ import EthAddress from "../eth-address";
 import { EvaluationData } from "../../eas/types/evaluation-data.type";
 import Evaluations from "../evaluation-list-item/evaluations";
 import FormattedDate from "../formatted-date";
-import { HypercertFull } from "../../hypercerts/fragments/hypercert-full.fragment";
 import Link from "next/link";
 import Tags from "../evaluation-list-item/tags";
 import { UserIcon } from "../user-icon";
+import type { AttestationResult } from "@/attestations/fragments/attestation-list.fragment";
+
+interface EvaluationsListProps {
+  initialEvaluations: {
+    count: number;
+    data: AttestationResult[];
+  };
+}
 
 export default async function EvaluationsList({
-  hypercert,
-}: {
-  hypercert: HypercertFull;
-}) {
-  const attestations = hypercert.attestations?.data;
-
-  if (!attestations || attestations.length === 0) {
+  initialEvaluations,
+}: EvaluationsListProps) {
+  if (initialEvaluations.data.length === 0) {
     return <div>This Hypercert has not yet been evaluated.</div>;
   }
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-      {attestations.map((attestation, index) => {
-        if (!attestation.attester) return null;
-        const data: EvaluationData = attestation.data as EvaluationData;
+      {initialEvaluations.data.map((attestation, index) => {
+        if (!attestation) return null;
+        const data = attestation.data as EvaluationData;
+        const attester = attestation.attester;
+
+        if (!attester) return null;
+
         return (
           <div
             key={attestation.uid}
@@ -37,10 +44,10 @@ export default async function EvaluationsList({
               className="w-full"
             >
               <div className="flex gap-2 w-full">
-                <UserIcon address={attestation.attester} size="large" />
+                <UserIcon address={attester} size="large" />
                 <div className="flex flex-col justify-center items-start w-52">
-                  <EnsName address={attestation.attester} />
-                  <EthAddress address={attestation.attester} />
+                  <EnsName address={attester} />
+                  <EthAddress address={attester} />
                 </div>
               </div>
             </Link>

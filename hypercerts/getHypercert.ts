@@ -21,9 +21,6 @@ const query = graphql(
 );
 
 export async function getHypercert(hypercertId: string) {
-  // hypercertID is a string consisting of chainId-contractAddress-tokenId [bigint, string, bigint]
-  // split it into its parts and getAddress for the contractAddress using viem (mixed case)
-
   const [chainId, contractAddress, tokenId] = hypercertId.split("-");
 
   if (!chainId || !contractAddress || !tokenId) {

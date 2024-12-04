@@ -1,6 +1,6 @@
 "use client";
 
-import { EmptySection } from "@/app/profile/[address]/sections";
+import { EmptySection } from "@/components/global/sections";
 import { HyperboardRow } from "@/components/hyperboard/hyperboard-row";
 import { CreateCollectionButton } from "@/components/collections/buttons";
 import { HyperboardFragment } from "@/collections/hyperboard.fragment";

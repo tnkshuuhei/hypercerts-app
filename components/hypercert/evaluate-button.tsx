@@ -11,15 +11,14 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Drawer } from "vaul";
 import { EvaluateDrawer } from "./evaluate-drawer";
-import { HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
 import { TrustedAttestor } from "@/github/types/trusted-attestor.type";
 import { isChainIdSupported } from "@/lib/isChainIdSupported";
 import { useAccount } from "wagmi";
 
 export default function EvaluateButton({
-  hypercert,
+  hypercertId,
 }: {
-  hypercert: HypercertFull;
+  hypercertId: string;
 }) {
   const { isConnected, address } = useAccount();
   const [evaluator, setEvaluator] = useState<TrustedAttestor>();
@@ -66,7 +65,7 @@ export default function EvaluateButton({
           <Drawer.Content className="bg-white flex flex-col rounded-t-[10px] h-full w-[500px] mt-24 fixed bottom-0 right-0">
             <div className="p-4 bg-white flex-1 h-full">
               <div className="max-w-md mx-auto flex flex-col gap-5">
-                <EvaluateDrawer hypercert={hypercert} />
+                <EvaluateDrawer hypercertId={hypercertId} />
               </div>
             </div>
           </Drawer.Content>

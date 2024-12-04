@@ -40,6 +40,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { clearCacheAfterListing } from "@/app/actions/clearCacheAfterListing";
 
 type State = {
   fractionId: string;
@@ -154,6 +155,7 @@ function ListDialogInner({
       toast({
         description: "Listing created successfully",
       });
+      clearCacheAfterListing(hypercert.hypercert_id);
     } catch (e) {
       console.error(e);
       toast({

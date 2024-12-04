@@ -32,8 +32,8 @@ import { useRouter } from "next/navigation";
 import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
 import { ExternalLink } from "lucide-react";
 import React from "react";
-import revalidatePathServerAction from "@/app/actions";
-
+import { clearCacheAfterListing } from "@/app/actions/clearCacheAfterListing";
+import { revalidatePathServerAction } from "@/app/actions/revalidatePathServerAction";
 export const useCreateOrderInSupabase = () => {
   const chainId = useChainId();
   const { client: hypercertExchangeClient } = useHypercertExchangeClient();
@@ -614,63 +614,109 @@ export const useBuyFractionalMakerAsk = () => {
   });
 };
 
+export interface CancelOrderParams {
+  nonce: bigint;
+  tokenId: string;
+  chainId: number;
+  hypercertId: string;
+  ownerAddress: string;
+}
+
 export const useCancelOrder = () => {
   const { client: hec } = useHypercertExchangeClient();
+  const router = useRouter();
 
-  return useMutation({
+  return useMutation<boolean, Error, CancelOrderParams>({
     mutationKey: ["cancelOrder"],
     mutationFn: async ({
       nonce,
       tokenId,
       chainId,
-    }: {
-      nonce: bigint;
-      tokenId: string;
-      chainId: number;
-    }) => {
+      hypercertId,
+      ownerAddress,
+    }: CancelOrderParams) => {
       if (!hec) {
-        throw new Error("No client");
+        throw new Error("Hypercert exchange client not initialized");
       }
 
       const tx = await hec.cancelOrders([BigInt(nonce)]).call();
       await tx.wait();
 
+      // Update order validity in the API
       await hec.api.updateOrderValidity([BigInt(tokenId)], chainId);
-      document.location.reload();
+
+      // Revalidate paths to update the server-side cache
+      await revalidatePathServerAction([
+        `/hypercerts/${hypercertId}`,
+        `/profile/${ownerAddress}`,
+      ]);
+
+      return true;
     },
-    onError: (e) => {
-      console.error(e);
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Listing cancelled successfully",
+        duration: 5000,
+      });
+      router.refresh(); // Refresh the current page to reflect changes
+    },
+    onError: (error) => {
+      console.error("Error cancelling order:", error);
       toast({
         title: "Error",
-        description: e.message,
+        description:
+          error.message || "An error occurred while cancelling the listing",
         duration: 5000,
       });
     },
   });
 };
 
+export interface DeleteOrderParams {
+  orderId: string;
+  hypercertId: string;
+  ownerAddress: string;
+}
+
 export const useDeleteOrder = () => {
   const { client: hec } = useHypercertExchangeClient();
+  const router = useRouter();
 
-  return useMutation({
+  return useMutation<boolean, Error, DeleteOrderParams>({
     mutationKey: ["deleteOrder"],
-    mutationFn: async ({ orderId }: { orderId: string }) => {
+    mutationFn: async ({ orderId, hypercertId, ownerAddress }) => {
       if (!hec) {
-        throw new Error("No client");
+        throw new Error("Hypercert exchange client not initialized");
       }
 
       const success = await hec.deleteOrder(orderId);
-      if (success) {
-        document.location.reload();
-      } else {
-        throw new Error(`Could not delete listing ${orderId}`);
+      if (!success) {
+        throw new Error(`Failed to delete listing with ID: ${orderId}`);
       }
+
+      // Revalidate paths to update the server-side cache
+      await revalidatePathServerAction([
+        `/hypercerts/${hypercertId}`,
+        `/profile/${ownerAddress}`,
+      ]);
+
+      return success;
     },
-    onError: (e) => {
-      console.error(e);
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Listing deleted successfully",
+        duration: 5000,
+      });
+      router.refresh(); // Refresh the current page to reflect changes
+    },
+    onError: (error) => {
+      console.error("Error deleting order:", error);
       toast({
         title: "Error",
-        description: e.message,
+        description:
+          error.message || "An error occurred while deleting the listing",
         duration: 5000,
       });
     },

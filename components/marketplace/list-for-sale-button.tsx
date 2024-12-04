@@ -15,22 +15,20 @@ import { useAccount, useReadContract } from "wagmi";
 import { useHypercertClient } from "@/hooks/use-hypercert-client";
 import { type HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
 import { useState } from "react";
-import { Address } from "viem";
+import { getAddress } from "viem";
 
 import { isChainIdSupported } from "@/lib/isChainIdSupported";
 
 export function ListForSaleButton({ hypercert }: { hypercert: HypercertFull }) {
-  const { isConnected, address, chainId } = useAccount();
+  const { isConnected, address } = useAccount();
   const { client } = useHypercertClient();
 
-  const contractAddress = hypercert.contract?.contract_address;
-  const tokenID = hypercert.token_id ? BigInt(hypercert.token_id) : null;
-
-  console.log("contractAddress", contractAddress);
-  console.log("tokenId", tokenID);
+  const hypercertId = hypercert.hypercert_id;
+  const tokenId = hypercert.token_id ? BigInt(hypercert.token_id) : null;
+  const { chain_id: chainId, contract_address: contractAddress } =
+    hypercert.contract || {};
 
   const { data: transferRestrictions } = useReadContract({
-    // ! Don't know if we really need to pass the ABI here
     abi: [
       {
         inputs: [{ internalType: "uint256", name: "tokenID", type: "uint256" }],
@@ -46,24 +44,22 @@ export function ListForSaleButton({ hypercert }: { hypercert: HypercertFull }) {
         type: "function",
       },
     ],
-    address: contractAddress as Address,
+    address: getAddress(contractAddress || ""),
     functionName: "readTransferRestriction",
-    args: [tokenID!],
+    args: [tokenId!],
     query: {
-      enabled: !!contractAddress && !!tokenID,
+      enabled: !!contractAddress && !!tokenId,
     },
   });
 
   const [isOpen, setIsOpen] = useState(false);
 
-  const hypercertId = hypercert.hypercert_id;
   const fractions = hypercert.fractions?.data || [];
   const fractionsOwnedByUser = fractions.filter(
     (fraction) => fraction.owner_address === address,
   );
 
   const disabled =
-    !hypercert ||
     !hypercertId ||
     !client ||
     !client.isClaimOrFractionOnConnectedChain(hypercertId) ||
@@ -73,7 +69,7 @@ export function ListForSaleButton({ hypercert }: { hypercert: HypercertFull }) {
       address?.toLowerCase() !== hypercert.creator_address?.toLowerCase());
 
   const getToolTipMessage = () => {
-    if (!hypercert || !hypercertId) return;
+    if (!hypercertId) return;
 
     if (!isConnected || !address) {
       return "Connect your wallet to access this feature";
