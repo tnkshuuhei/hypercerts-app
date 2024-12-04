@@ -58,6 +58,7 @@ import { useCancelOrder, useDeleteOrder } from "@/marketplace/hooks";
 import { OrderValidatorCode } from "@hypercerts-org/marketplace-sdk";
 import { DEFAULT_DISPLAY_CURRENCY } from "@/configs/hypercerts";
 
+// TODO: replace with hypercert-listings components, add functionality to refresh order validity and filter on invalidated orders
 export default function UserListingsList({
   address,
   orders,
@@ -487,6 +488,10 @@ export default function UserListingsList({
               <BuyFractionalOrderForm
                 order={orderFragmentToMarketplaceOrder(selectedOrder)}
                 hypercert={orderFragmentToHypercert(selectedOrder)}
+                onBuyOrder={() => {}}
+                onCompleted={() => {
+                  setSelectedOrder(null);
+                }}
               />
             </StepProcessDialogProvider>
           </DialogContent>
