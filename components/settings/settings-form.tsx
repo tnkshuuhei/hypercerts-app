@@ -46,6 +46,13 @@ const defaultValues = {
 
 const ERROR_TOAST_DURATION = 5000;
 
+type LoadingStates = {
+  isLoadingDetails: boolean;
+  isPendingGetUser: boolean;
+  isPendingUpdateUser: boolean;
+  isCancellingSignature: boolean;
+};
+
 export const SettingsForm = () => {
   const { selectedAccount } = useAccountStore();
   const {
@@ -107,11 +114,6 @@ export const SettingsForm = () => {
   };
 
   const cancelSignatureRequest = useCancelSignatureRequest();
-  const isPending =
-    isPendingGetUser ||
-    isLoadingDetails ||
-    isPendingUpdateUser ||
-    cancelSignatureRequest.isPending;
 
   const form = useForm<SettingsFormValues>({
     resolver: zodResolver(formSchema),
@@ -125,10 +127,30 @@ export const SettingsForm = () => {
     name: ["displayName", "avatar"],
   });
 
+  const loadingStates: LoadingStates = {
+    isLoadingDetails,
+    isPendingGetUser,
+    isPendingUpdateUser,
+    isCancellingSignature: cancelSignatureRequest.isPending,
+  };
+
+  const isLoading = Object.values(loadingStates).some(Boolean);
+
+  const isFormDisabled = isLoading || !!pendingUpdate;
+
+  const isSubmitDisabled =
+    form.formState.isSubmitting || !form.formState.isValid || isFormDisabled;
+
+  const shouldShowAvatar =
+    avatar &&
+    isURL(avatar) &&
+    !form.formState.isValidating &&
+    !form.formState.errors.avatar;
+
   const [updatedUserName, setUpdatedUserName] = useState(false);
   const [updatedUserNameEns, setUpdatedUserNameEns] = useState(false);
   useEffect(() => {
-    if (updatedUserName || isPending) return;
+    if (updatedUserName || isLoading) return;
 
     if (userData?.user?.display_name) {
       console.log(
@@ -152,13 +174,13 @@ export const SettingsForm = () => {
     userData,
     updatedUserName,
     updatedUserNameEns,
-    isPending,
+    isLoading,
   ]);
 
   const [updatedAvatar, setUpdatedAvatar] = useState(false);
   const [updatedEnsAvatar, setUpdatedEnsAvatar] = useState(false);
   useEffect(() => {
-    if (updatedAvatar || isPending) return;
+    if (updatedAvatar || isLoading) return;
 
     if (userData?.user?.avatar) {
       console.log("Setting avatar from graphql", userData?.user?.avatar);
@@ -179,7 +201,7 @@ export const SettingsForm = () => {
     userData,
     updatedAvatar,
     updatedEnsAvatar,
-    isPending,
+    isLoading,
   ]);
 
   // Reset form state when account changes
@@ -237,18 +259,6 @@ export const SettingsForm = () => {
     }
   };
 
-  const submitDisabled =
-    form.formState.isSubmitting ||
-    !form.formState.isValid ||
-    isPending ||
-    !!pendingUpdate;
-
-  const shouldShowAvatar =
-    avatar &&
-    isURL(avatar) &&
-    !form.formState.isValidating &&
-    !form.formState.errors.avatar;
-
   return (
     <div>
       <Form {...form}>
@@ -263,7 +273,7 @@ export const SettingsForm = () => {
               <FormItem>
                 <FormLabel>Display name</FormLabel>
                 <FormControl>
-                  <Input {...field} disabled={isPending || !!pendingUpdate} />
+                  <Input {...field} disabled={isFormDisabled} />
                 </FormControl>
                 <FormMessage />
                 <FormDescription>Max. 30 characters</FormDescription>
@@ -277,7 +287,7 @@ export const SettingsForm = () => {
               <FormItem>
                 <FormLabel>Image</FormLabel>
                 <FormControl>
-                  <Input {...field} disabled={isPending || !!pendingUpdate} />
+                  <Input {...field} disabled={isFormDisabled} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -297,7 +307,7 @@ export const SettingsForm = () => {
             </>
           )}
 
-          <Button disabled={submitDisabled}>
+          <Button disabled={isSubmitDisabled}>
             {(form.formState.isSubmitting || isPendingUpdateUser) && (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             )}
