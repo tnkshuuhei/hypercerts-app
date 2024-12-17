@@ -13,6 +13,8 @@ import { getHypercertAttestations } from "@/attestations/getHypercertAttestation
 import EvaluationsList from "@/components/hypercert/evaluations-list";
 import HypercertListings from "@/components/marketplace/hypercert-listings";
 import CreatorFeedButton from "@/components/hypercert/creatorfeed-button";
+import { CreatorFeedLists } from "@/components/hypercert/creatorfeed-lists";
+import { getCreatorFeedAttestation } from "@/attestations/getCreatorFeedAttestation";
 
 type Props = {
   params: { hypercertId: string };
@@ -46,6 +48,11 @@ export default async function HypercertPage({ params, searchParams }: Props) {
     getHypercert(hypercertId),
     getHypercertAttestations(hypercertId),
   ]);
+
+  const creatorFeedAttestation = await getCreatorFeedAttestation(
+    hypercertId,
+    hypercert?.creator_address!,
+  );
 
   if (!hypercert) {
     return (
@@ -87,6 +94,11 @@ export default async function HypercertPage({ params, searchParams }: Props) {
           {"CREATOR'S FEED"}
         </h2>
         <CreatorFeedButton hypercertId={hypercertId} />
+      </div>
+      <div className="grid grid-cols-3 gap-4">
+        {creatorFeedAttestation.data.map((attestation) => (
+          <CreatorFeedLists key={attestation.id} attestation={attestation} />
+        ))}
       </div>
     </main>
   );

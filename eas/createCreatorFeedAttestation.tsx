@@ -49,7 +49,7 @@ export async function createCreatorFeedAttestation(
   const tx = await eas.attest({
     schema: CREATOR_FEED_SCHEMA_UID,
     data: {
-      recipient: "0x0000000000000000000000000000000000000000", // TODO: who receives the attestation?
+      recipient: rpcSigner.address, // TODO: who receives the attestation?
       expirationTime: BigInt(0),
       revocable: false,
       data: encodedData,
