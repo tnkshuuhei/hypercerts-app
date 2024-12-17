@@ -31,6 +31,7 @@ import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { isAddress } from "ethers";
 import { createCreatorFeedAttestation } from "@/eas/createCreatorFeedAttestation";
+import { TooltipInfo } from "../tooltip-info";
 
 const creatorFeedSchema = z.object({
   chainId: z.string(),
@@ -144,10 +145,12 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
     const url = `${easConfig?.explorerUrl}/attestation/view/${uid}`;
     return (
       <>
-        <Drawer.Title className="font-serif text-3xl font-medium tracking-tight">
-          ATTESTATION CREATED!
+        <Drawer.Title className="uppercase font-serif text-3xl font-medium tracking-tight">
+          Submit additional information
         </Drawer.Title>
-        <p>Your attestation has been created!</p>
+        <p>
+          Your information has been submitted successfully as an attestation!
+        </p>
         <a
           href={url}
           title={url}
@@ -161,8 +164,8 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
           <ArrowUpRight className="w-4 h-4 ml-1 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 duration-200" />
         </a>
         <p>
-          Attestations will not be immediately visible on the Hypercerts page
-          but will be visible in 5-10 minutes.
+          Information will not be immediately visible on the Hypercerts page,
+          but will be visible in ~2 minutes.
         </p>
       </>
     );
@@ -175,9 +178,9 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
       </Drawer.Title>
 
       <p>
-        You can submit comments or files to provide insights on the outputs,
-        outcomes and impact of your work. The submitted details will be recorded
-        as an on-chain attestation.
+        You can share comments or documents to share insights on the outputs,
+        outcomes, and impact of your work. This information will be saved as an
+        on-chain attestation and cannot be changed or deleted afterward.
       </p>
 
       {/* Forms */}
@@ -188,7 +191,13 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
             name="title"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="uppercase">Title</FormLabel>
+                <div className="flex items-center gap-2">
+                  <FormLabel className="uppercase">Title</FormLabel>
+                  <TooltipInfo
+                    tooltipText="Enter a brief title, such as 'Impact Report' or 'Progress Update' (max. 50 characters)."
+                    className="w-4 h-4"
+                  />
+                </div>
                 <FormControl>
                   <Input {...field} placeholder="Impact Report" />
                 </FormControl>
@@ -200,7 +209,13 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
             name="description"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="uppercase">Description</FormLabel>
+                <div className="flex items-center gap-2">
+                  <FormLabel className="uppercase">Description</FormLabel>
+                  <TooltipInfo
+                    tooltipText="Add new information here, or provide a brief description of the details available in the document you can link to below (max. 500 characters)."
+                    className="w-4 h-4"
+                  />
+                </div>
                 <FormControl>
                   <Textarea
                     {...field}
@@ -210,10 +225,34 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
               </FormItem>
             )}
           />
+          <FormField
+            control={form.control}
+            name="termsAccepted"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                <FormControl>
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
+                <div className="space-y-1 leading-none">
+                  <FormLabel>
+                    I confirm that the uploaded files conform to the terms and
+                    conditions.
+                  </FormLabel>
+                </div>
+              </FormItem>
+            )}
+          />
           <div className="flex flex-col space-y-4">
-            <FormLabel className="uppercase text-sm font-medium">
-              Links
-            </FormLabel>
+            <div className="flex items-center gap-2">
+              <FormLabel className="uppercase">Links</FormLabel>
+              <TooltipInfo
+                tooltipText="Add a publicly accessible HTTPS or IPFS link to your document or content. Ensure the content is public and remains accessible."
+                className="w-4 h-4"
+              />
+            </div>
             {linkFields.map((field, index) => (
               <div key={field.id} className="flex items-center gap-2">
                 <FormField
@@ -261,26 +300,6 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
             </Button>
           </div>
 
-          <FormField
-            control={form.control}
-            name="termsAccepted"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                <FormControl>
-                  <Checkbox
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-                <div className="space-y-1 leading-none">
-                  <FormLabel>
-                    I confirm that the uploaded files conform to the terms and
-                    conditions.
-                  </FormLabel>
-                </div>
-              </FormItem>
-            )}
-          />
           <div className="flex gap-5 justify-center w-full">
             <Drawer.Close asChild>
               <Button variant="outline" className="w-1/2">
