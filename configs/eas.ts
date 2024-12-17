@@ -4,6 +4,12 @@ export const EVALUATIONS_SCHEMA_UID =
 export const EVALUATIONS_SCHEMA =
   "uint256 chain_id,address contract_address,uint256 token_id,uint8 evaluate_basic,uint8 evaluate_work,uint8 evaluate_contributors,uint8 evaluate_properties,string comments,string[] tags";
 
+// TODO: Add CREATOR_FEED_SCHEMA and CREATOR_FEED_SCHEMA_UID for actual implementation
+export const CREATOR_FEED_SCHEMA_UID =
+  "0x768cbed07b4c1fcb06373cd1c8d50b1380b517a533d25f7f299e3bbfadfabafc";
+export const CREATOR_FEED_SCHEMA =
+  "uint256 chainId,address contractAddress,uint256 tokenId,string title,string description,string[] sources,bytes32 ref";
+
 type EasConfig = {
   id: number;
   address: string;
