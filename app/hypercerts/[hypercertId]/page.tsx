@@ -12,6 +12,7 @@ import ErrorState from "@/components/global/error-state";
 import { getHypercertAttestations } from "@/attestations/getHypercertAttestations";
 import EvaluationsList from "@/components/hypercert/evaluations-list";
 import HypercertListings from "@/components/marketplace/hypercert-listings";
+import CreatorFeedButton from "@/components/hypercert/creatorfeed-button";
 
 type Props = {
   params: { hypercertId: string };
@@ -81,6 +82,12 @@ export default async function HypercertPage({ params, searchParams }: Props) {
         searchParams={searchParams}
         invalidated={false}
       />
+      <div className="flex justify-between mb-4">
+        <h2 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
+          {"CREATOR'S FEED"}
+        </h2>
+        <CreatorFeedButton hypercertId={hypercertId} />
+      </div>
     </main>
   );
 }
