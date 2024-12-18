@@ -22,12 +22,13 @@ export async function createCreatorFeedAttestation(
   const schemaEncoder = new SchemaEncoder(CREATOR_FEED_SCHEMA);
 
   // Stringify the links
-  const stringifiedLinks = data.links.map((link) =>
-    JSON.stringify({
-      type: link.type,
-      src: link.src,
-    }),
-  );
+  const stringifiedLinks =
+    data.links?.map((link) =>
+      JSON.stringify({
+        type: link.type,
+        src: link.src,
+      }),
+    ) || [];
 
   // Encode the data according to schema
   const encodedData = schemaEncoder.encodeData([
@@ -49,7 +50,7 @@ export async function createCreatorFeedAttestation(
   const tx = await eas.attest({
     schema: CREATOR_FEED_SCHEMA_UID,
     data: {
-      recipient: rpcSigner.address, // TODO: who receives the attestation?
+      recipient: "0x0000000000000000000000000000000000000000",
       expirationTime: BigInt(0),
       revocable: false,
       data: encodedData,
