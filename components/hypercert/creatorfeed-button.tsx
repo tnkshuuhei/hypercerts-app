@@ -12,11 +12,14 @@ import { Drawer } from "vaul";
 import { isChainIdSupported } from "@/lib/isChainIdSupported";
 import { useAccount } from "wagmi";
 import { CreatorFeedDrawer } from "./creatorfeed-drawer";
+import { getAddress } from "viem";
 
 export default function CreatorFeedButton({
   hypercertId,
+  creatorAddress,
 }: {
   hypercertId: string;
+  creatorAddress: string;
 }) {
   const { isConnected, address } = useAccount();
 
@@ -28,13 +31,18 @@ export default function CreatorFeedButton({
     }
 
     if (!isChainIdSupported(chainId)) {
-      return "Evaulations are only available on supported chains.";
+      return "Creator Feeds are only available on supported chains.";
     }
 
-    return "Evaluation is only available to the group of trusted evaluators at this time.";
+    if (address !== getAddress(creatorAddress)) {
+      return "Only the creator of this Hypercert can submit additional information.";
+    }
   };
 
-  const enabled = address && isChainIdSupported(chainId); // TODO: Add check if user is a creator of the hypercert
+  const enabled =
+    address &&
+    isChainIdSupported(chainId) &&
+    address === getAddress(creatorAddress);
 
   if (enabled) {
     return (

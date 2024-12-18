@@ -27,9 +27,9 @@ import {
 } from "../ui/form";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
-import { isAddress } from "ethers";
 import { createCreatorFeedAttestation } from "@/eas/createCreatorFeedAttestation";
 import { TooltipInfo } from "../tooltip-info";
+import { isAddress } from "viem";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ACCEPTED_FILE_TYPES = [
@@ -97,7 +97,7 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
     resolver: zodResolver(creatorFeedSchema),
     defaultValues: {
       chainId: chainId,
-      contractAddress: contractAddress,
+      contractAddress: contractAddress as `0x${string}`,
       tokenId: tokenId,
       termsAccepted: false,
     },
