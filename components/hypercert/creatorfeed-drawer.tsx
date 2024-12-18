@@ -72,7 +72,6 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
       chainId: chainId,
       contractAddress: contractAddress,
       tokenId: tokenId,
-      links: [],
       termsAccepted: false,
     },
   });
@@ -201,6 +200,7 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
                 <FormControl>
                   <Input {...field} placeholder="Impact Report" />
                 </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />
@@ -222,6 +222,7 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
                     placeholder="This report outlines the impact achieved, including a 10% increase in [impact metric]. For full details, see the linked PDF"
                   />
                 </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />
@@ -241,63 +242,72 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
                     I confirm that the uploaded files conform to the terms and
                     conditions.
                   </FormLabel>
+                  <FormMessage />
                 </div>
               </FormItem>
             )}
           />
           <div className="flex flex-col space-y-4">
-            <div className="flex items-center gap-2">
-              <FormLabel className="uppercase">Links</FormLabel>
-              <TooltipInfo
-                tooltipText="Add a publicly accessible HTTPS or IPFS link to your document or content. Ensure the content is public and remains accessible."
-                className="w-4 h-4"
-              />
-            </div>
-            {linkFields.map((field, index) => (
-              <div key={field.id} className="flex items-center gap-2">
-                <FormField
-                  control={form.control}
-                  name={`links.${index}.type`}
-                  render={({ field }) => (
-                    <Input type="hidden" {...field} value="url" />
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name={`links.${index}.src`}
-                  render={({ field }) => (
-                    <FormItem className="flex-1">
-                      <FormControl>
-                        <Input
-                          {...field}
-                          placeholder="https://example.com/impact-report.pdf"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="h-10 w-10"
-                  onClick={() => removeLink(index)}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            ))}
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="mt-2"
-              onClick={addNewLink}
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Add Link
-            </Button>
+            <FormField
+              control={form.control}
+              name="links"
+              render={() => (
+                <FormItem className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <FormLabel className="uppercase">Links</FormLabel>
+                    <TooltipInfo
+                      tooltipText="Add a publicly accessible HTTPS or IPFS link to your document or content. Ensure the content is public and remains accessible."
+                      className="w-4 h-4"
+                    />
+                  </div>
+                  {linkFields.map((field, index) => (
+                    <div key={field.id} className="flex items-center gap-2">
+                      <FormField
+                        control={form.control}
+                        name={`links.${index}.type`}
+                        render={({ field }) => (
+                          <Input type="hidden" {...field} value="url" />
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name={`links.${index}.src`}
+                        render={({ field }) => (
+                          <FormItem className="flex-1">
+                            <FormControl>
+                              <Input
+                                {...field}
+                                placeholder="https://example.com/impact-report.pdf"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-10 w-10"
+                        onClick={() => removeLink(index)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="mt-2"
+                    onClick={addNewLink}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Link
+                  </Button>
+                </FormItem>
+              )}
+            />
           </div>
 
           <div className="flex gap-5 justify-center w-full">
@@ -306,14 +316,7 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
                 Cancel
               </Button>
             </Drawer.Close>
-            <Button
-              disabled={!form.formState.isValid || isAttesting}
-              type="submit"
-              className={cn("w-1/2", {
-                "opacity-50 cursor-not-allowed":
-                  !form.formState.isValid || isAttesting,
-              })}
-            >
+            <Button disabled={isAttesting} type="submit" className="w-1/2">
               {isAttesting && (
                 <LoaderCircle className="h-4 w-4 animate-spin mr-1" />
               )}
