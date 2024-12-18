@@ -128,10 +128,8 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
     });
   };
 
-  function validateFile(
-    file: File,
-    currentFiles = form.getValues("documents") || [],
-  ) {
+  function validateFile(file: File) {
+    const currentFiles = form.getValues("documents") || [];
     if (currentFiles.length >= 5) {
       errorToast("Maximum 5 files allowed");
       return;
@@ -146,11 +144,9 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
     }
 
     if (!ACCEPTED_FILE_TYPES.includes(file.type)) {
-      toast({
-        title:
-          "Invalid file type. Only PDF, CSV, XLS, PNG, and JPG files are allowed",
-        variant: "destructive",
-      });
+      errorToast(
+        "Invalid file type. Only PDF, CSV, XLS, PNG, and JPG files are allowed",
+      );
       return;
     }
     // TODO: Check to see if the file is malicious
