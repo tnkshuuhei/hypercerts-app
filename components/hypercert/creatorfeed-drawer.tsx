@@ -7,7 +7,6 @@ import { ArrowUpRight, LoaderCircle, Plus, X } from "lucide-react";
 import { Button } from "../ui/button";
 import { Drawer } from "vaul";
 import { clearCacheAfterEvaluation } from "@/app/actions/clearCacheAfterEvaluation";
-import { cn } from "@/lib/utils";
 import { errorHasMessage } from "@/lib/errorHasMessage";
 import { errorHasReason } from "@/lib/errorHasReason";
 import { getEasConfig } from "@/eas/getEasConfig";
@@ -21,7 +20,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -32,6 +30,16 @@ import { Textarea } from "../ui/textarea";
 import { isAddress } from "ethers";
 import { createCreatorFeedAttestation } from "@/eas/createCreatorFeedAttestation";
 import { TooltipInfo } from "../tooltip-info";
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const ACCEPTED_FILE_TYPES = [
+  "application/pdf",
+  "text/csv",
+  "application/vnd.ms-excel",
+  "image/png",
+  "image/jpeg",
+  "image/jpg",
+];
 
 const creatorFeedSchema = z.object({
   chainId: z.string(),
@@ -45,15 +53,34 @@ const creatorFeedSchema = z.object({
   description: z.string().max(500, {
     message: "Description should be less than 500 characters",
   }),
-  links: z.array(
-    z.object({
-      type: z.string(),
-      src: z.string().url({ message: "Please enter a valid URL" }),
-    }),
-  ),
+  links: z
+    .array(
+      z.object({
+        type: z.string(),
+        src: z.string().url({ message: "Please enter a valid URL" }),
+      }),
+    )
+    .max(5, "Maximum of 5 files allowed")
+    .optional(),
   termsAccepted: z.boolean().refine((val) => val === true, {
     message: "You must accept the terms and conditions",
   }),
+  documents: z
+    .array(
+      z.object({
+        name: z.string(),
+        size: z.number().max(MAX_FILE_SIZE, "File size must be less than 10MB"),
+        type: z
+          .string()
+          .refine(
+            (type) => ACCEPTED_FILE_TYPES.includes(type),
+            "Invalid file type. Only PDF, CSV, XLS, PNG, and JPG files are allowed",
+          ),
+        src: z.string().url({ message: "Please enter a valid URL" }),
+      }),
+    )
+    .max(5, "Maximum of 5 files allowed")
+    .optional(),
   // ref: z.string(),
 });
 
@@ -75,6 +102,7 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
       termsAccepted: false,
     },
   });
+
   const {
     fields: linkFields,
     append: appendLink,
@@ -84,14 +112,66 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
     name: "links",
   });
   const addNewLink = () => {
+    const currentLinks = form.getValues("links") || [];
+    if (currentLinks.length >= 5) {
+      errorToast("Maximum 5 links allowed");
+      return;
+    }
     appendLink({ type: "url", src: "" });
   };
+
+  const errorToast = (message: string | undefined) => {
+    toast({
+      title: message,
+      variant: "destructive",
+      duration: 2000,
+    });
+  };
+
+  function validateFile(
+    file: File,
+    currentFiles = form.getValues("documents") || [],
+  ) {
+    if (currentFiles.length >= 5) {
+      errorToast("Maximum 5 files allowed");
+      return;
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+      toast({
+        title: "File size must be less than 10MB",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!ACCEPTED_FILE_TYPES.includes(file.type)) {
+      toast({
+        title:
+          "Invalid file type. Only PDF, CSV, XLS, PNG, and JPG files are allowed",
+        variant: "destructive",
+      });
+      return;
+    }
+    // TODO: Check to see if the file is malicious
+    form.setValue("documents", [
+      ...currentFiles,
+      {
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        // TODO: store on IPFS and set cid
+        src: "",
+      },
+    ]);
+  }
 
   async function onSubmit(values: CreatorFeedFormValues) {
     console.log("values", values);
     if (!rpcSigner) {
       console.error("rpcSigner not found");
-      return errorToast("Please connect your wallet to attest.");
+      errorToast("Please connect your wallet to attest.");
+      return;
     }
 
     setIsAttesting(true);
@@ -111,14 +191,6 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
       setIsAttesting(false);
     }
   }
-
-  const errorToast = (message: string | undefined) => {
-    toast({
-      title: message,
-      variant: "destructive",
-      duration: 2000,
-    });
-  };
 
   if (!isChainIdSupported(chainId)) {
     return (
@@ -171,7 +243,7 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
   }
 
   return (
-    <>
+    <div className="max-h-[95vh] overflow-y-auto">
       <Drawer.Title className="font-serif text-3xl font-medium tracking-tight">
         SUBMIT ADDITIONAL INFORMATION
       </Drawer.Title>
@@ -185,6 +257,7 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
       {/* Forms */}
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          {/* title */}
           <FormField
             control={form.control}
             name="title"
@@ -204,6 +277,7 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
               </FormItem>
             )}
           />
+          {/* description */}
           <FormField
             control={form.control}
             name="description"
@@ -226,6 +300,7 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
               </FormItem>
             )}
           />
+          {/* termsAccepted */}
           <FormField
             control={form.control}
             name="termsAccepted"
@@ -247,6 +322,7 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
               </FormItem>
             )}
           />
+          {/* links */}
           <div className="flex flex-col space-y-4">
             <FormField
               control={form.control}
@@ -309,7 +385,80 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
               )}
             />
           </div>
-
+          {/* documents */}
+          <div className="flex flex-col space-y-4">
+            <FormField
+              control={form.control}
+              name="documents"
+              render={() => (
+                <FormItem className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <FormLabel className="uppercase">Documents</FormLabel>
+                    <TooltipInfo
+                      tooltipText="Upload your documents here (maximum of 5 files, up to 10 MB total). Supported file types: .pdf, .csv, .xls, .png, .jpg."
+                      className="w-4 h-4"
+                    />
+                  </div>
+                  {/* list files */}
+                  {form.watch("documents")?.map((file: any, index: number) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <div className="flex-1 flex items-center gap-2 p-2">
+                        <span className="text-sm truncate">{file.name}</span>
+                        <span className="text-xs text-gray-500">
+                          ({(file.size / 1024 / 1024).toFixed(2)} MB)
+                        </span>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-10 w-10"
+                        onClick={() => {
+                          const files = form.getValues("documents");
+                          form.setValue(
+                            "documents",
+                            files?.filter((_: any, i: number) => i !== index),
+                          );
+                        }}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                  {/* Upload file button */}
+                  <div>
+                    <input
+                      type="file"
+                      id="file-upload"
+                      className="hidden"
+                      accept=".pdf,.csv,.xls,.png,.jpg"
+                      onChange={(e) => {
+                        if (e.target.files && e.target.files.length > 0) {
+                          const file = e.target.files[0];
+                          validateFile(file);
+                        }
+                        // Clear the file input
+                        e.target.value = "";
+                      }}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="mt-2"
+                      onClick={() =>
+                        document.getElementById("file-upload")?.click()
+                      }
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Upload file(s)
+                    </Button>
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
           <div className="flex gap-5 justify-center w-full">
             <Drawer.Close asChild>
               <Button variant="outline" className="w-1/2">
@@ -325,6 +474,6 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
           </div>
         </form>
       </Form>
-    </>
+    </div>
   );
 }
