@@ -44,16 +44,13 @@ export default async function EvaluationsList({
               className="w-full"
             >
               <div className="flex items-center gap-2 w-full">
-                <UserIcon address={attester} size="medium" />
+                <UserIcon address={attester} size="small" />
                 <div className="flex flex-col justify-center items-start overflow-hidden">
                   <EnsName
                     address={attester}
                     className="text-sm font-semibold truncate"
                   />
-                  <EthAddress
-                    address={attester}
-                    className="text-xs text-slate-500 truncate"
-                  />
+                  <EthAddress address={attester} />
                 </div>
               </div>
             </Link>
