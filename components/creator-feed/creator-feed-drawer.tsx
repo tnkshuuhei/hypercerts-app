@@ -239,7 +239,7 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
   }
 
   return (
-    <div className="max-h-[95vh] overflow-y-auto">
+    <div className="max-h-[95vh] overflow-y-auto p-2">
       <Drawer.Title className="font-serif text-3xl font-medium tracking-tight">
         SUBMIT ADDITIONAL INFORMATION
       </Drawer.Title>
@@ -252,7 +252,7 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
 
       {/* Forms */}
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 mt-6">
           {/* title */}
           <FormField
             control={form.control}
@@ -267,8 +267,11 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
                   />
                 </div>
                 <FormControl>
-                  <Input {...field} placeholder="Impact Report" />
+                  <Input {...field} placeholder="Impact Report" type="text" />
                 </FormControl>
+                <span className=" text-sm text-gray-500">
+                  {field.value?.length || 0}/50
+                </span>
                 <FormMessage />
               </FormItem>
             )}
@@ -292,6 +295,9 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
                     placeholder="This report outlines the impact achieved, including a 10% increase in [impact metric]. For full details, see the linked PDF"
                   />
                 </FormControl>
+                <span className=" text-sm text-gray-500">
+                  {field.value?.length || 0}/500
+                </span>
                 <FormMessage />
               </FormItem>
             )}
