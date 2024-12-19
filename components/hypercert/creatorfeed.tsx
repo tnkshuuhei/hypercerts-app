@@ -3,20 +3,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ArrowUpRight, Calendar, Link as LinkIcon } from "lucide-react";
 import { DecodedAttestation } from "@/attestations/getCreatorFeedAttestation";
 import Link from "next/link";
+import { formatDate } from "@/lib/utils";
 
 export function CreatorFeed({
   attestation,
+  cardwidth,
 }: {
   attestation: DecodedAttestation;
+  cardwidth?: string;
 }) {
-  const formatDate = (timestamp: number) => {
-    return new Date(timestamp * 1000).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  };
-
   const parseSourceLinks = (sources: string[]) => {
     return sources.map((source) => {
       try {
@@ -26,16 +21,18 @@ export function CreatorFeed({
       }
     });
   };
+  const date = new Date(attestation.timeCreated * 1000);
+  const formattedDate = formatDate(date.toString());
 
   return (
     <div className="space-y-4">
-      <Card>
+      <Card className={`${cardwidth || "w-full"}`}>
         <CardContent className="p-6">
           <div className="flex justify-between items-start mb-4">
             <div>
               <div className="flex items-center text-gray-500 text-sm mb-2">
                 <Calendar className="h-4 w-4 mr-2" />
-                <span>{formatDate(attestation.timeCreated)}</span>
+                <span>{formattedDate}</span>
               </div>
               <h3 className="text-xl font-semibold mb-2">
                 {attestation.title}
