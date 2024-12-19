@@ -2,7 +2,7 @@ import PageSkeleton from "@/components/hypercert/page-skeleton";
 import { EVALUATIONS_PER_PAGE, LISTINGS_PER_PAGE } from "@/configs/ui";
 import { cache, Suspense } from "react";
 import { InfoSection } from "../global/sections";
-import NestedPagination from "../nested-pagination";
+import Pagination from "../global/pagination/pagination";
 import {
   getAttestations,
   GetAttestationsParams,
@@ -30,7 +30,7 @@ export default async function HypercertEvaluations({
   hypercertId: string;
   searchParams: Record<string, string>;
 }) {
-  const currentPage = Number(searchParams?.listings) || 1;
+  const currentPage = Number(searchParams?.evaluations) || 1;
   const offset = Math.max(0, LISTINGS_PER_PAGE * (currentPage - 1));
   const [chainId, contractAddress, tokenId] = hypercertId.split("-");
 
@@ -60,7 +60,7 @@ export default async function HypercertEvaluations({
     <div className="w-full">
       <Suspense fallback={<PageSkeleton />}>
         <EvaluationsList initialEvaluations={evaluations} />
-        <NestedPagination
+        <Pagination
           searchParams={searchParams}
           totalItems={evaluations.count}
           itemsPerPage={EVALUATIONS_PER_PAGE}
