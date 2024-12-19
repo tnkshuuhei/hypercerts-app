@@ -13,7 +13,7 @@ export default function Comments({ comments }: CommentsProps) {
   const { truncatedComments, isTruncated } = useMemo(() => {
     if (!comments) return { truncatedComments: "", isTruncated: false };
     const truncated = truncate(comments, {
-      length: 100,
+      length: 150,
       separator: "...",
     });
     return {
@@ -25,14 +25,17 @@ export default function Comments({ comments }: CommentsProps) {
   if (!comments) return null;
 
   return (
-    <div className="flex flex-col gap-2">
-      <div className="text-sm text-slate-700">
+    <div className="flex flex-col h-[160px]">
+      <div
+        className={`text-sm text-slate-700 overflow-y-auto flex-grow scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100`}
+      >
         {showFullComments ? comments : truncatedComments}
       </div>
       {isTruncated && (
         <button
-          className="text-xs font-medium text-slate-700 hover:underline"
+          className="text-xs font-medium text-slate-700 hover:underline mt-2"
           onClick={() => setShowFullComments(!showFullComments)}
+          aria-expanded={showFullComments}
         >
           {showFullComments ? "Show less" : "Show full comments"}
         </button>
