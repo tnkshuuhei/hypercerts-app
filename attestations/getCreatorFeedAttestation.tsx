@@ -21,13 +21,12 @@ export interface ReturnedAttestation {
   attester: string;
 }
 export interface AttestationData {
-  chainId: number;
-  contractAddress: string;
-  tokenId: number;
+  chain_id: number;
+  contract_address: string;
+  token_id: number;
   title: string;
   description: string;
   sources: string[];
-  ref: string;
 }
 
 export interface DecodedAttestation
@@ -71,7 +70,7 @@ export async function getCreatorFeedAttestation(
   // TODO: use hypercerts API. just hardcoding for now
   const res = await request("https://sepolia.easscan.org/graphql", query, {
     schemaId: CREATOR_FEED_SCHEMA_UID,
-    recipient: address,
+    recipient: "0x0000000000000000000000000000000000000000",
   });
 
   if (!res.attestations || !Array.isArray(res.attestations)) {
@@ -89,13 +88,12 @@ export async function getCreatorFeedAttestation(
 function formatDecodedData(item: ReturnedAttestation): DecodedAttestation {
   const decoded = JSON.parse(item.decodedDataJson);
   const formatted: AttestationData = {
-    chainId: decoded[0].value.value,
-    contractAddress: decoded[1].value.value,
-    tokenId: decoded[2].value.value,
+    chain_id: decoded[0].value.value,
+    contract_address: decoded[1].value.value,
+    token_id: decoded[2].value.value,
     title: decoded[3].value.value,
     description: decoded[4].value.value,
     sources: decoded[5].value.value,
-    ref: decoded[6].value.value,
   };
 
   const returnVal: DecodedAttestation = {

@@ -32,19 +32,12 @@ export async function createCreatorFeedAttestation(
 
   // Encode the data according to schema
   const encodedData = schemaEncoder.encodeData([
-    { name: "chainId", value: BigInt(data.chainId), type: "uint256" },
-    { name: "contractAddress", value: data.contractAddress, type: "address" },
-    { name: "tokenId", value: BigInt(data.tokenId), type: "uint256" },
+    { name: "chain_id", value: BigInt(data.chainId), type: "uint256" },
+    { name: "contract_address", value: data.contractAddress, type: "address" },
+    { name: "token_id", value: BigInt(data.tokenId), type: "uint256" },
     { name: "title", value: data.title, type: "string" },
     { name: "description", value: data.description, type: "string" },
     { name: "sources", value: stringifiedLinks, type: "string[]" },
-    {
-      name: "ref",
-      value:
-        // refUID: data.ref // TODO: add refUID
-        "0x0000000000000000000000000000000000000000000000000000000000000000",
-      type: "bytes32",
-    },
   ]);
 
   const tx = await eas.attest({

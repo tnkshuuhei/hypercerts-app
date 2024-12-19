@@ -35,7 +35,7 @@ export function CreatorFeed({
               <h4 className="text-sm font-medium text-gray-500 mb-2">
                 Sources
               </h4>
-              <div className="space-y-2">
+              <div>
                 {parsedSources.map((source, index) => (
                   <Source key={index} type={source.type} src={source.src} />
                 ))}
