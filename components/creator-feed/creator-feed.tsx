@@ -32,10 +32,8 @@ export function CreatorFeed({
 
           {attestation.sources && attestation.sources.length > 0 && (
             <div className="space-y-2">
-              <h4 className="text-sm font-medium text-gray-500 mb-2">
-                Sources
-              </h4>
-              <div>
+              <h4 className="text-sm font-medium text-gray-500">Sources</h4>
+              <div className="flex flex-col items-start">
                 {parsedSources.map((source, index) => (
                   <Source key={index} type={source.type} src={source.src} />
                 ))}
