@@ -3,7 +3,7 @@ import { CREATOR_FEED_SCHEMA, CREATOR_FEED_SCHEMA_UID } from "@/configs/eas";
 
 import { JsonRpcSigner } from "ethers";
 import { getEasConfig } from "./getEasConfig";
-import { CreatorFeedFormValues } from "@/components/hypercert/creatorfeed-drawer";
+import { CreatorFeedFormValues } from "@/components/creator-feed/creator-feed-drawer";
 
 export async function createCreatorFeedAttestation(
   data: CreatorFeedFormValues,

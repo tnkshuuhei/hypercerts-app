@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
-import { CreatorFeed } from "./creatorfeed";
+
 import { DecodedAttestation } from "@/attestations/getCreatorFeedAttestation";
 import { Button } from "../ui/button";
 import { formatDate } from "@/lib/utils";
+import { CreatorFeed } from "./creator-feed";
 
 export function CreatorFeedLists({ data }: { data: DecodedAttestation[] }) {
   const [isExpanded, setIsExpanded] = useState(false);

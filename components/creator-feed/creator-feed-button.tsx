@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Drawer } from "vaul";
 import { isChainIdSupported } from "@/lib/isChainIdSupported";
 import { useAccount } from "wagmi";
-import { CreatorFeedDrawer } from "./creatorfeed-drawer";
+import { CreatorFeedDrawer } from "./creator-feed-drawer";
 import { getAddress } from "viem";
 
 export default function CreatorFeedButton({

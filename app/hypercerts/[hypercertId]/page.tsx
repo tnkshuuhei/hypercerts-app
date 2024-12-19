@@ -12,10 +12,10 @@ import ErrorState from "@/components/global/error-state";
 import { getHypercertAttestations } from "@/attestations/getHypercertAttestations";
 import EvaluationsList from "@/components/hypercert/evaluations-list";
 import HypercertListings from "@/components/marketplace/hypercert-listings";
-import CreatorFeedButton from "@/components/hypercert/creatorfeed-button";
+import CreatorFeedButton from "@/components/creator-feed/creator-feed-button";
 
 import { getCreatorFeedAttestation } from "@/attestations/getCreatorFeedAttestation";
-import { CreatorFeedLists } from "@/components/hypercert/creatorfeed-lists";
+import { CreatorFeedLists } from "@/components/creator-feed/creator-feed-lists";
 
 type Props = {
   params: { hypercertId: string };
