@@ -1,8 +1,8 @@
 import PageSkeleton from "@/components/hypercert/page-skeleton";
 import { EVALUATIONS_PER_PAGE, LISTINGS_PER_PAGE } from "@/configs/ui";
 import { cache, Suspense } from "react";
-import { InfoSection } from "../global/sections";
-import Pagination from "../global/pagination/pagination";
+import { InfoSection } from "@/components/global/sections";
+import Pagination from "@/components/global/pagination/pagination";
 import {
   getAttestations,
   GetAttestationsParams,

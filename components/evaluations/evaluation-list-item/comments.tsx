@@ -22,10 +22,19 @@ export default function Comments({ comments }: CommentsProps) {
     };
   }, [comments]);
 
-  if (!comments) return null;
+  if (!comments)
+    return (
+      <div className="flex flex-col h-[120px]">
+        <div
+          className={`center text-sm text-slate-400 overflow-y-auto flex-grow scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100`}
+        >
+          No comments submitted
+        </div>
+      </div>
+    );
 
   return (
-    <div className="flex flex-col h-[160px]">
+    <div className="flex flex-col h-[120px]">
       <div
         className={`text-sm text-slate-700 overflow-y-auto flex-grow scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100`}
       >
