@@ -8,7 +8,7 @@ import {
   GetAttestationsParams,
 } from "@/attestations/getAttestations";
 import { getAddress } from "viem";
-import EvaluationsList from "../hypercert/evaluations-list";
+import EvaluationsList from "./evaluations-list";
 
 function EvaluationsListNoResults() {
   return "No evaluations found";

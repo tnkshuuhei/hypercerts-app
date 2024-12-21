@@ -1,11 +1,11 @@
-import Comments from "../evaluation-list-item/comments";
+import Comments from "./evaluation-list-item/comments";
 import EnsName from "../ens-name";
 import EthAddress from "../eth-address";
 import { EvaluationData } from "../../eas/types/evaluation-data.type";
-import Evaluations from "../evaluation-list-item/evaluations";
+import Evaluations from "./evaluation-list-item/evaluations";
 import FormattedDate from "../formatted-date";
 import Link from "next/link";
-import Tags from "../evaluation-list-item/tags";
+import Tags from "./evaluation-list-item/tags";
 import { UserIcon } from "../user-icon";
 import type { AttestationResult } from "@/attestations/fragments/attestation-list.fragment";
 
