@@ -11,11 +11,11 @@ import NestedPagination from "../nested-pagination";
 import HypercertListingsTable from "./hypercert-listings-table";
 
 function ListingsListNoResults() {
-  return "No listings found";
+  return <InfoSection>We couldn&apos;t find any listings...</InfoSection>;
 }
 
 function ListingsListLoadError() {
-  return <InfoSection>We couldn&apos;t find any listings...</InfoSection>;
+  return <InfoSection>Error loading listings...</InfoSection>;
 }
 
 const getListingsData = cache(async (params: GetAllListingsParams) => {
@@ -59,7 +59,7 @@ export default async function HypercertListings({
   }
 
   return (
-    <div className="w-full">
+    <div id="marketplace-listings" className="w-full">
       <Suspense fallback={<PageSkeleton />}>
         <HypercertListingsTable
           orders={orders.data}
