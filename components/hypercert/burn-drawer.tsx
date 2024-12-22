@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 
 import { Button } from "../ui/button";
 import { Drawer } from "vaul";
-import { HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
 import { cn, generateBlockExplorerLink } from "@/lib/utils";
 import { errorHasMessage } from "@/lib/errorHasMessage";
 import { errorHasReason } from "@/lib/errorHasReason";
@@ -44,6 +43,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { HypercertState } from "@/hypercerts/fragments/hypercert-state.fragment";
 
 const burnForm = z.object({
   fractionId: z.string(),
@@ -51,7 +51,7 @@ const burnForm = z.object({
 
 export type BurnFormValues = z.infer<typeof burnForm>;
 
-export function BurnDrawer({ hypercert }: { hypercert: HypercertFull }) {
+export function BurnDrawer({ hypercert }: { hypercert: HypercertState }) {
   const { chainId, chain, address } = useAccount();
   const { toast } = useToast();
   const { client } = useHypercertClient();

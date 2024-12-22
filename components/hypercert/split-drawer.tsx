@@ -5,7 +5,6 @@ import { ArrowUpRight, LoaderCircle, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Drawer } from "vaul";
-import { HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
 import { cn, generateBlockExplorerLink } from "@/lib/utils";
 import { errorHasMessage } from "@/lib/errorHasMessage";
 import { errorHasReason } from "@/lib/errorHasReason";
@@ -36,6 +35,7 @@ import {
 } from "@/components/ui/select";
 import { FormattedUnits } from "@/components/formatted-units";
 import { Progress } from "@/components/ui/progress";
+import { HypercertState } from "@/hypercerts/fragments/hypercert-state.fragment";
 
 function QuickAddButtons({
   totalUnits,
@@ -127,7 +127,7 @@ const splitForm = z.object({
 
 export type SplitCreateFormValues = z.infer<typeof splitForm>;
 
-export function SplitDrawer({ hypercert }: { hypercert: HypercertFull }) {
+export function SplitDrawer({ hypercert }: { hypercert: HypercertState }) {
   const { chainId, chain, address } = useAccount();
   const { toast } = useToast();
   const { client } = useHypercertClient();
