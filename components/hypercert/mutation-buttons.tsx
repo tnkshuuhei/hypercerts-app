@@ -21,9 +21,10 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { SplitDrawer } from "@/components/hypercert/split-drawer";
+import { HypercertState } from "@/hypercerts/fragments/hypercert-state.fragment";
 
 type MutationButtonsProps = {
-  hypercert: HypercertFull;
+  hypercert: HypercertState;
 };
 
 export default function MutationButtons({ hypercert }: MutationButtonsProps) {
