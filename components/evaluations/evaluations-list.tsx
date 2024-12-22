@@ -40,7 +40,7 @@ export default async function EvaluationsList({
             >
               <FormattedDate seconds={attestation.creation_block_timestamp} />
               <div className="flex items-center gap-2 mt-2">
-                <UserIcon address={attester} size="medium" />
+                <UserIcon address={attester} size="large" />
                 <div className="flex flex-col justify-center items-start overflow-hidden">
                   <Link href={`/evaluators/${attestation.attester}`}>
                     <EnsName
