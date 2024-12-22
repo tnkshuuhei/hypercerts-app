@@ -5,7 +5,7 @@ import { LoaderCircle, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Drawer } from "vaul";
-import { cn, generateBlockExplorerLink } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { errorHasMessage } from "@/lib/errorHasMessage";
 import { errorHasReason } from "@/lib/errorHasReason";
 import { isChainIdSupported } from "@/lib/isChainIdSupported";

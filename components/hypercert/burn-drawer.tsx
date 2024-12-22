@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 
 import { Button } from "../ui/button";
 import { Drawer } from "vaul";
-import { cn, generateBlockExplorerLink } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { errorHasMessage } from "@/lib/errorHasMessage";
 import { errorHasReason } from "@/lib/errorHasReason";
 import { isChainIdSupported } from "@/lib/isChainIdSupported";
@@ -55,8 +55,7 @@ const burnForm = z.object({
 export type BurnFormValues = z.infer<typeof burnForm>;
 
 export function BurnDrawer({ hypercert }: { hypercert: HypercertState }) {
-  const { chainId, chain, address } = useAccount();
-  const { toast } = useToast();
+  const { chainId, address } = useAccount();
   const { client } = useHypercertClient();
   const [fractionIdToBurn, setFractionIdToBurn] = useState<string>("");
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
