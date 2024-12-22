@@ -13,7 +13,7 @@ import Fractions from "./fractions";
 
 import { InfoSection } from "../global/sections";
 import PageSkeleton from "./page-skeleton";
-import { Suspense } from "react";
+import { cache, Suspense } from "react";
 import { getHypercertState } from "@/hypercerts/getHypercertState";
 
 function HypercertDetailsNotFound() {
@@ -28,9 +28,9 @@ function HypercertDetailsSkeleton() {
   return <PageSkeleton />;
 }
 
-const getHypercertDetails = async (hypercertId: string) => {
+const getHypercertDetails = cache(async (hypercertId: string) => {
   return await getHypercertState(hypercertId);
-};
+});
 
 export default async function HypercertDetails({
   hypercertId,
