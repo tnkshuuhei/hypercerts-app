@@ -5,7 +5,7 @@ import { LoaderCircle, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Drawer } from "vaul";
-import { cn } from "@/lib/utils";
+import { cn, generateBlockExplorerLink } from "@/lib/utils";
 import { errorHasMessage } from "@/lib/errorHasMessage";
 import { errorHasReason } from "@/lib/errorHasReason";
 import { isChainIdSupported } from "@/lib/isChainIdSupported";
@@ -131,7 +131,6 @@ export type SplitCreateFormValues = z.infer<typeof splitForm>;
 
 export function SplitDrawer({ hypercert }: { hypercert: HypercertState }) {
   const { chainId, address } = useAccount();
-  const { toast } = useToast();
   const { client } = useHypercertClient();
   const [fractionIdToSplit, setFractionIdToSplit] = useState<string>("");
   const [isSplitting, setIsSplitting] = useState(false);
