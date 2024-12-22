@@ -38,24 +38,21 @@ export default async function EvaluationsList({
               key={attestation.uid}
               className="flex-shrink-0 w-[300px] p-4 flex flex-col gap-2 rounded-lg border border-slate-200"
             >
-              <div className="flex justify-between items-center">
-                <FormattedDate seconds={attestation.creation_block_timestamp} />
-                <Link
-                  href={`/evaluators/${attestation.attester}`}
-                  className="flex items-center gap-2"
-                >
-                  <UserIcon address={attester} size="small" />
-                  <div className="flex flex-col justify-center items-start overflow-hidden">
+              <FormattedDate seconds={attestation.creation_block_timestamp} />
+              <div className="flex items-center gap-2 mt-2">
+                <UserIcon address={attester} size="medium" />
+                <div className="flex flex-col justify-center items-start overflow-hidden">
+                  <Link href={`/evaluators/${attestation.attester}`}>
                     <EnsName
                       address={attester}
-                      className="text-sm font-semibold truncate"
+                      className="text-sm font-semibold truncate hover:underline"
                     />
-                    <EthAddress
-                      address={attester}
-                      className="text-xs text-slate-500 truncate"
-                    />
-                  </div>
-                </Link>
+                  </Link>
+                  <EthAddress
+                    address={attester}
+                    className="text-xs text-slate-500 truncate"
+                  />
+                </div>
               </div>
               <Evaluations
                 basic={data.evaluate_basic}
