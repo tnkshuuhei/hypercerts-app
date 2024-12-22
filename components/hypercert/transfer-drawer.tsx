@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 
 import { Button } from "../ui/button";
 import { Drawer } from "vaul";
-import { HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
 import { cn, generateBlockExplorerLink } from "@/lib/utils";
 import { errorHasMessage } from "@/lib/errorHasMessage";
 import { errorHasReason } from "@/lib/errorHasReason";
@@ -36,6 +35,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { FormattedUnits } from "@/components/formatted-units";
+import { HypercertState } from "@/hypercerts/fragments/hypercert-state.fragment";
 
 const transferForm = z.object({
   fractionId: z.string().optional(),
@@ -50,7 +50,7 @@ const transferForm = z.object({
 
 export type TransferCreateFormValues = z.infer<typeof transferForm>;
 
-export function TransferDrawer({ hypercert }: { hypercert: HypercertFull }) {
+export function TransferDrawer({ hypercert }: { hypercert: HypercertState }) {
   const { chainId, chain, address } = useAccount();
   const { toast } = useToast();
   const { client } = useHypercertClient();
