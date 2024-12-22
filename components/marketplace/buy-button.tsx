@@ -7,6 +7,8 @@ export function BuyButton() {
     const listingsSection = document.getElementById("marketplace-listings");
     if (listingsSection) {
       listingsSection.scrollIntoView({ behavior: "smooth" });
+    } else {
+      console.error("Marketplace listings section not found");
     }
   };
 
