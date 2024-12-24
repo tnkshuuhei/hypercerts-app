@@ -42,6 +42,7 @@ const query = graphql(`
           { schemaId: { equals: $schemaId } }
         ]
       }
+      orderBy: [{ timeCreated: desc }]
     ) {
       id
       data
