@@ -30,6 +30,7 @@ import { Textarea } from "../ui/textarea";
 import { createCreatorFeedAttestation } from "@/eas/createCreatorFeedAttestation";
 import { TooltipInfo } from "../tooltip-info";
 import { isAddress } from "viem";
+import Link from "next/link";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ACCEPTED_FILE_TYPES = [
@@ -316,8 +317,15 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
                 </FormControl>
                 <div className="space-y-1 leading-none">
                   <FormLabel>
-                    I confirm that the uploaded files conform to the terms and
-                    conditions.
+                    I confirm that the uploaded files conform to the
+                    <Link
+                      href="https://www.hypercerts.org/terms"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-blue-600"
+                    >
+                      {" terms and conditions."}
+                    </Link>
                   </FormLabel>
                   <FormMessage />
                 </div>
@@ -456,7 +464,6 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
                       Upload file(s)
                     </Button>
                   </div>
-                  <FormMessage />
                 </FormItem>
               )}
             />
