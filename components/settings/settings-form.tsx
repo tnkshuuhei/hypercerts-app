@@ -60,7 +60,11 @@ export const SettingsForm = () => {
     ensAvatar,
     isLoading: isLoadingDetails,
   } = useAccountDetails();
-  const { data: userData, isFetching: isPendingGetUser } = useGetUser({
+  const {
+    data: userData,
+    isFetching: isPendingGetUser,
+    refetch: refetchUser,
+  } = useGetUser({
     address,
   });
   const [pendingUpdate, setPendingUpdate] = useState<PendingUserUpdate>();
@@ -85,6 +89,7 @@ export const SettingsForm = () => {
           },
         });
       }
+      await refetchUser();
     } catch (error) {
       if (errorHasReason(error)) {
         toast({
@@ -108,7 +113,6 @@ export const SettingsForm = () => {
           duration: ERROR_TOAST_DURATION,
         });
       }
-      return;
     }
   };
 
