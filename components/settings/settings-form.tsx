@@ -78,17 +78,26 @@ export const SettingsForm = () => {
     try {
       await addOrUpdateUser(data);
 
-      if (selectedAccount?.type === "safe") {
-        setPendingUpdate({
-          user: {
-            displayName: data.displayName || "",
-            avatar: data.avatar || "",
-          },
-          metadata: {
-            timestamp: new Date().getTime(),
-          },
-        });
+      if (selectedAccount?.type !== "safe") {
+        return;
       }
+
+      setPendingUpdate({
+        user: {
+          displayName: data.displayName || "",
+          avatar: data.avatar || "",
+        },
+        metadata: {
+          timestamp: new Date().getTime() / 1000,
+        },
+      });
+
+      // Show original values
+      form.setValue(
+        "displayName",
+        userData?.user?.display_name || ensName || "",
+      );
+      form.setValue("avatar", userData?.user?.avatar || ensAvatar || "");
       await refetchUser();
     } catch (error) {
       if (errorHasReason(error)) {
