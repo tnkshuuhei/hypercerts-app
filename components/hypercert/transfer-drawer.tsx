@@ -113,7 +113,7 @@ export function TransferDrawer({ hypercert }: { hypercert: HypercertFull }) {
 
       const hash = await client.transferFraction({
         fractionId: BigInt(tokenIdFromFraction),
-        to: getAddress(recipient),
+        to: getAddress(recipient) as `0x${string}`,
       });
 
       setTxHash(hash);

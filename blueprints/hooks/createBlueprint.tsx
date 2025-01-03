@@ -102,7 +102,7 @@ export const useCreateBlueprint = () => {
               : {}),
           },
           minter_address: minterAddress as `0x${string}`,
-          admin_address: address,
+          admin_address: address as `0x${string}`,
           signature: signature as `0x${string}`,
           chain_id: chainId,
         };
