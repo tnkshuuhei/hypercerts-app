@@ -41,6 +41,10 @@ const ACCEPTED_FILE_TYPES = [
   "image/jpeg",
   "image/jpg",
 ];
+type FileUploadResult = {
+  cid: string;
+  fileName: string;
+};
 
 const creatorFeedSchema = z.object({
   chainId: z.string(),
@@ -77,7 +81,8 @@ const creatorFeedSchema = z.object({
             (type) => ACCEPTED_FILE_TYPES.includes(type),
             "Invalid file type. Only PDF, CSV, XLS, PNG, and JPG files are allowed",
           ),
-        src: z.string().url({ message: "Please enter a valid URL" }),
+        file: z.instanceof(File),
+        src: z.string(),
       }),
     )
     .max(5, "Maximum of 5 files allowed")
@@ -91,6 +96,7 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
   const { toast } = useToast();
   const [chainId, contractAddress, tokenId] = hypercertId.split("-");
   const rpcSigner = useEthersSigner({ chainId: +chainId });
+  const [isStoringFiles, setIsStoringFiles] = useState(false);
   const [isAttesting, setIsAttesting] = useState(false);
   const [uid, setUid] = useState<string>();
 
@@ -129,7 +135,7 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
     });
   };
 
-  function validateFile(file: File) {
+  async function validateFile(file: File) {
     const currentFiles = form.getValues("documents") || [];
     if (currentFiles.length >= 5) {
       errorToast("Maximum 5 files allowed");
@@ -150,6 +156,7 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
       );
       return;
     }
+
     // TODO: Check to see if the file is malicious
     form.setValue("documents", [
       ...currentFiles,
@@ -157,7 +164,7 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
         name: file.name,
         size: file.size,
         type: file.type,
-        // TODO: store on IPFS and set cid
+        file: file,
         src: "",
       },
     ]);
@@ -171,9 +178,68 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
       return;
     }
 
-    setIsAttesting(true);
+    if (values?.documents) {
+      const formData = new FormData();
+
+      values.documents.forEach((doc) => {
+        formData.append("files", doc.file, doc.name);
+      });
+
+      try {
+        console.log("Storing files...");
+        setIsStoringFiles(true);
+        const response = await fetch("http://localhost:4000/v1/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          errorToast(errorData.message);
+          return;
+        }
+
+        const result = await response.json();
+        console.log("Upload result:", result);
+
+        if (result.success && result.data.results.length > 0) {
+          const currentDocuments = form.getValues("documents") || [];
+          const updatedDocuments = currentDocuments.map((doc) => {
+            const uploadResult = result.data.results.find(
+              (r: FileUploadResult) => r.fileName === doc.name,
+            );
+            return {
+              ...doc,
+              src: uploadResult ? uploadResult.cid : doc.src,
+            };
+          });
+
+          // update form values
+          form.setValue("documents", updatedDocuments);
+        }
+
+        if (result.data.failed.length > 0) {
+          const failedFiles = result.data.failed
+            .map((f: FileUploadResult) => f.fileName)
+            .join(", ");
+          errorToast(`Failed to upload: ${failedFiles}`);
+          return;
+        }
+      } catch (error) {
+        console.error("Upload error:", error);
+        errorToast("File upload failed");
+        return;
+      } finally {
+        setIsStoringFiles(false);
+      }
+    }
+
     try {
-      const { uid } = await createCreatorFeedAttestation(values, rpcSigner);
+      setIsAttesting(true);
+      const { uid } = await createCreatorFeedAttestation(
+        form.getValues(), // get New Data
+        rpcSigner,
+      );
       setUid(uid);
     } catch (e) {
       if (errorHasReason(e)) {
@@ -188,7 +254,6 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
       setIsAttesting(false);
     }
   }
-
   if (!isChainIdSupported(chainId)) {
     return (
       <div>
@@ -474,11 +539,19 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
                 Cancel
               </Button>
             </Drawer.Close>
-            <Button disabled={isAttesting} type="submit" className="w-1/2">
-              {isAttesting && (
+            <Button
+              disabled={isStoringFiles || isAttesting}
+              type="submit"
+              className="w-1/2"
+            >
+              {isStoringFiles || isAttesting ? (
                 <LoaderCircle className="h-4 w-4 animate-spin mr-1" />
-              )}
-              {isAttesting ? "Submitting information" : "Submit"}
+              ) : null}
+              {isStoringFiles
+                ? "Storing files..."
+                : isAttesting
+                  ? "Submitting information"
+                  : "Submit"}
             </Button>
           </div>
         </form>

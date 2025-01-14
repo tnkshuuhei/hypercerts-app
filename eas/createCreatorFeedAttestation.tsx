@@ -21,15 +21,24 @@ export async function createCreatorFeedAttestation(
   // Initialize SchemaEncoder with the schema string
   const schemaEncoder = new SchemaEncoder(CREATOR_FEED_SCHEMA);
 
-  // Stringify the links
-  const stringifiedLinks =
-    data.links?.map((link) =>
+  // Stringify the sources
+  const sources = [
+    // stringified links
+    ...(data.links?.map((link) =>
       JSON.stringify({
         type: link.type,
         src: link.src,
       }),
-    ) || [];
-
+    ) || []),
+    // stringified files
+    ...(data.documents?.map((doc) =>
+      JSON.stringify({
+        type: doc.type,
+        name: doc.name,
+        src: doc.src,
+      }),
+    ) || []),
+  ];
   // Encode the data according to schema
   const encodedData = schemaEncoder.encodeData([
     { name: "chain_id", value: BigInt(data.chainId), type: "uint256" },
@@ -37,7 +46,7 @@ export async function createCreatorFeedAttestation(
     { name: "token_id", value: BigInt(data.tokenId), type: "uint256" },
     { name: "title", value: data.title, type: "string" },
     { name: "description", value: data.description, type: "string" },
-    { name: "sources", value: stringifiedLinks, type: "string[]" },
+    { name: "sources", value: sources, type: "string[]" },
   ]);
 
   const tx = await eas.attest({
