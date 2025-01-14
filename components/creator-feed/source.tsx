@@ -12,13 +12,14 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import Link from "next/link";
+import { truncateCID } from "@/lib/utils";
 interface SourceProps {
   type: string;
   src: string;
   name?: string; // use for file name
 }
 
-export default function Source({ type, src }: SourceProps) {
+export default function Source({ type, src, name }: SourceProps) {
   // TODO: implement dialog
   return (
     <AlertDialog>
@@ -30,7 +31,16 @@ export default function Source({ type, src }: SourceProps) {
             ) : (
               <File className="h-4 w-4 mr-2" />
             )}
-            <span className="truncate flex-1">{src}</span>
+            <span className="truncate flex-1">
+              {type === "url" ? (
+                src
+              ) : (
+                <div className="flex flex-row items-center gap-1">
+                  <span className="truncate">{name}</span>
+                  <span className="text-gray-500"> {truncateCID(src)}</span>
+                </div>
+              )}
+            </span>
           </div>
         </Button>
       </AlertDialogTrigger>
@@ -44,7 +54,7 @@ export default function Source({ type, src }: SourceProps) {
         <AlertDialogFooter>
           <AlertDialogCancel className="w-1/2">Go back</AlertDialogCancel>
           <Link
-            href={src}
+            href={type === "url" ? src : `https://${src}.ipfs.w3s.link`}
             className="w-1/2"
             target="_blank"
             rel="noopener noreferrer"

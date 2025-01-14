@@ -35,7 +35,12 @@ export function CreatorFeed({
               <h4 className="text-sm font-medium text-gray-500">Sources</h4>
               <div className="flex flex-col items-start">
                 {parsedSources.map((source, index) => (
-                  <Source key={index} type={source.type} src={source.src} />
+                  <Source
+                    key={index}
+                    type={source.type}
+                    src={source.src}
+                    name={source.name}
+                  />
                 ))}
               </div>
             </div>

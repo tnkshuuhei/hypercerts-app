@@ -22,6 +22,16 @@ export const truncateEthereumAddress = (
   )}`;
 };
 
+export const truncateCID = (cid: string, length = 4): string => {
+  if (!cid) {
+    return "";
+  }
+  if (cid.length <= length * 2) {
+    return cid;
+  }
+  return `${cid.substring(0, length)}...${cid.substring(cid.length - length)}`;
+};
+
 export const formatDate = (date: string, locale?: string) => {
   if (!date) {
     return null;
