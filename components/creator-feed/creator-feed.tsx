@@ -39,7 +39,7 @@ export function CreatorFeed({
                     key={index}
                     type={source.type}
                     src={source.src}
-                    name={source.name}
+                    fileName={source.name}
                   />
                 ))}
               </div>
