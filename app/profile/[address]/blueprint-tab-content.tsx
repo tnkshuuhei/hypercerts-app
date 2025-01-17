@@ -3,12 +3,13 @@ import { ProfileSubTabKey, subTabs } from "@/app/profile/[address]/tabs";
 import ExploreListSkeleton from "@/components/explore/explore-list-skeleton";
 import { SubTabsWithCount } from "@/components/profile/sub-tabs-with-count";
 import { getBlueprints } from "@/blueprints/getBlueprints";
-import BlueprintsList from "@/components/blueprints/blueprints-list";
 import { CreateBlueprintButton } from "@/components/blueprints/buttons";
 import { OwnAccountOnly } from "@/components/own-account-only";
-import { BlueprintsTable } from "@/components/blueprints/blueprints-table";
 import { BLUEPRINTS_PER_PAGE } from "@/configs/ui";
 import Pagination from "@/components/global/pagination/pagination";
+import { BlueprintsCreatedTable } from "@/components/blueprints/blueprints-created-table";
+import { BlueprintsClaimableTable } from "@/components/blueprints/blueprints-claimable-table";
+import { BlueprintsClaimedTable } from "@/components/blueprints/blueprints-claimed-table";
 
 const BlueprintTabContentInner = async ({
   address,
@@ -50,6 +51,7 @@ const BlueprintTabContentInner = async ({
   };
   const currentCount =
     tabBadgeCounts[activeTab as (typeof subTabs)[number]["key"]];
+
   return (
     <section>
       <SubTabsWithCount
@@ -65,15 +67,21 @@ const BlueprintTabContentInner = async ({
         </div>
       </OwnAccountOnly>
       {activeTab === "blueprints-claimable" && (
-        <BlueprintsList blueprints={availableBlueprints?.blueprints || []} />
+        <BlueprintsClaimableTable
+          blueprints={availableBlueprints?.blueprints || []}
+          count={availableBlueprints?.count}
+        />
       )}
 
       {activeTab === "blueprints-claimed" && (
-        <BlueprintsList blueprints={mintedBlueprints?.blueprints || []} />
+        <BlueprintsClaimedTable
+          blueprints={mintedBlueprints?.blueprints || []}
+          count={mintedBlueprints?.count}
+        />
       )}
 
       {activeTab === "blueprints-created" && (
-        <BlueprintsTable
+        <BlueprintsCreatedTable
           blueprints={blueprintsCreated?.blueprints || []}
           count={blueprintsCreated?.count}
         />
