@@ -16,6 +16,8 @@ import { useAccount, useWalletClient } from "wagmi";
 import { generateBlockExplorerLink } from "@/lib/utils";
 import { useQueueMintBlueprint } from "@/blueprints/hooks/queueMintBlueprint";
 import { revalidatePathServerAction } from "@/app/actions/revalidatePathServerAction";
+import { track } from "@vercel/analytics";
+
 const createExtraContent = (
   receipt: TransactionReceipt,
   hypercertId?: string,
@@ -97,6 +99,12 @@ export const useMintHypercert = () => {
     },
     onSuccess: async (hash) => {
       await setDialogStep("confirming", "active");
+      console.log("Mint submitted", {
+        hash,
+      });
+      track("Mint submitted", {
+        hash,
+      });
       let receipt;
 
       try {
@@ -126,6 +134,12 @@ export const useMintHypercert = () => {
       let hypercertId;
       try {
         hypercertId = generateHypercertIdFromReceipt(receipt, chain?.id!);
+        console.log("Mint completed", {
+          hypercertId: hypercertId || "not found",
+        });
+        track("Mint completed", {
+          hypercertId: hypercertId || "not found",
+        });
         console.log({ hypercertId });
       } catch (error) {
         console.error("Error generating hypercert ID:", error);
