@@ -6,7 +6,6 @@ import { useState } from "react";
 import { ArrowUpRight, LoaderCircle, Plus, X } from "lucide-react";
 import { Button } from "../ui/button";
 import { Drawer } from "vaul";
-import { clearCacheAfterEvaluation } from "@/app/actions/clearCacheAfterEvaluation";
 import { errorHasMessage } from "@/lib/errorHasMessage";
 import { errorHasReason } from "@/lib/errorHasReason";
 import { getEasConfig } from "@/eas/getEasConfig";
@@ -110,7 +109,7 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
     setDialogStep: setStep,
     setSteps,
     setOpen,
-    setExtraContent,
+    setTitle,
   } = useStepProcessDialogContext();
 
   const form = useForm<z.infer<typeof creatorFeedSchema>>({
@@ -200,6 +199,10 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
       try {
         setSteps([
           {
+            id: "Preparing upload",
+            description: "Preparing upload",
+          },
+          {
             id: "Storing files",
             description: "Storing files on IPFS",
           },
@@ -209,10 +212,13 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
           },
         ]);
 
+        setTitle("Submitting additional information");
+
         setOpen(true);
+        await setStep("Preparing upload");
         console.log("Storing files...");
         setIsStoringFiles(true);
-        await setStep("Storing files on IPFS");
+        await setStep("Storing files");
         const response = await fetch(`${HYPERCERTS_API_URL_REST}/upload`, {
           method: "POST",
           body: formData,
@@ -221,7 +227,7 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
         if (!response.ok) {
           const errorData = await response.json();
           errorToast(errorData.message);
-          setStep("Storing files on IPFS", "error");
+          await setStep("Storing files", "error");
           return;
         }
 
@@ -249,7 +255,7 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
           const failedFiles = result.data.failed
             .map((f: FileUploadResult) => f.fileName)
             .join(", ");
-          setStep("Uploading files to IPFS", "error");
+          await setStep("Uploading files to IPFS", "error");
           errorToast(`Failed to upload: ${failedFiles}`);
           return;
         }
@@ -263,7 +269,7 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
     }
 
     try {
-      setStep("Creating attestation");
+      await setStep("Creating attestation");
       setIsAttesting(true);
       const latestFeed = await getCreatorFeedAttestations({
         first: 1,
@@ -282,23 +288,22 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
         form.getValues(), // get New Data
         rpcSigner,
       );
-      setStep("Creating attestation", "completed");
+      await setStep("Creating attestation", "completed");
       setUid(uid);
     } catch (e) {
       if (errorHasReason(e)) {
         errorToast(e.reason);
-        setStep("Creating attestation", "error", e.reason);
+        await setStep("Creating attestation", "error", e.reason);
       } else if (errorHasMessage(e)) {
         errorToast(e.message);
-        setStep("Creating attestation", "error", e.message);
+        await setStep("Creating attestation", "error", e.message);
       } else {
         errorToast("An error occurred while creating the attestation.");
-        setStep("Creating attestation", "error");
+        await setStep("Creating attestation", "error");
       }
       console.error(e);
     } finally {
       setIsAttesting(false);
-      setOpen(false);
     }
   }
   if (!isChainIdSupported(chainId)) {
