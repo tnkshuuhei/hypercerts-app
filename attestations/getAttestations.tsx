@@ -54,7 +54,7 @@ export async function getAttestations({
   }
 
   if (filter?.schemaId) {
-    where.eas_schema.uid = { eq: filter.schemaId };
+    where.eas_schema = { uid: { eq: filter.schemaId } };
   }
 
   const res = await request(HYPERCERTS_API_URL_GRAPH, query, {
