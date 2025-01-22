@@ -56,7 +56,9 @@ export async function createCreatorFeedAttestation(
       expirationTime: BigInt(0),
       revocable: false,
       data: encodedData,
-      refUID: data.ref || "",
+      refUID:
+        data.ref ||
+        "0x0000000000000000000000000000000000000000000000000000000000000000",
     },
   });
 
