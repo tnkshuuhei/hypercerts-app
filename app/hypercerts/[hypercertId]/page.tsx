@@ -13,9 +13,7 @@ import HypercertListings from "@/components/marketplace/hypercert-listings";
 import HypercertEvaluations from "@/components/evaluations/hypercert-evaluations";
 import { Separator } from "@/components/ui/separator";
 import CreatorFeedButton from "@/components/creator-feed/creator-feed-button";
-
-import { getCreatorFeedAttestation } from "@/attestations/getCreatorFeedAttestation";
-import { CreatorFeedLists } from "@/components/creator-feed/creator-feed-lists";
+import CreatorFeeds from "@/components/creator-feed/creator-feeds";
 
 type Props = {
   params: { hypercertId: string };
@@ -46,10 +44,6 @@ export default async function HypercertPage({ params, searchParams }: Props) {
   const { hypercertId } = params;
 
   const [hypercert] = await Promise.all([getHypercert(hypercertId)]);
-  const creatorFeedAttestation = await getCreatorFeedAttestation(
-    hypercertId,
-    hypercert?.creator_address!,
-  );
 
   if (!hypercert) {
     return (
@@ -102,7 +96,7 @@ export default async function HypercertPage({ params, searchParams }: Props) {
           creatorAddress={hypercert.creator_address!}
         />
       </div>
-      <CreatorFeedLists data={creatorFeedAttestation.data} />
+      <CreatorFeeds hypercertId={hypercertId} />
     </main>
   );
 }

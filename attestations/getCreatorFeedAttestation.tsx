@@ -1,106 +1,76 @@
 import "server-only";
 
-import { graphql } from "@/lib/graphql";
-
+import { graphql, readFragment } from "@/lib/graphql";
+import { AttestationListFragment } from "./fragments/attestation-list.fragment";
 import request from "graphql-request";
-import { CREATOR_FEED_SCHEMA_UID } from "@/configs/eas";
-import { getAddress } from "viem";
+import { Address, Hex } from "viem";
+import { HYPERCERTS_API_URL_GRAPH } from "@/configs/hypercerts";
 
-export interface ReturnedAttestation {
-  id: string;
-  data: string;
-  decodedDataJson: string;
-  recipient: string;
-  timeCreated: number;
-  revoked: boolean;
-  schemaId: string;
-  expirationTime: number;
-  refUID: string;
-  time: number;
-  revocable: boolean;
-  attester: string;
-}
-export interface AttestationData {
-  chain_id: number;
-  contract_address: string;
-  token_id: number;
-  title: string;
-  description: string;
-  sources: string[];
-}
-
-export interface DecodedAttestation
-  extends ReturnedAttestation,
-    AttestationData {}
-
-const query = graphql(`
-  query Attestations($recipient: String!, $schemaId: String!) {
-    attestations(
-      where: {
-        AND: [
-          { recipient: { equals: $recipient } }
-          { schemaId: { equals: $schemaId } }
-        ]
+const query = graphql(
+  `
+    query AttestationsQuery($where: AttestationWhereInput) {
+      attestations(
+        where: $where
+        sort: { by: { creation_block_timestamp: descending } }
+      ) {
+        count
+        data {
+          ...AttestationListFragment
+        }
       }
-      orderBy: [{ timeCreated: desc }]
-    ) {
-      id
-      data
-      decodedDataJson
-      recipient
-      timeCreated
-      revoked
-      schemaId
-      expirationTime
-      refUID
-      time
-      expirationTime
-      revocable
-      attester
     }
+  `,
+  [AttestationListFragment],
+);
+interface GetAttestationsParams {
+  first?: number;
+  offset?: number;
+  filter?: {
+    chainId?: bigint;
+    contractAddress?: Address;
+    tokenId?: bigint;
+    schemaId?: Hex;
+  };
+}
+
+export async function getCreatorFeedAttestations({
+  first,
+  offset,
+  filter,
+}: GetAttestationsParams) {
+  const where: Record<string, any> = {};
+
+  if (filter?.chainId) {
+    where.chain_id = { eq: filter.chainId.toString() };
   }
-`);
+  if (filter?.contractAddress) {
+    where.contract_address = { eq: filter.contractAddress };
+  }
+  if (filter?.tokenId) {
+    where.token_id = { eq: filter.tokenId.toString() };
+  }
 
-export async function getCreatorFeedAttestation(
-  hypercertId: string,
-  recipient: string,
-) {
-  // const [chainId, contractAddress, tokenId] = hypercertId.split("-");
-  const address = getAddress(recipient);
+  if (filter?.schemaId) {
+    where.eas_schema = { uid: { eq: filter.schemaId } };
+  }
 
-  // TODO: use hypercerts API. just hardcoding for now
-  const res = await request("https://sepolia.easscan.org/graphql", query, {
-    schemaId: CREATOR_FEED_SCHEMA_UID,
-    recipient: "0x0000000000000000000000000000000000000000",
+  const res = await request(HYPERCERTS_API_URL_GRAPH, query, {
+    first,
+    offset,
+    where,
   });
 
-  if (!res.attestations || !Array.isArray(res.attestations)) {
+  if (!res.attestations?.data || !res.attestations?.count) {
     return {
+      count: 0,
       data: [],
     };
   }
 
   return {
-    data: res.attestations.map((attestation: ReturnedAttestation) =>
-      formatDecodedData(attestation),
+    count: res.attestations.count,
+    data: res.attestations.data.map((attestation) =>
+      readFragment(AttestationListFragment, attestation),
     ),
   };
-}
-function formatDecodedData(item: ReturnedAttestation): DecodedAttestation {
-  const decoded = JSON.parse(item.decodedDataJson);
-  const formatted: AttestationData = {
-    chain_id: decoded[0].value.value,
-    contract_address: decoded[1].value.value,
-    token_id: decoded[2].value.value,
-    title: decoded[3].value.value,
-    description: decoded[4].value.value,
-    sources: decoded[5].value.value,
-  };
-
-  const returnVal: DecodedAttestation = {
-    ...item,
-    ...formatted,
-  };
-
-  return returnVal;
 }

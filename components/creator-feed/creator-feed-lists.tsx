@@ -2,18 +2,20 @@
 
 import React, { useState } from "react";
 
-import { DecodedAttestation } from "@/attestations/getCreatorFeedAttestation";
 import { formatDate } from "@/lib/utils";
 import { CreatorFeed } from "./creator-feed";
 import { ShowMoreButton } from "./show-more-button";
-
-export function CreatorFeedLists({ data }: { data: DecodedAttestation[] }) {
+import { AttestationResult } from "@/attestations/fragments/attestation-list.fragment";
+interface CreatorFeedListProps {
+  CreatorFeedData: {
+    count: number;
+    data: AttestationResult[];
+  };
+}
+export function CreatorFeedLists({ CreatorFeedData }: CreatorFeedListProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const latestAttestation = data[0];
 
-  if (data.length === 0) {
-    return <div>The creator has not published additional information.</div>;
-  }
+  const latestAttestation = CreatorFeedData?.data[0];
 
   return (
     <>
@@ -37,8 +39,10 @@ export function CreatorFeedLists({ data }: { data: DecodedAttestation[] }) {
               <div className="relative">
                 {/* Date labels */}
                 <div className="flex gap-4">
-                  {data.map((attestation) => {
-                    const date = new Date(attestation.timeCreated * 1000);
+                  {CreatorFeedData?.data.map((attestation) => {
+                    const date = new Date(
+                      Number(attestation.creation_block_timestamp) * 1000,
+                    );
                     const formattedDate = formatDate(date.toString());
                     return (
                       <div
@@ -60,7 +64,7 @@ export function CreatorFeedLists({ data }: { data: DecodedAttestation[] }) {
 
                   {/* Circles and cards */}
                   <div className="flex gap-4">
-                    {data.map((attestation) => (
+                    {CreatorFeedData?.data.map((attestation) => (
                       <div
                         key={attestation.id}
                         className="flex-none w-[250px] md:w-[400px]"

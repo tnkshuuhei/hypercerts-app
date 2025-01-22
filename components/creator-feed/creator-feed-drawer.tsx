@@ -31,6 +31,7 @@ import { createCreatorFeedAttestation } from "@/eas/createCreatorFeedAttestation
 import { TooltipInfo } from "../tooltip-info";
 import { isAddress } from "viem";
 import Link from "next/link";
+import { HYPERCERTS_API_URL_REST } from "@/configs/hypercerts";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ACCEPTED_FILE_TYPES = [
@@ -188,7 +189,7 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
       try {
         console.log("Storing files...");
         setIsStoringFiles(true);
-        const response = await fetch("http://localhost:4000/v1/upload", {
+        const response = await fetch(`${HYPERCERTS_API_URL_REST}/upload`, {
           method: "POST",
           body: formData,
         });
