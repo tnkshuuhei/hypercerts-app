@@ -1,5 +1,3 @@
-import "server-only";
-
 import { graphql, readFragment } from "@/lib/graphql";
 import { AttestationListFragment } from "./fragments/attestation-list.fragment";
 import request from "graphql-request";

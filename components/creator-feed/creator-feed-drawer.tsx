@@ -32,6 +32,9 @@ import { TooltipInfo } from "../tooltip-info";
 import { isAddress } from "viem";
 import Link from "next/link";
 import { HYPERCERTS_API_URL_REST } from "@/configs/hypercerts";
+import { useStepProcessDialogContext } from "../global/step-process-dialog";
+import { getCreatorFeedAttestations } from "@/attestations/getCreatorFeedAttestation";
+import { AttestationResult } from "@/attestations/fragments/attestation-list.fragment";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ACCEPTED_FILE_TYPES = [
@@ -88,11 +91,13 @@ const creatorFeedSchema = z.object({
     )
     .max(5, "Maximum of 5 files allowed")
     .optional(),
-  // ref: z.string(),
+  ref: z.string().optional(),
 });
 
 export type CreatorFeedFormValues = z.infer<typeof creatorFeedSchema>;
 
+// TODO: add steps dialog
+// TODO: add refID
 export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
   const { toast } = useToast();
   const [chainId, contractAddress, tokenId] = hypercertId.split("-");
@@ -100,6 +105,13 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
   const [isStoringFiles, setIsStoringFiles] = useState(false);
   const [isAttesting, setIsAttesting] = useState(false);
   const [uid, setUid] = useState<string>();
+
+  const {
+    setDialogStep: setStep,
+    setSteps,
+    setOpen,
+    setExtraContent,
+  } = useStepProcessDialogContext();
 
   const form = useForm<z.infer<typeof creatorFeedSchema>>({
     resolver: zodResolver(creatorFeedSchema),
@@ -172,7 +184,6 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
   }
 
   async function onSubmit(values: CreatorFeedFormValues) {
-    console.log("values", values);
     if (!rpcSigner) {
       console.error("rpcSigner not found");
       errorToast("Please connect your wallet to attest.");
@@ -187,8 +198,21 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
       });
 
       try {
+        setSteps([
+          {
+            id: "Storing files",
+            description: "Storing files on IPFS",
+          },
+          {
+            id: "Creating attestation",
+            description: "Creating attestation",
+          },
+        ]);
+
+        setOpen(true);
         console.log("Storing files...");
         setIsStoringFiles(true);
+        await setStep("Storing files on IPFS");
         const response = await fetch(`${HYPERCERTS_API_URL_REST}/upload`, {
           method: "POST",
           body: formData,
@@ -197,6 +221,7 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
         if (!response.ok) {
           const errorData = await response.json();
           errorToast(errorData.message);
+          setStep("Storing files on IPFS", "error");
           return;
         }
 
@@ -217,12 +242,14 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
 
           // update form values
           form.setValue("documents", updatedDocuments);
+          setStep("Uploading files to IPFS", "completed");
         }
 
         if (result.data.failed.length > 0) {
           const failedFiles = result.data.failed
             .map((f: FileUploadResult) => f.fileName)
             .join(", ");
+          setStep("Uploading files to IPFS", "error");
           errorToast(`Failed to upload: ${failedFiles}`);
           return;
         }
@@ -236,23 +263,42 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
     }
 
     try {
+      setStep("Creating attestation");
       setIsAttesting(true);
+      const latestFeed = await getCreatorFeedAttestations({
+        first: 1,
+        offset: 0,
+        filter: {
+          chainId: BigInt(values.chainId),
+          contractAddress: values.contractAddress,
+          tokenId: BigInt(values.tokenId),
+        },
+      });
+      if (latestFeed.count > 0) {
+        const latestFeedData = latestFeed.data[0] as AttestationResult;
+        form.setValue("ref", latestFeedData.uid!);
+      }
       const { uid } = await createCreatorFeedAttestation(
         form.getValues(), // get New Data
         rpcSigner,
       );
+      setStep("Creating attestation", "completed");
       setUid(uid);
     } catch (e) {
       if (errorHasReason(e)) {
         errorToast(e.reason);
+        setStep("Creating attestation", "error", e.reason);
       } else if (errorHasMessage(e)) {
         errorToast(e.message);
+        setStep("Creating attestation", "error", e.message);
       } else {
         errorToast("An error occurred while creating the attestation.");
+        setStep("Creating attestation", "error");
       }
       console.error(e);
     } finally {
       setIsAttesting(false);
+      setOpen(false);
     }
   }
   if (!isChainIdSupported(chainId)) {
@@ -273,8 +319,6 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
   }
 
   if (uid) {
-    clearCacheAfterEvaluation(hypercertId);
-
     const easConfig = getEasConfig(+chainId);
     const url = `${easConfig?.explorerUrl}/attestation/view/${uid}`;
     return (
