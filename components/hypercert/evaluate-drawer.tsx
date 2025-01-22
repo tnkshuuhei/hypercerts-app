@@ -17,9 +17,9 @@ import { errorHasMessage } from "@/lib/errorHasMessage";
 import { errorHasReason } from "@/lib/errorHasReason";
 import { getEasConfig } from "@/eas/getEasConfig";
 import { isChainIdSupported } from "@/lib/isChainIdSupported";
-import { useEthersSigner } from "@/ethers/hooks/useEthersSigner";
 import { useGlobalState } from "@/lib/state";
 import { useToast } from "../ui/use-toast";
+import { useEthersSigner } from "@/hooks/use-ethers-signer";
 
 function isAnySectionEvaluated(state: AllEvaluationStates) {
   return (
