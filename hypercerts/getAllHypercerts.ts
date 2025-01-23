@@ -5,6 +5,7 @@ import { VariablesOf, graphql, readFragment } from "@/lib/graphql";
 import { HYPERCERTS_API_URL_GRAPH } from "@/configs/hypercerts";
 import { HypercertListFragment } from "@/hypercerts/fragments/hypercert-list.fragment";
 import request from "graphql-request";
+// import { EVALUATIONS_SCHEMA_UID } from "@/configs/eas";
 
 export type ClaimsOrderBy =
   | "created_asc"
@@ -97,6 +98,8 @@ function createFilter({
   }
   if (filter === "evaluated") {
     where.attestations_count = { gte: 1 };
+    // TODO: Specify evaluations schemaId so that '/explore' page can only filter evaluation attestations
+    // where.eas_schema = { uid: { eq: EVALUATIONS_SCHEMA_UID } };
   }
   if (chainId) {
     where.contract = {
