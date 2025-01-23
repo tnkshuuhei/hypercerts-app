@@ -95,8 +95,6 @@ const creatorFeedSchema = z.object({
 
 export type CreatorFeedFormValues = z.infer<typeof creatorFeedSchema>;
 
-// TODO: add steps dialog
-// TODO: add refID
 export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
   const { toast } = useToast();
   const [chainId, contractAddress, tokenId] = hypercertId.split("-");
