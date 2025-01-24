@@ -12,7 +12,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import Link from "next/link";
-import { truncateCID } from "@/lib/utils";
+import { truncateText } from "@/lib/utils";
 import { AlertDialogDescription } from "@radix-ui/react-alert-dialog";
 interface SourceProps {
   type: string;
@@ -35,11 +35,15 @@ export default function Source({ type, src, fileName }: SourceProps) {
             )}
             <span className="truncate flex-1">
               {type === "url" ? (
-                src
+                <div className="truncate max-w-[200px]">{src}</div>
               ) : (
                 <div className="flex flex-row items-center gap-1">
-                  <span className="truncate">{fileName}</span>
-                  <span className="text-gray-500"> {truncateCID(src)}</span>
+                  <div className="truncate max-w-[200px]">
+                    {truncateText(fileName!, 10)}
+                  </div>
+                  <span className="text-gray-500 shrink-0">
+                    {truncateText(src)}
+                  </span>
                 </div>
               )}
             </span>

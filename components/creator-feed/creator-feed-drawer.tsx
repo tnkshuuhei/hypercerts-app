@@ -10,7 +10,7 @@ import { errorHasMessage } from "@/lib/errorHasMessage";
 import { errorHasReason } from "@/lib/errorHasReason";
 import { getEasConfig } from "@/eas/getEasConfig";
 import { isChainIdSupported } from "@/lib/isChainIdSupported";
-import { useEthersSigner } from "@/ethers/hooks/useEthersSigner";
+import { useEthersSigner } from "@/hooks/use-ethers-signer";
 import { useToast } from "../ui/use-toast";
 import { Checkbox } from "../ui/checkbox";
 import { z } from "zod";
@@ -34,6 +34,7 @@ import { HYPERCERTS_API_URL_REST } from "@/configs/hypercerts";
 import { useStepProcessDialogContext } from "../global/step-process-dialog";
 import { getCreatorFeedAttestations } from "@/attestations/getCreatorFeedAttestation";
 import { AttestationResult } from "@/attestations/fragments/attestation-list.fragment";
+import { truncateText } from "@/lib/utils";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ACCEPTED_FILE_TYPES = [
@@ -526,7 +527,9 @@ export function CreatorFeedDrawer({ hypercertId }: { hypercertId: string }) {
                   {form.watch("documents")?.map((file: any, index: number) => (
                     <div key={index} className="flex items-center gap-2">
                       <div className="flex-1 flex items-center gap-2 p-2">
-                        <span className="text-sm truncate">{file.name}</span>
+                        <span className="text-sm">
+                          {truncateText(file.name!, 10)}
+                        </span>
                         <span className="text-xs text-gray-500">
                           ({(file.size / 1024 / 1024).toFixed(2)} MB)
                         </span>
