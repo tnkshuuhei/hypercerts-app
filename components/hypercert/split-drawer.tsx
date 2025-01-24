@@ -10,7 +10,6 @@ import { errorHasMessage } from "@/lib/errorHasMessage";
 import { errorHasReason } from "@/lib/errorHasReason";
 import { isChainIdSupported } from "@/lib/isChainIdSupported";
 import { useAccount } from "wagmi";
-import { useToast } from "@/components/ui/use-toast";
 import { useHypercertClient } from "@/hooks/use-hypercert-client";
 import { getAddress } from "viem";
 import {
