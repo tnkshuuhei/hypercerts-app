@@ -146,10 +146,12 @@ export function HypercertMintingForm({
   isBlueprint,
   presetValues,
   blueprintId,
+  transferRestrictions = TransferRestrictions.FromCreatorOnly,
 }: {
   isBlueprint?: boolean;
   presetValues?: HypercertFormValues;
   blueprintId?: number;
+  transferRestrictions?: TransferRestrictions;
 }) {
   console.log("presetValues", presetValues);
   const [currentStep, setCurrentStep] = useState(1);
@@ -288,11 +290,12 @@ export function HypercertMintingForm({
     //     return;
     //   }
     // }
+
     if (!isBlueprint) {
       await mintHypercert({
         metaData: formattedMetadata.data!,
         units: DEFAULT_NUM_FRACTIONS,
-        transferRestrictions: TransferRestrictions.FromCreatorOnly,
+        transferRestrictions,
         blueprintId,
         allowlistRecords:
           values.allowlistURL ||
