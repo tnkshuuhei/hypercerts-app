@@ -16,6 +16,8 @@ import localFont from "next/font/local";
 import { headers } from "next/headers";
 import { cookieToInitialState } from "wagmi";
 
+import { VercelAnalytics } from "@/lib/VercelAnalytics";
+
 const instrumentSerif = Instrument_Serif({
   weight: "400",
   display: "swap",
@@ -69,6 +71,7 @@ export default function RootLayout({
             <MobileNav />
             <Footer />
             <Toaster />
+            <VercelAnalytics />
           </StepProcessDialogProvider>
         </Web3ModalProvider>
       </body>

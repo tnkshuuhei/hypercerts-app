@@ -7,28 +7,23 @@ interface CommentsProps {
   comments?: string;
 }
 
-export default function Comments({ comments }: CommentsProps) {
+export default function CreatorFeedDescription({ comments }: CommentsProps) {
   const [showFullComments, setShowFullComments] = useState(false);
   if (!comments) return null;
+
+  const isLong = comments.length > 200;
 
   const truncatedComments = truncate(comments, {
     length: 200,
     separator: "...",
   });
 
-  const showFullCommentsButton = showFullComments ? (
+  const showFullCommentsButton = (
     <button
       className="text-xs font-medium text-slate-700"
-      onClick={() => setShowFullComments(false)}
+      onClick={() => setShowFullComments((prev) => !prev)}
     >
-      Show less
-    </button>
-  ) : (
-    <button
-      className="text-xs font-medium text-slate-700"
-      onClick={() => setShowFullComments(true)}
-    >
-      Show full comments
+      {showFullComments ? "Show less" : "Show full comments"}
     </button>
   );
 
@@ -39,9 +34,9 @@ export default function Comments({ comments }: CommentsProps) {
           {showFullComments ? comments : truncatedComments}
         </div>
       </div>
-      <div>
+      {isLong && (
         <div className="flex justify-center">{showFullCommentsButton}</div>
-      </div>
+      )}
     </div>
   );
 }

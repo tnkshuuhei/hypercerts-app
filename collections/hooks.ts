@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { CollectionCreateFormValues } from "@/components/collections/collection-form";
 import { HYPERCERTS_API_URL_REST } from "@/configs/hypercerts";
 import { useAccount, useSignTypedData } from "wagmi";
-import revalidatePathServerAction from "@/app/actions";
+import { revalidatePathServerAction } from "@/app/actions/revalidatePathServerAction";
 import { useStepProcessDialogContext } from "@/components/global/step-process-dialog";
 import { useRouter } from "next/navigation";
 import { isParseableNumber } from "@/lib/isParseableInteger";
@@ -129,8 +129,14 @@ export const useCreateHyperboard = () => {
           {
             title: data.title,
             description: data.description,
-            hypercerts,
-            blueprints,
+            hypercerts: hypercerts.map((hc) => ({
+              hypercertId: hc.hypercertId,
+              factor: hc.factor as number,
+            })),
+            blueprints: blueprints.map((bp) => ({
+              blueprintId: bp.blueprintId,
+              factor: bp.factor as number,
+            })),
           },
         ],
         borderColor: data.borderColor,
@@ -314,8 +320,14 @@ export const useUpdateHyperboard = () => {
             id: data.collectionId,
             title: data.title,
             description: data.description,
-            hypercerts,
-            blueprints,
+            hypercerts: hypercerts.map((hc) => ({
+              hypercertId: hc.hypercertId,
+              factor: hc.factor as number,
+            })),
+            blueprints: blueprints.map((bp) => ({
+              blueprintId: bp.blueprintId,
+              factor: bp.factor as number,
+            })),
           },
         ],
         borderColor: data.borderColor,

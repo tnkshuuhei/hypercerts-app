@@ -2,9 +2,10 @@ import { cookieStorage, createConfig, createStorage, http } from "wagmi";
 
 import { siteConfig } from "./site";
 import { walletConnect } from "wagmi/connectors";
-import { HttpTransport } from "viem";
+import { fallback, HttpTransport } from "viem";
 import { mainnet } from "viem/chains";
 import { SUPPORTED_CHAINS } from "@/configs/constants";
+import { EvmClientFactory } from "@/lib/evmClient";
 
 const metadata = {
   name: siteConfig.name,
@@ -32,7 +33,9 @@ export const config = createConfig({
   }),
   transports: supportedChainsWithMainnetForEnsLookup.reduce(
     (acc, chain) => {
-      acc[chain.id] = http();
+      const urls = EvmClientFactory.getAllAvailableUrls(chain.id);
+      // @ts-expect-error
+      acc[chain.id] = fallback([...urls.map((url) => http(url)), http()]);
       return acc;
     },
     {} as Record<number, HttpTransport>,

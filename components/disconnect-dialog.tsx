@@ -41,7 +41,7 @@ export default function DisconnectDialog({
       {/* {customConnectors.map((connector) => ( */}
       {address && (
         <p className="text-sm text-muted-foreground uppercase font-semibold tracking-wide">
-          {truncateEthereumAddress(address)}
+          {truncateEthereumAddress(address as `0x${string}`)}
         </p>
       )}
       <Button
