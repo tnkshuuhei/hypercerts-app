@@ -5,7 +5,6 @@ import { VariablesOf, graphql, readFragment } from "@/lib/graphql";
 import { HYPERCERTS_API_URL_GRAPH } from "@/configs/hypercerts";
 import { HypercertListFragment } from "@/hypercerts/fragments/hypercert-list.fragment";
 import request from "graphql-request";
-// import { EVALUATIONS_SCHEMA_UID } from "@/configs/eas";
 
 export type ClaimsOrderBy =
   | "created_asc"
