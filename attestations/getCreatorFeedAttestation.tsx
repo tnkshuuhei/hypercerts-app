@@ -1,20 +1,16 @@
-import "server-only";
-
 import { graphql, readFragment } from "@/lib/graphql";
-
 import { AttestationListFragment } from "./fragments/attestation-list.fragment";
 import request from "graphql-request";
-import { HYPERCERTS_API_URL_GRAPH } from "@/configs/hypercerts";
 import { Address, Hex } from "viem";
+import { HYPERCERTS_API_URL_GRAPH } from "@/configs/hypercerts";
 
 const query = graphql(
   `
-    query AttestationsQuery(
-      $first: Int!
-      $offset: Int!
-      $where: AttestationWhereInput
-    ) {
-      attestations(where: $where, first: $first, offset: $offset) {
+    query AttestationsQuery($where: AttestationWhereInput) {
+      attestations(
+        where: $where
+        sort: { by: { creation_block_timestamp: descending } }
+      ) {
         count
         data {
           ...AttestationListFragment
@@ -24,10 +20,9 @@ const query = graphql(
   `,
   [AttestationListFragment],
 );
-
-export interface GetAttestationsParams {
-  first: number;
-  offset: number;
+interface GetAttestationsParams {
+  first?: number;
+  offset?: number;
   filter?: {
     chainId?: bigint;
     contractAddress?: Address;
@@ -36,7 +31,7 @@ export interface GetAttestationsParams {
   };
 }
 
-export async function getAttestations({
+export async function getCreatorFeedAttestations({
   first,
   offset,
   filter,

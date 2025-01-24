@@ -97,6 +97,8 @@ function createFilter({
   }
   if (filter === "evaluated") {
     where.attestations_count = { gte: 1 };
+    // TODO: Specify evaluations schemaId so that '/explore' page can only filter evaluation attestations
+    // where.eas_schema = { uid: { eq: EVALUATIONS_SCHEMA_UID } };
   }
   if (chainId) {
     where.contract = {

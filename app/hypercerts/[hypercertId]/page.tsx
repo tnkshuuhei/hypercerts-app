@@ -12,6 +12,8 @@ import ErrorState from "@/components/global/error-state";
 import HypercertListings from "@/components/marketplace/hypercert-listings";
 import HypercertEvaluations from "@/components/evaluations/hypercert-evaluations";
 import { Separator } from "@/components/ui/separator";
+import CreatorFeedButton from "@/components/creator-feed/creator-feed-button";
+import CreatorFeeds from "@/components/creator-feed/creator-feeds";
 
 type Props = {
   params: { hypercertId: string };
@@ -40,6 +42,7 @@ export async function generateMetadata(
 }
 export default async function HypercertPage({ params, searchParams }: Props) {
   const { hypercertId } = params;
+
   const [hypercert] = await Promise.all([getHypercert(hypercertId)]);
 
   if (!hypercert) {
@@ -82,6 +85,18 @@ export default async function HypercertPage({ params, searchParams }: Props) {
         searchParams={searchParams}
         invalidated={false}
       />
+      <Separator />
+      {/* creator feed */}
+      <div className="flex justify-between mb-4">
+        <h2 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
+          {"CREATOR'S FEED"}
+        </h2>
+        <CreatorFeedButton
+          hypercertId={hypercertId}
+          creatorAddress={hypercert.creator_address!}
+        />
+      </div>
+      <CreatorFeeds hypercertId={hypercertId} />
     </main>
   );
 }

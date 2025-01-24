@@ -9,6 +9,7 @@ import {
 } from "@/attestations/getAttestations";
 import { getAddress } from "viem";
 import EvaluationsList from "./evaluations-list";
+import { EVALUATIONS_SCHEMA_UID } from "@/configs/eas";
 
 function EvaluationsListNoResults() {
   return "No evaluations found";
@@ -39,6 +40,7 @@ export default async function HypercertEvaluations({
       chainId: BigInt(chainId),
       contractAddress: getAddress(contractAddress),
       tokenId: BigInt(tokenId),
+      schemaId: EVALUATIONS_SCHEMA_UID,
     },
     first: EVALUATIONS_PER_PAGE,
     offset: offset,
