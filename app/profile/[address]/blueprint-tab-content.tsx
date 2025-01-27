@@ -1,6 +1,5 @@
 import React, { Suspense } from "react";
 import { ProfileSubTabKey, subTabs } from "@/app/profile/[address]/tabs";
-import ExploreListSkeleton from "@/components/explore/explore-list-skeleton";
 import { SubTabsWithCount } from "@/components/profile/sub-tabs-with-count";
 import { getBlueprints } from "@/blueprints/getBlueprints";
 import { CreateBlueprintButton } from "@/components/blueprints/buttons";
@@ -10,6 +9,7 @@ import Pagination from "@/components/global/pagination/pagination";
 import { BlueprintsCreatedTable } from "@/components/blueprints/blueprints-created-table";
 import { BlueprintsClaimableTable } from "@/components/blueprints/blueprints-claimable-table";
 import { BlueprintsClaimedTable } from "@/components/blueprints/blueprints-claimed-table";
+import { TableSkeleton } from "@/components/global/table-skeleton";
 
 const BlueprintTabContentInner = async ({
   address,
@@ -111,7 +111,7 @@ const BlueprintsTabContent = ({
   searchParams: Record<string, string>;
 }) => {
   return (
-    <Suspense fallback={<ExploreListSkeleton length={9} />}>
+    <Suspense fallback={<TableSkeleton />}>
       <BlueprintTabContentInner
         address={address}
         activeTab={activeTab}
