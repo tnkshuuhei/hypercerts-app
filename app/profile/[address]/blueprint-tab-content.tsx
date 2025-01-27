@@ -92,7 +92,8 @@ const BlueprintTabContentInner = async ({
             searchParams={searchParams}
             totalItems={currentCount || 0}
             itemsPerPage={BLUEPRINTS_PER_PAGE}
-            basePath={`/profile/${address}/blueprints`}
+            basePath={`/profile/${address}`}
+            currentPage={currentPage}
           />
         </div>
       )}
