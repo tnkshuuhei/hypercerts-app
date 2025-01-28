@@ -455,7 +455,7 @@ const AdvancedAndSubmit = ({ form, isBlueprint }: FormStepsProps) => {
       <Collapsible
         open={isAdvancedOpen}
         onOpenChange={setIsAdvancedOpen}
-        className="space-y-2"
+        className="space-y-4 border-t border-b border-slate-300 py-2"
       >
         <div className="flex items-center justify-between">
           <h4 className="text-sm font-semibold">Advanced Options</h4>
