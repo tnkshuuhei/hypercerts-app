@@ -10,6 +10,7 @@ import { Button } from "../ui/button";
 import Link from "next/link";
 import { TrashIcon } from "lucide-react";
 import { useDeleteBlueprint } from "@/blueprints/hooks/deleteBlueprint";
+import { ChainFactory } from "@/lib/chainFactory";
 
 export const BlueprintsClaimableTable = ({
   blueprints,
@@ -41,6 +42,19 @@ export const BlueprintsClaimableTable = ({
         return fromUnixTime(Number(row.getValue()) / 1000)
           .toISOString()
           .split("T")[0];
+      },
+    }),
+    columnHelper.accessor("admins", {
+      header: "Chain",
+      id: "chain",
+      cell: (row) => {
+        const admins = row.getValue();
+        const chain = ChainFactory.getChain(Number(admins[0].chain_id));
+        return (
+          <div className="bg-slate-100 rounded-md px-2 py-1 w-fit cursor-default">
+            {chain.name}
+          </div>
+        );
       },
     }),
     columnHelper.display({

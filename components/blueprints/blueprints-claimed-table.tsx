@@ -6,6 +6,7 @@ import React from "react";
 import EthAddress from "@/components/eth-address";
 import { fromUnixTime } from "date-fns";
 import { BlueprintsTable } from "./blueprints-table";
+import { ChainFactory } from "@/lib/chainFactory";
 
 export const BlueprintsClaimedTable = ({
   blueprints,
@@ -29,6 +30,19 @@ export const BlueprintsClaimedTable = ({
       cell: (row) => {
         const address = row.getValue()[0].address;
         return <EthAddress address={address} />;
+      },
+    }),
+    columnHelper.accessor("admins", {
+      header: "Chain",
+      id: "chain",
+      cell: (row) => {
+        const admins = row.getValue();
+        const chain = ChainFactory.getChain(Number(admins[0].chain_id));
+        return (
+          <div className="bg-slate-100 rounded-md px-2 py-1 w-fit cursor-default">
+            {chain.name}
+          </div>
+        );
       },
     }),
     columnHelper.accessor("created_at", {

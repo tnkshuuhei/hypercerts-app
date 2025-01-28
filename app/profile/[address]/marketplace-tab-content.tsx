@@ -7,6 +7,7 @@ import UserDealsList from "@/components/marketplace/user-deals-list";
 import ExploreListSkeleton from "@/components/explore/explore-list-skeleton";
 import { SubTabsWithCount } from "@/components/profile/sub-tabs-with-count";
 import { CurrencyButtons } from "@/components/currency-buttons";
+import { TableSkeleton } from "@/components/global/table-skeleton";
 
 const MarketplaceTabContentInner = async ({
   address,
@@ -42,7 +43,7 @@ const MarketplaceTabContentInner = async ({
         tabs={marketplaceSubTabs}
       />
       {activeTab === "marketplace-listings" && (
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<TableSkeleton />}>
           <div className="flex justify-end">
             <CurrencyButtons />
           </div>
@@ -73,7 +74,15 @@ const MarketplaceTabContent = ({
   activeTab: ProfileSubTabKey;
 }) => {
   return (
-    <Suspense fallback={<ExploreListSkeleton length={9} />}>
+    <Suspense
+      fallback={
+        activeTab === "marketplace-listings" ? (
+          <TableSkeleton />
+        ) : (
+          <ExploreListSkeleton length={9} />
+        )
+      }
+    >
       <MarketplaceTabContentInner address={address} activeTab={activeTab} />
     </Suspense>
   );
