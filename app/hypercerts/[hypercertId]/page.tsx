@@ -57,7 +57,7 @@ export default async function HypercertPage({ params, searchParams }: Props) {
   return (
     <main className="flex flex-col p-8 md:px-24 md:pt-14 pb-24 space-y-4 flex-1">
       <HypercertDetails hypercertId={hypercertId} />
-      <Accordion type="single" collapsible className="w-full">
+      <Accordion type="multiple" defaultValue={["item-3"]} className="w-full">
         <AccordionItem value="item-1">
           {/* creator feed */}
           <AccordionTrigger className="uppercase text-sm text-slate-500 font-medium tracking-wider">
