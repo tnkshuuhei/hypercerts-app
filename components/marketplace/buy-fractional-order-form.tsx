@@ -200,7 +200,15 @@ export const BuyFractionalOrderForm = ({
                 % to buy
               </h5>
               <FormControl>
-                <Input {...field} />
+                <Input
+                  {...field}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value === "" || /^\d*\.?\d*$/.test(value)) {
+                      field.onChange(value);
+                    }
+                  }}
+                />
               </FormControl>
               <div className="text-sm text-slate-500">
                 You will buy{" "}
@@ -233,9 +241,11 @@ export const BuyFractionalOrderForm = ({
                   )}
                   onChange={(e) => {
                     const value = e.target.value;
-                    field.onChange(
-                      parseUnits(value, currency.decimals).toString(),
-                    );
+                    if (value === "" || /^\d*\.?\d*$/.test(value)) {
+                      field.onChange(
+                        parseUnits(value, currency.decimals).toString(),
+                      );
+                    }
                   }}
                 />
               </FormControl>
