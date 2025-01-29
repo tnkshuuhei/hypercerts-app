@@ -42,17 +42,102 @@ import {
 } from "@/components/ui/alert-dialog";
 import { clearCacheAfterListing } from "@/app/actions/clearCacheAfterListing";
 
-type State = {
-  fractionId: string;
-  price: string;
-  currency: string;
-  unitsForSale?: string;
-  unitsMinPerOrder?: string;
-  unitsMaxPerOrder?: string;
-  formIsValid: boolean;
-  startDateTime?: Date;
-  endDateTime?: Date;
-};
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+
+export const listingFormSchema = z
+  .object({
+    fractionId: z.string(),
+    price: z
+      .string()
+      .refine(
+        (val) => /^\d*\.?\d*$/.test(val) && Number(val) > 0,
+        "Must be a positive number",
+      ),
+    currency: z.string(),
+    unitsForSale: z
+      .string()
+      .refine(
+        (val) => /^\d*\.?\d*$/.test(val) && Number(val) > 0,
+        "Must be a positive number",
+      )
+      .refine(
+        (val) => BigInt(val) % BigInt(1) === BigInt(0),
+        "Must be an integer",
+      ),
+    unitsMinPerOrder: z
+      .string()
+      .refine(
+        (val) => /^\d*\.?\d*$/.test(val) && Number(val) > 0,
+        "Must be a positive number",
+      )
+      .refine(
+        (val) => BigInt(val) % BigInt(1) === BigInt(0),
+        "Must be an integer",
+      ),
+    unitsMaxPerOrder: z
+      .string()
+      .refine(
+        (val) => /^\d*\.?\d*$/.test(val) && Number(val) > 0,
+        "Must be a positive number",
+      )
+      .refine(
+        (val) => BigInt(val) % BigInt(1) === BigInt(0),
+        "Must be an integer",
+      ),
+    startDateTime: z.date().superRefine((date, ctx) => {
+      const now = new Date();
+      const startTime = Math.floor(date.getTime() / 1000);
+      const currentTime = Math.floor(now.getTime() / 1000);
+
+      if (startTime < currentTime) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Start time must be in the future",
+        });
+      }
+    }),
+    endDateTime: z.date(),
+  })
+  .refine(
+    (data) => {
+      const now = new Date();
+      const endTime = Math.floor(data.endDateTime.getTime() / 1000);
+      const currentTime = Math.floor(now.getTime() / 1000);
+      const startTime = Math.floor(data.startDateTime.getTime() / 1000);
+
+      return endTime > currentTime && endTime > startTime;
+    },
+    {
+      message: "End time must be in the future and after the start time",
+      path: ["endDateTime"],
+    },
+  )
+  .refine(
+    (data) => {
+      const minOrder = BigInt(data.unitsMinPerOrder);
+      const maxOrder = BigInt(data.unitsMaxPerOrder);
+      const forSale = BigInt(data.unitsForSale);
+      return minOrder <= maxOrder && maxOrder <= forSale;
+    },
+    {
+      message:
+        "Min units must be less than max units, and max units must be less than or equal to units for sale",
+      path: ["unitsMaxPerOrder"],
+    },
+  );
+
+export type ListingFormValues = z.infer<typeof listingFormSchema>;
 
 function ListDialogInner({
   hypercert,
@@ -75,183 +160,126 @@ function ListDialogInner({
   const fractionsOwnedByUser = fractions.filter(
     (fraction) => fraction.owner_address === address,
   );
-
-  const [state, setState] = useState<State>(() => {
-    const currency = Object.values(client.currencies)[0];
-    const defaultFraction = fractionsOwnedByUser[0];
-    const unitsForSale = defaultFraction?.units || "0";
-    const minimumPrice = getMinimumPrice(
-      unitsForSale,
-      chainId,
-      currency.address,
-    );
-    return {
-      fractionId: defaultFraction?.fraction_id || "",
+  const form = useForm<z.infer<typeof listingFormSchema>>({
+    resolver: zodResolver(listingFormSchema),
+    mode: "onChange",
+    defaultValues: {
+      fractionId: fractionsOwnedByUser[0]?.fraction_id || "",
       price: "",
-      currency: currency.address,
-      unitsForSale,
+      currency: Object.values(client.currencies)[0].address,
+      unitsForSale: fractionsOwnedByUser[0]?.units || "0",
       unitsMinPerOrder: "1",
-      unitsMaxPerOrder: defaultFraction?.units || "",
-      formIsValid: true,
-      minimumPrice,
-      startDateTime: new Date(Date.now()),
-      endDateTime: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
-    };
+      unitsMaxPerOrder: fractionsOwnedByUser[0]?.units || "0",
+      startDateTime: new Date(Date.now() + 1000 * 60 * 60 * 24), // 24 hours (1 day) in the future
+      endDateTime: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30), // 30 days in the future
+    },
   });
 
   const selectedFraction = fractions.find(
-    (fraction) => fraction.fraction_id === state.fractionId,
+    (fraction) => fraction.fraction_id === form.watch("fractionId"),
   );
 
-  const floatPrice = Number.parseFloat(state.price);
-
   const isPriceValid =
-    state.price !== undefined &&
-    !isNaN(floatPrice) &&
-    state.currency !== undefined;
+    form.watch("price") !== undefined &&
+    !isNaN(Number.parseFloat(form.watch("price"))) &&
+    form.watch("currency") !== undefined;
 
   const handleListButtonClick = async () => {
-    if (
-      !createFractionalMakerAsk ||
-      !isPriceValid ||
-      !state.formIsValid ||
-      !state.fractionId ||
-      !state.unitsMinPerOrder ||
-      !state.unitsForSale ||
-      !state.startDateTime ||
-      !state.endDateTime
-    ) {
-      return;
-    }
-
-    const selectedFraction = fractions.find(
-      (fraction) => fraction.fraction_id === state.fractionId,
-    );
-
-    if (!selectedFraction?.units) {
-      console.error("Unknown units");
-      return;
-    }
-
-    const unitsInFraction = BigInt(selectedFraction.units);
-
-    try {
-      await createFractionalMakerAsk({
-        fractionId: state.fractionId,
-        minUnitAmount: state.unitsMinPerOrder,
-        maxUnitAmount: state.unitsMaxPerOrder || state.unitsForSale,
-        minUnitsToKeep: (
-          unitsInFraction - BigInt(state.unitsForSale)
-        ).toString(),
-        price: state.price,
-        sellLeftoverFraction: false,
-        currency: state.currency,
-        unitsForSale: state.unitsForSale,
-        startDateTime: Math.floor(state.startDateTime.getTime() / 1000),
-        endDateTime: Math.floor(state.endDateTime.getTime() / 1000),
-      });
-
-      setIsOpen(false);
-      toast({
-        description: "Listing created successfully",
-      });
-      clearCacheAfterListing(hypercert.hypercert_id);
-    } catch (e) {
-      console.error(e);
-      toast({
-        description:
-          (e as Error).toString() ||
-          "Something went wrong while creating the order",
-      });
-    }
+    // if (
+    //   !createFractionalMakerAsk ||
+    //   !isPriceValid ||
+    //   !state.formIsValid ||
+    //   !state.fractionId ||
+    //   !state.unitsMinPerOrder ||
+    //   !state.unitsForSale ||
+    //   !state.startDateTime ||
+    //   !state.endDateTime
+    // ) {
+    //   return;
+    // }
+    // const selectedFraction = fractions.find(
+    //   (fraction) => fraction.fraction_id === form.watch("fractionId"),
+    // );
+    // if (!selectedFraction?.units) {
+    //   console.error("Unknown units");
+    //   return;
+    // }
+    // const unitsInFraction = BigInt(selectedFraction.units);
+    // try {
+    //   await createFractionalMakerAsk({
+    //     fractionId: state.fractionId,
+    //     minUnitAmount: state.unitsMinPerOrder,
+    //     maxUnitAmount: state.unitsMaxPerOrder || state.unitsForSale,
+    //     minUnitsToKeep: (
+    //       unitsInFraction - BigInt(state.unitsForSale)
+    //     ).toString(),
+    //     price: state.price,
+    //     sellLeftoverFraction: false,
+    //     currency: state.currency,
+    //     unitsForSale: state.unitsForSale,
+    //     startDateTime: Math.floor(state.startDateTime.getTime() / 1000),
+    //     endDateTime: Math.floor(state.endDateTime.getTime() / 1000),
+    //   });
+    //   setIsOpen(false);
+    //   toast({
+    //     description: "Listing created successfully",
+    //   });
+    //   clearCacheAfterListing(hypercert.hypercert_id);
+    // } catch (e) {
+    //   console.error(e);
+    //   toast({
+    //     description:
+    //       (e as Error).toString() ||
+    //       "Something went wrong while creating the order",
+    //   });
+    // }
   };
 
   useEffect(() => {
     // Update the minimum price when the currency changes
     const minimumPrice = getMinimumPrice(
-      state.unitsForSale,
+      form.watch("unitsForSale"),
       chainId,
-      state.currency,
+      form.watch("currency"),
     );
 
-    setState((currentState) => ({
-      ...currentState,
-      price:
-        currentState.price < minimumPrice ? minimumPrice : currentState.price,
-    }));
-  }, [state.currency, state.unitsForSale]);
+    form.setValue(
+      "price",
+      form.watch("price") < minimumPrice ? minimumPrice : form.watch("price"),
+    );
+  }, [form.watch("currency"), form.watch("unitsForSale")]);
 
   useEffect(() => {
-    setState((state) => {
-      const fraction = fractions.find(
-        (fraction) => fraction.fraction_id === state.fractionId,
-      );
+    form.setValue("unitsForSale", selectedFraction?.units || "0");
+    form.setValue("unitsMaxPerOrder", selectedFraction?.units || "0");
+    form.setValue("unitsMinPerOrder", "1");
+  }, [form.watch("fractionId"), fractions]);
 
-      if (!fraction) {
-        return state;
-      }
-
-      const unitsForSale = fraction?.units || "0";
-
-      return {
-        ...state,
-        unitsForSale,
-        unitsMaxPerOrder: fraction.units || "",
-        unitsMinPerOrder: "1",
-      };
-    });
-  }, [state.fractionId, fractions]);
-
-  const currency = getCurrencyByAddress(chainId, state.currency);
+  const currency = getCurrencyByAddress(chainId, form.watch("currency"));
 
   if (!currency) {
     return null;
   }
 
   const minimumPrice = getMinimumPrice(
-    state.unitsForSale,
+    form.watch("unitsForSale"),
     chainId,
-    state.currency,
+    form.watch("currency"),
   );
 
   const actualPricePerUnit =
-    parseUnits(state.price, currency.decimals) /
-    BigInt(state.unitsForSale || 1);
-  const actualTotalPrice = actualPricePerUnit * BigInt(state.unitsForSale || 0);
+    parseUnits(form.watch("price"), currency.decimals) /
+    BigInt(form.watch("unitsForSale") || 1);
+  const actualTotalPrice =
+    actualPricePerUnit * BigInt(form.watch("unitsForSale") || 0);
   const actualPriceForListing = formatUnits(
     actualTotalPrice,
     currency.decimals,
   );
 
-  const createButtonEnabled =
-    isPriceValid && state.formIsValid && actualPricePerUnit !== BigInt(0);
-
-  const validateStartDateTime = (): [boolean, React.ReactNode] => {
-    if (!state.startDateTime) {
-      return [false, "Must be a valid date and time."];
-    }
-
-    return [true, "Sale will start at the selected moment."];
-  };
-
-  const validateEndDateTime = (): [boolean, React.ReactNode] => {
-    if (!state.endDateTime) {
-      return [false, "Must be a valid date and time."];
-    }
-
-    if (state.endDateTime <= new Date()) {
-      return [false, "Must be in the future."];
-    }
-
-    if (state.startDateTime && state.endDateTime <= state.startDateTime) {
-      return [false, "Must be after the start of the sale."];
-    }
-
-    return [true, "Sale will end at the selected moment."];
-  };
-
-  const startDateTimeValidation = validateStartDateTime();
-  const endDateTimeValidation = validateEndDateTime();
+  async function onSubmit(values: ListingFormValues) {
+    console.log("values", values);
+  }
 
   return (
     <DialogContent className="gap-5 max-w-2xl max-h-full overflow-y-auto">
@@ -273,192 +301,202 @@ function ListDialogInner({
           like to list on the marketplace?
         </div>
       )}
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <table className="text-right w-full">
+            <tbody>
+              <tr className="h-10">
+                <td className="w-[30%]"></td>
+                <td className="w-[20%]">Fraction Id</td>
+                <td className="w-[20%]">Units</td>
+                <td className="pr-3 w-[30%]">Hypercert share</td>
+              </tr>
 
-      <table className="text-right">
-        <tbody>
-          <tr className="h-10">
-            <td className="w-[30%]"></td>
-            <td className="w-[20%]">Fraction Id</td>
-            <td className="w-[20%]">Units</td>
-            <td className="pr-3 w-[30%]">Hypercert share</td>
-          </tr>
+              {fractionsOwnedByUser.map((fraction) => (
+                <ListFractionSelect
+                  fraction={fraction}
+                  units={units}
+                  key={fraction.fraction_id}
+                  selected={form.watch("fractionId") === fraction.fraction_id}
+                  setSelected={(fractionId) => {
+                    form.setValue("fractionId", fractionId);
+                  }}
+                />
+              ))}
+            </tbody>
+          </table>
 
-          {fractionsOwnedByUser.map((fraction) => (
-            <ListFractionSelect
-              fraction={fraction}
-              units={units}
-              key={fraction.fraction_id}
-              selected={state.fractionId === fraction.fraction_id}
-              setSelected={(fractionId) => setState({ ...state, fractionId })}
+          <div className="flex flex-col gap-2">
+            <h5 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
+              ASKED SHARE PRICE
+            </h5>
+            <ListAskedPrice
+              price={form.watch("price")}
+              currency={form.watch("currency")}
+              setPrice={(price) => form.setValue("price", price)}
+              setCurrency={(currency) => form.setValue("currency", currency)}
             />
-          ))}
-        </tbody>
-      </table>
-
-      <div className="flex flex-col gap-2">
-        <h5 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
-          ASKED SHARE PRICE
-        </h5>
-        <ListAskedPrice
-          price={state.price}
-          currency={state.currency}
-          setPrice={(price) => setState({ ...state, price })}
-          setCurrency={(currency) => setState({ ...state, currency })}
-        />
-        {selectedFraction && isPriceValid && (
-          <div className="text-sm text-slate-500 flex align-middle w-full">
-            Creating this listing will offer&nbsp;
-            <b>
-              <FormattedUnits>{state.unitsForSale}</FormattedUnits>
-            </b>
-            &nbsp;units for sale at a total price of&nbsp;
-            <b>
-              {actualPriceForListing}&nbsp;
-              {getCurrencyByAddress(chainId, state.currency)?.symbol}
-            </b>
-            .
-            {actualPriceForListing !== state.price && (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger className={"ml-auto"}>
-                    <InfoIcon className="ml-auto text-black" />
-                  </TooltipTrigger>
-                  <TooltipContent className="max-w-[300px]" side={"left"}>
-                    Due to rounding, your listing will actually be for{" "}
-                    <b>
-                      {actualPriceForListing}{" "}
-                      {getCurrencyByAddress(chainId, state.currency)?.symbol}
-                    </b>
-                    . To prevent this, use a price that is a multiple of{" "}
-                    <b>
-                      {minimumPrice}{" "}
-                      {getCurrencyByAddress(chainId, state.currency)?.symbol}
-                    </b>
-                    .
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+            {selectedFraction && isPriceValid && (
+              <div className="text-sm text-slate-500 flex align-middle w-full">
+                Creating this listing will offer&nbsp;
+                <b>
+                  <FormattedUnits>{form.watch("unitsForSale")}</FormattedUnits>
+                </b>
+                &nbsp;units for sale at a total price of&nbsp;
+                <b>
+                  {actualPriceForListing}&nbsp;
+                  {
+                    getCurrencyByAddress(chainId, form.watch("currency"))
+                      ?.symbol
+                  }
+                </b>
+                .
+                {actualPriceForListing !== form.watch("price") && (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger className={"ml-auto"}>
+                        <InfoIcon className="ml-auto text-black" />
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-[300px]" side={"left"}>
+                        Due to rounding, your listing will actually be for{" "}
+                        <b>
+                          {actualPriceForListing}{" "}
+                          {
+                            getCurrencyByAddress(
+                              chainId,
+                              form.watch("currency"),
+                            )?.symbol
+                          }
+                        </b>
+                        . To prevent this, use a price that is a multiple of{" "}
+                        <b>
+                          {minimumPrice}{" "}
+                          {
+                            getCurrencyByAddress(
+                              chainId,
+                              form.watch("currency"),
+                            )?.symbol
+                          }
+                        </b>
+                        .
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
+              </div>
             )}
           </div>
-        )}
-      </div>
 
-      <div className="flex flex-col gap-3">
-        <h5 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
-          SALE STARTING TIME
-        </h5>
-        <DateTimePicker
-          onChange={(startDateTime) =>
-            setState((currentState) => ({
-              ...currentState,
-              startDateTime,
-            }))
-          }
-          value={state.startDateTime}
-        />
-        {startDateTimeValidation[0] ? (
-          <div className="text-sm text-slate-500">
-            {startDateTimeValidation[1]}
-          </div>
-        ) : (
-          <div className="text-sm text-red-500">
-            {startDateTimeValidation[1]}
-          </div>
-        )}{" "}
-      </div>
+          <FormField
+            control={form.control}
+            name="startDateTime"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <h5 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
+                  SALE STARTING TIME
+                </h5>
+                <FormControl>
+                  <DateTimePicker
+                    onChange={field.onChange}
+                    value={field.value}
+                  />
+                </FormControl>
+                <FormDescription>
+                  Sale will start at the selected moment.
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="endDateTime"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <h5 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
+                  SALE ENDING TIME
+                </h5>
+                <FormControl>
+                  <DateTimePicker
+                    onChange={field.onChange}
+                    value={field.value}
+                  />
+                </FormControl>
+                <FormDescription>
+                  Sale will end at the selected moment.
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <div className="flex flex-col gap-2">
+            <Accordion type="single" collapsible className="w-full">
+              <AccordionItem
+                value="item-1"
+                className="data-[state=open]:border-0"
+              >
+                <AccordionTrigger className="uppercase text-sm text-slate-500 font-medium tracking-wider">
+                  Advanced settings
+                </AccordionTrigger>
 
-      <div className="flex flex-col gap-3">
-        <h5 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
-          SALE ENDING TIME
-        </h5>
-        <DateTimePicker
-          onChange={(endDateTime) =>
-            setState((currentState) => ({ ...currentState, endDateTime }))
-          }
-          value={state.endDateTime}
-        />
-        {endDateTimeValidation[0] ? (
-          <div className="text-sm text-slate-500">
-            {endDateTimeValidation[1]}
+                <AccordionContent>
+                  <ListDialogSettingsForm
+                    control={form.control}
+                    units={selectedFraction?.units || "0"}
+                  />
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
           </div>
-        ) : (
-          <div className="text-sm text-red-500">{endDateTimeValidation[1]}</div>
-        )}{" "}
-      </div>
-      <div className="flex flex-col gap-2">
-        <Accordion type="single" collapsible className="w-full">
-          <AccordionItem value="item-1" className="data-[state=open]:border-0">
-            <AccordionTrigger className="uppercase text-sm text-slate-500 font-medium tracking-wider">
-              Advanced settings
-            </AccordionTrigger>
-            <AccordionContent>
-              <ListDialogSettingsForm
-                selectedFractionUnits={selectedFraction?.units || ""}
-                unitsForSale={state.unitsForSale}
-                unitsMinPerOrder={state.unitsMinPerOrder}
-                unitsMaxPerOrder={state.unitsMaxPerOrder}
-                setUnitsForSale={(unitsForSale) =>
-                  setState({ ...state, unitsForSale })
-                }
-                setUnitsMinPerOrder={(unitsMinPerOrder) =>
-                  setState({ ...state, unitsMinPerOrder })
-                }
-                setUnitsMaxPerOrder={(unitsMaxPerOrder) =>
-                  setState({ ...state, unitsMaxPerOrder })
-                }
-                setFormIsValid={(formIsValid) =>
-                  setState({ ...state, formIsValid })
-                }
-              />
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
-      </div>
 
-      <div className="flex gap-2 justify-evenly">
-        <Button
-          variant={"outline"}
-          className="w-full"
-          onClick={() => setIsOpen(false)}
-        >
-          Cancel
-        </Button>
-        <AlertDialog>
-          <AlertDialogTrigger
-            disabled={!createButtonEnabled}
-            className={"w-full"}
-          >
-            <Button disabled={!createButtonEnabled} className="w-full">
-              {isPending && (
-                <LoaderCircle className="h-4 w-4 animate-spin mr-1" />
-              )}
-              {isPending ? "Creating listing" : "Create listing"}
+          <div className="flex gap-2 justify-evenly">
+            <Button
+              variant={"outline"}
+              className="w-full"
+              onClick={() => setIsOpen(false)}
+            >
+              Cancel
             </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Confirm listing</AlertDialogTitle>
-              <AlertDialogDescription>
-                You will sell{" "}
-                <b>
-                  <FormattedUnits>{state.unitsForSale}</FormattedUnits>
-                </b>{" "}
-                units of your hypercert for{" "}
-                <b>
-                  {actualPriceForListing} {currency.symbol}
-                </b>{" "}
-                in total.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={handleListButtonClick}>
-                Continue
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      </div>
+            <AlertDialog>
+              <AlertDialogTrigger
+                disabled={!form.formState.isValid}
+                className={"w-full"}
+              >
+                <Button disabled={!form.formState.isValid} className="w-full">
+                  {isPending && (
+                    <LoaderCircle className="h-4 w-4 animate-spin mr-1" />
+                  )}
+                  {isPending ? "Creating listing" : "Create listing"}
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Confirm listing</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    You will sell{" "}
+                    <b>
+                      <FormattedUnits>
+                        {form.getValues("unitsForSale")}
+                      </FormattedUnits>
+                    </b>{" "}
+                    units of your hypercert for{" "}
+                    <b>
+                      {actualPriceForListing} {currency.symbol}
+                    </b>{" "}
+                    in total.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleListButtonClick}>
+                    Continue
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        </form>
+      </Form>
     </DialogContent>
   );
 }
