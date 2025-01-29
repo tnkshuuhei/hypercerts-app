@@ -15,7 +15,7 @@ import ListFractionSelect from "./list-fraction-select";
 import { InfoIcon, LoaderCircle } from "lucide-react";
 import { useAccount } from "wagmi";
 import { useCreateFractionalMakerAsk } from "@/marketplace/hooks";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useHypercertExchangeClient } from "@/hooks/use-hypercert-exchange-client";
 import { toast } from "@/components/ui/use-toast";
 import { getCurrencyByAddress, getMinimumPrice } from "@/marketplace/utils";
@@ -41,7 +41,6 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { clearCacheAfterListing } from "@/app/actions/clearCacheAfterListing";
-
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -51,7 +50,6 @@ import {
   FormDescription,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 
@@ -184,55 +182,36 @@ function ListDialogInner({
     !isNaN(Number.parseFloat(form.watch("price"))) &&
     form.watch("currency") !== undefined;
 
-  const handleListButtonClick = async () => {
-    // if (
-    //   !createFractionalMakerAsk ||
-    //   !isPriceValid ||
-    //   !state.formIsValid ||
-    //   !state.fractionId ||
-    //   !state.unitsMinPerOrder ||
-    //   !state.unitsForSale ||
-    //   !state.startDateTime ||
-    //   !state.endDateTime
-    // ) {
-    //   return;
-    // }
-    // const selectedFraction = fractions.find(
-    //   (fraction) => fraction.fraction_id === form.watch("fractionId"),
-    // );
-    // if (!selectedFraction?.units) {
-    //   console.error("Unknown units");
-    //   return;
-    // }
-    // const unitsInFraction = BigInt(selectedFraction.units);
-    // try {
-    //   await createFractionalMakerAsk({
-    //     fractionId: state.fractionId,
-    //     minUnitAmount: state.unitsMinPerOrder,
-    //     maxUnitAmount: state.unitsMaxPerOrder || state.unitsForSale,
-    //     minUnitsToKeep: (
-    //       unitsInFraction - BigInt(state.unitsForSale)
-    //     ).toString(),
-    //     price: state.price,
-    //     sellLeftoverFraction: false,
-    //     currency: state.currency,
-    //     unitsForSale: state.unitsForSale,
-    //     startDateTime: Math.floor(state.startDateTime.getTime() / 1000),
-    //     endDateTime: Math.floor(state.endDateTime.getTime() / 1000),
-    //   });
-    //   setIsOpen(false);
-    //   toast({
-    //     description: "Listing created successfully",
-    //   });
-    //   clearCacheAfterListing(hypercert.hypercert_id);
-    // } catch (e) {
-    //   console.error(e);
-    //   toast({
-    //     description:
-    //       (e as Error).toString() ||
-    //       "Something went wrong while creating the order",
-    //   });
-    // }
+  const handleListButtonClick = async (values: ListingFormValues) => {
+    const unitsInFraction = BigInt(selectedFraction?.units!);
+    try {
+      await createFractionalMakerAsk({
+        fractionId: values.fractionId,
+        minUnitAmount: values.unitsMinPerOrder,
+        maxUnitAmount: values.unitsMaxPerOrder || values.unitsForSale,
+        minUnitsToKeep: (
+          unitsInFraction - BigInt(values.unitsForSale)
+        ).toString(),
+        price: values.price,
+        sellLeftoverFraction: false,
+        currency: values.currency,
+        unitsForSale: values.unitsForSale,
+        startDateTime: Math.floor(values.startDateTime.getTime() / 1000),
+        endDateTime: Math.floor(values.endDateTime.getTime() / 1000),
+      });
+      setIsOpen(false);
+      toast({
+        description: "Listing created successfully",
+      });
+      clearCacheAfterListing(hypercert.hypercert_id);
+    } catch (e) {
+      console.error(e);
+      toast({
+        description:
+          (e as Error).toString() ||
+          "Something went wrong while creating the order",
+      });
+    }
   };
 
   useEffect(() => {
@@ -277,10 +256,6 @@ function ListDialogInner({
     currency.decimals,
   );
 
-  async function onSubmit(values: ListingFormValues) {
-    console.log("values", values);
-  }
-
   return (
     <DialogContent className="gap-5 max-w-2xl max-h-full overflow-y-auto">
       <DialogHeader>
@@ -302,7 +277,10 @@ function ListDialogInner({
         </div>
       )}
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <form
+          onSubmit={form.handleSubmit(handleListButtonClick)}
+          className="space-y-6"
+        >
           <table className="text-right w-full">
             <tbody>
               <tr className="h-10">
@@ -488,9 +466,7 @@ function ListDialogInner({
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleListButtonClick}>
-                    Continue
-                  </AlertDialogAction>
+                  <AlertDialogAction type="submit">Continue</AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
