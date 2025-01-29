@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
-import SafeApiKit from "@safe-global/api-kit";
+import { SafeApiStrategyFactory } from "@/safe/SafeApiKitStrategy";
 
 import { useEnsStore } from "@/lib/ens-store";
 import { Account } from "@/lib/account-store";
@@ -17,9 +17,8 @@ export function useSafeAccounts() {
 
       setIsLoading(true);
       try {
-        const safeService = new SafeApiKit({
-          chainId: BigInt(chainId),
-        });
+        const safeService =
+          SafeApiStrategyFactory.getStrategy(chainId).createInstance();
 
         const { safes } = await safeService.getSafesByOwner(address);
         setSafeAccounts(

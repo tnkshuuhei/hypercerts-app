@@ -1,5 +1,4 @@
 import { TypedDataEncoder } from "ethers";
-import SafeApiKit from "@safe-global/api-kit";
 import { type EIP712TypedData } from "@safe-global/types-kit";
 import Safe, {
   buildSignatureBytes,
@@ -12,6 +11,7 @@ import {
   hypercertApiSigningDomainSafe,
   type SafeApiSigningDomain,
 } from "@/configs/constants";
+import { SafeApiStrategyFactory } from "@/safe/SafeApiKitStrategy";
 
 import { SettingsSigningStrategy } from "./SettingsSigningStrategy";
 
@@ -72,7 +72,9 @@ export class SafeSettingsSigningStrategy extends SettingsSigningStrategy {
       provider: this.walletClient as unknown as Eip1193Provider,
       safeAddress: this.address,
     });
-    const apiKit = new SafeApiKit({ chainId: BigInt(this.chainId) });
+    const apiKit = SafeApiStrategyFactory.getStrategy(
+      this.chainId,
+    ).createInstance();
 
     const typedData = {
       domain: hypercertApiSigningDomainSafe(this.chainId, this.address),
