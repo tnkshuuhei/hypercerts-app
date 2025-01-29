@@ -6,7 +6,11 @@ import { CreatorFeedLists } from "./creator-feed-lists";
 import { InfoSection } from "../global/sections";
 
 function CreatorFeedsNoResults() {
-  return "The creator has not published additional information.";
+  return (
+    <InfoSection>
+      The creator has not published additional information.
+    </InfoSection>
+  );
 }
 
 function CreatorFeedsLoadError() {

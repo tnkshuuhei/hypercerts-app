@@ -12,7 +12,7 @@ import EvaluationsList from "./evaluations-list";
 import { EVALUATIONS_SCHEMA_UID } from "@/configs/eas";
 
 function EvaluationsListNoResults() {
-  return "No evaluations found";
+  return <InfoSection>No evaluations found</InfoSection>;
 }
 
 function EvaluationsListLoadError() {
