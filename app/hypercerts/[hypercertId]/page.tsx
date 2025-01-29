@@ -54,6 +54,18 @@ export default async function HypercertPage({ params, searchParams }: Props) {
   return (
     <main className="flex flex-col p-8 md:px-24 md:pt-14 pb-24 space-y-4 flex-1">
       <HypercertDetails hypercertId={hypercertId} />
+      {/* creator feed */}
+      <div className="flex justify-between mb-4">
+        <h2 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
+          {"CREATOR'S FEED"}
+        </h2>
+        <CreatorFeedButton
+          hypercertId={hypercertId}
+          creatorAddress={hypercert.creator_address!}
+        />
+      </div>
+      <CreatorFeeds hypercertId={hypercertId} />
+      {/* evaluations */}
       <div className="flex justify-between">
         <h2 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
           Evaluations
@@ -82,17 +94,6 @@ export default async function HypercertPage({ params, searchParams }: Props) {
         invalidated={false}
       />
       <Separator />
-      {/* creator feed */}
-      <div className="flex justify-between mb-4">
-        <h2 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
-          {"CREATOR'S FEED"}
-        </h2>
-        <CreatorFeedButton
-          hypercertId={hypercertId}
-          creatorAddress={hypercert.creator_address!}
-        />
-      </div>
-      <CreatorFeeds hypercertId={hypercertId} />
     </main>
   );
 }
