@@ -1,9 +1,7 @@
 import { Metadata, ResolvingMetadata } from "next";
-import { Suspense } from "react";
 
 import { getHypercert } from "@/hypercerts/getHypercert";
 
-import PageSkeleton from "@/components/hypercert/page-skeleton";
 import HypercertDetails from "@/components/hypercert/hypercert-details";
 import EvaluateButton from "@/components/hypercert/evaluate-button";
 import { CurrencyButtons } from "@/components/currency-buttons";
@@ -11,9 +9,14 @@ import { ListForSaleButton } from "@/components/marketplace/list-for-sale-button
 import ErrorState from "@/components/global/error-state";
 import HypercertListings from "@/components/marketplace/hypercert-listings";
 import HypercertEvaluations from "@/components/evaluations/hypercert-evaluations";
-import { Separator } from "@/components/ui/separator";
 import CreatorFeedButton from "@/components/creator-feed/creator-feed-button";
 import CreatorFeeds from "@/components/creator-feed/creator-feeds";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 type Props = {
   params: { hypercertId: string };
@@ -54,46 +57,60 @@ export default async function HypercertPage({ params, searchParams }: Props) {
   return (
     <main className="flex flex-col p-8 md:px-24 md:pt-14 pb-24 space-y-4 flex-1">
       <HypercertDetails hypercertId={hypercertId} />
-      {/* creator feed */}
-      <div className="flex justify-between mb-4">
-        <h2 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
-          {"CREATOR'S FEED"}
-        </h2>
-        <CreatorFeedButton
-          hypercertId={hypercertId}
-          creatorAddress={hypercert.creator_address!}
-        />
-      </div>
-      <CreatorFeeds hypercertId={hypercertId} />
-      {/* evaluations */}
-      <div className="flex justify-between">
-        <h2 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
-          Evaluations
-        </h2>
-        <EvaluateButton hypercertId={hypercertId} />
-      </div>
-      <HypercertEvaluations
-        hypercertId={hypercertId}
-        searchParams={searchParams}
-      />
-      <Separator />
-      {/* marketplace */}
-      <div className="flex justify-between mb-4">
-        <h2 className="uppercase text-sm text-slate-500 font-medium tracking-wider">
-          Marketplace
-        </h2>
-        <div className="flex gap-2">
-          <CurrencyButtons />
-          <ListForSaleButton hypercert={hypercert} />
-        </div>
-      </div>
-      <HypercertListings
-        hypercertId={hypercertId}
-        initialHypercert={hypercert}
-        searchParams={searchParams}
-        invalidated={false}
-      />
-      <Separator />
+      <Accordion type="single" collapsible className="w-full">
+        <AccordionItem value="item-1">
+          {/* creator feed */}
+          <AccordionTrigger className="uppercase text-sm text-slate-500 font-medium tracking-wider">
+            CREATOR&apos;S FEED
+          </AccordionTrigger>
+          <AccordionContent>
+            <div className="flex justify-end mb-4">
+              <CreatorFeedButton
+                hypercertId={hypercertId}
+                creatorAddress={hypercert.creator_address!}
+              />
+            </div>
+            <CreatorFeeds hypercertId={hypercertId} />
+          </AccordionContent>
+        </AccordionItem>
+
+        {/* evaluations */}
+        <AccordionItem value="item-2">
+          <AccordionTrigger className="uppercase text-sm text-slate-500 font-medium tracking-wider">
+            Evaluations
+          </AccordionTrigger>
+          <AccordionContent>
+            <div className="flex justify-end mb-4">
+              <EvaluateButton hypercertId={hypercertId} />
+            </div>
+            <HypercertEvaluations
+              hypercertId={hypercertId}
+              searchParams={searchParams}
+            />
+          </AccordionContent>
+        </AccordionItem>
+
+        {/* marketplace */}
+        <AccordionItem value="item-3">
+          <AccordionTrigger className="uppercase text-sm text-slate-500 font-medium tracking-wider">
+            Marketplace
+          </AccordionTrigger>
+          <AccordionContent>
+            <div className="flex justify-end mb-4">
+              <div className="flex gap-2">
+                <CurrencyButtons />
+                <ListForSaleButton hypercert={hypercert} />
+              </div>
+            </div>
+            <HypercertListings
+              hypercertId={hypercertId}
+              initialHypercert={hypercert}
+              searchParams={searchParams}
+              invalidated={false}
+            />
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
     </main>
   );
 }
