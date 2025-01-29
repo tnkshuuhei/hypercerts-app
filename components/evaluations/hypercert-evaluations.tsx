@@ -2,7 +2,6 @@ import PageSkeleton from "@/components/hypercert/page-skeleton";
 import { EVALUATIONS_PER_PAGE, LISTINGS_PER_PAGE } from "@/configs/ui";
 import { cache, Suspense } from "react";
 import { InfoSection } from "@/components/global/sections";
-import Pagination from "@/components/global/pagination/pagination";
 import {
   getAttestations,
   GetAttestationsParams,
@@ -62,14 +61,6 @@ export default async function HypercertEvaluations({
     <div className="w-full">
       <Suspense fallback={<PageSkeleton />}>
         <EvaluationsList initialEvaluations={evaluations} />
-        <Pagination
-          searchParams={searchParams}
-          totalItems={evaluations.count}
-          itemsPerPage={EVALUATIONS_PER_PAGE}
-          basePath={`/hypercerts/${hypercertId}`}
-          parameterName="evaluations"
-          currentPage={currentPage}
-        />
       </Suspense>
     </div>
   );

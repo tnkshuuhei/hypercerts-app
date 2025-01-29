@@ -10,8 +10,8 @@ import { Address, Hex } from "viem";
 const query = graphql(
   `
     query AttestationsQuery(
-      $first: Int!
-      $offset: Int!
+      $first: Int
+      $offset: Int
       $where: AttestationWhereInput
     ) {
       attestations(where: $where, first: $first, offset: $offset) {
@@ -26,8 +26,8 @@ const query = graphql(
 );
 
 export interface GetAttestationsParams {
-  first: number;
-  offset: number;
+  first?: number;
+  offset?: number;
   filter?: {
     chainId?: bigint;
     contractAddress?: Address;
