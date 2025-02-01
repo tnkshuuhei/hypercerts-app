@@ -1,25 +1,22 @@
-import { HttpTransport, PublicClient } from "viem";
-import { JsonRpcProvider, FallbackProvider } from "ethers";
+import { PublicClient } from "viem";
+import { JsonRpcProvider } from "ethers";
 
 import { usePublicClient } from "wagmi";
 import React from "react";
+import { EvmClientFactory } from "@/lib/evmClient";
 
 export function publicClientToProvider(publicClient: PublicClient) {
   const { chain, transport } = publicClient;
   if (!chain || !transport) return undefined;
+
   const network = {
     chainId: chain.id,
     name: chain.name,
     ensAddress: chain.contracts?.ensRegistry?.address,
   };
-  if (transport.type === "fallback") {
-    const providers = (transport.transports as ReturnType<HttpTransport>[]).map(
-      ({ value }) => new JsonRpcProvider(value?.url, network),
-    );
-    if (providers.length === 1) return providers[0];
-    return new FallbackProvider(providers);
-  }
-  return new JsonRpcProvider(transport.url, network);
+
+  const rpcUrl = EvmClientFactory.getFirstAvailableUrl(chain.id);
+  return new JsonRpcProvider(rpcUrl, network);
 }
 
 /** Hook to convert a viem Public Client to an ethers.js Provider. */
