@@ -3,6 +3,7 @@ import { buttonVariants } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -212,10 +213,13 @@ const StepProcessModal = ({
             {title}
           </DialogTitle>
         </DialogHeader>
+        <DialogDescription hidden>
+          Shows the status of the transaction
+        </DialogDescription>
         <div className="flex flex-col px-2 pt-3">
-          {steps.map((step) => (
+          {steps.map((step, index) => (
             <div
-              key={step.description}
+              key={step.id}
               className="flex items-center relative border-l-2 border-slate-300 pl-2 pb-6 last-of-type:pb-0"
             >
               <div
