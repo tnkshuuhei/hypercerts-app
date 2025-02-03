@@ -10,7 +10,7 @@ import {
 import { useEffect } from "react";
 import { Loader2, Wallet2 } from "lucide-react";
 import Image from "next/image";
-import { DialogTrigger } from "@radix-ui/react-dialog";
+import { DialogDescription, DialogTrigger } from "@radix-ui/react-dialog";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import {
   Drawer,
@@ -121,6 +121,7 @@ export default function ConnectDialog({
         </DialogTrigger>
 
         <DialogContent>
+          <DialogDescription hidden>Connect wallet</DialogDescription>
           <DialogTitle>
             <p className="text-sm text-muted-foreground uppercase font-semibold tracking-wide">
               Connect wallet

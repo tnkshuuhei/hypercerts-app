@@ -8,9 +8,10 @@ import {
 export function decodeContractError(error: any, defaultMessage: string) {
   const abis = [TransferManagerAbi, HypercertExchangeAbi, OrderValidatorV2AAbi];
   // @ts-ignore
-  const transactionData = error?.info?.error?.data?.originalError?.data as
-    | `0x${string}`
-    | undefined;
+  const transactionData = (error?.info?.error?.data?.originalError?.data ||
+    error?.data?.originalError?.data ||
+    error?.data?.data ||
+    error?.data) as `0x${string}` | undefined;
 
   if (!transactionData) {
     return defaultMessage;

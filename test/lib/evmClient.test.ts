@@ -33,7 +33,7 @@ vi.mock("viem", () => ({
   http: vi.fn((url) => ({ url })),
 }));
 
-import { EvmClientFactory, getRpcUrl } from "@/lib/evmClient";
+import { EvmClientFactory } from "@/lib/evmClient";
 
 describe("EvmClient", () => {
   describe("EvmClientFactory", () => {
@@ -71,13 +71,13 @@ describe("EvmClient", () => {
 
   describe("getRpcUrl", () => {
     it("should return URL for supported chain", () => {
-      const url = getRpcUrl(11155111);
+      const url = EvmClientFactory.getRpcUrl(11155111);
       expect(url).toContain("alchemy.com");
       expect(url).toContain("mock-alchemy-key");
     });
 
     it("should throw error for unsupported chain", () => {
-      expect(() => getRpcUrl(999999)).toThrow(
+      expect(() => EvmClientFactory.getRpcUrl(999999)).toThrow(
         "No RPC URL available for chain 999999",
       );
     });
@@ -87,24 +87,24 @@ describe("EvmClient", () => {
 describe("RPC Providers", () => {
   describe("getRpcUrl", () => {
     it("should return Alchemy URL for supported chains", () => {
-      const url = getRpcUrl(11155111); // Sepolia
+      const url = EvmClientFactory.getRpcUrl(11155111); // Sepolia
       expect(url).toContain("alchemy.com");
       expect(url).toContain("alchemy-key");
     });
 
     it("should return Infura URL when Alchemy is not available", () => {
-      const url = getRpcUrl(42220); // Celo
+      const url = EvmClientFactory.getRpcUrl(42220); // Celo
       expect(url).toContain("infura.io");
       expect(url).toContain("infura-key");
     });
 
     it("should return Glif URL for Filecoin", () => {
-      const url = getRpcUrl(314159);
+      const url = EvmClientFactory.getRpcUrl(314159);
       expect(url).toContain("glif.io");
     });
 
     it("should throw error for unsupported chain", () => {
-      expect(() => getRpcUrl(999999)).toThrow(
+      expect(() => EvmClientFactory.getRpcUrl(999999)).toThrow(
         "No RPC URL available for chain 999999",
       );
     });

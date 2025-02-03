@@ -95,10 +95,10 @@ export class EvmClientFactory {
   static getFirstAvailableUrl(chainId: number): string | undefined {
     return EvmClientFactory.getAllAvailableUrls(chainId)[0];
   }
-}
 
-export const getRpcUrl = (chainId: number): string => {
-  const url = EvmClientFactory.getFirstAvailableUrl(chainId);
-  if (!url) throw new Error(`No RPC URL available for chain ${chainId}`);
-  return url;
-};
+  static getRpcUrl(chainId: number): string {
+    const url = EvmClientFactory.getFirstAvailableUrl(chainId);
+    if (!url) throw new Error(`No RPC URL available for chain ${chainId}`);
+    return url;
+  }
+}

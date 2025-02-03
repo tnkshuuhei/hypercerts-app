@@ -52,6 +52,7 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
+import { DialogDescription } from "@radix-ui/react-dialog";
 
 export const listingFormSchema = z
   .object({
@@ -264,11 +265,11 @@ function ListDialogInner({
         </DialogTitle>
       </DialogHeader>
 
-      <div>
+      <DialogDescription>
         List your hypercert fraction for sale, allowing buyers to directly
         purchase all or part of it. Adjust settings to retain portions for
         yourself or set a minimum transaction amount as needed.
-      </div>
+      </DialogDescription>
 
       {fractionsOwnedByUser.length > 1 && (
         <div className="font-semibold">
@@ -439,8 +440,13 @@ function ListDialogInner({
               <AlertDialogTrigger
                 disabled={!form.formState.isValid}
                 className={"w-full"}
+                asChild
               >
-                <Button disabled={!form.formState.isValid} className="w-full">
+                <Button
+                  disabled={!form.formState.isValid}
+                  className="w-full"
+                  type="submit"
+                >
                   {isPending && (
                     <LoaderCircle className="h-4 w-4 animate-spin mr-1" />
                   )}

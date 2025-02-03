@@ -31,7 +31,7 @@ import { SUPPORTED_CHAINS } from "@/configs/constants";
 import { useRouter } from "next/navigation";
 import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
 import { ExternalLink } from "lucide-react";
-import React from "react";
+import React, { useEffect } from "react";
 import { clearCacheAfterListing } from "@/app/actions/clearCacheAfterListing";
 import { revalidatePathServerAction } from "@/app/actions/revalidatePathServerAction";
 export const useCreateOrderInSupabase = () => {
@@ -96,7 +96,9 @@ export const useCreateFractionalMakerAsk = ({
     setExtraContent,
   } = useStepProcessDialogContext();
 
-  setTitle("Create marketplace listing");
+  useEffect(() => {
+    setTitle("Create marketplace listing");
+  }, []);
 
   return useMutation({
     mutationKey: ["createFractionalMakerAsk"],
@@ -150,8 +152,8 @@ export const useCreateFractionalMakerAsk = ({
           description: "Signing order",
         },
         {
-          id: "Create order",
-          description: "Creating order",
+          id: "Register",
+          description: "Registering order",
         },
       ]);
       setOpen(true);
@@ -264,7 +266,7 @@ export const useCreateFractionalMakerAsk = ({
         throw new Error("Error signing order");
       }
 
-      await setStep("Create order");
+      await setStep("Register");
       try {
         await createOrder({
           order: maker,
@@ -276,7 +278,7 @@ export const useCreateFractionalMakerAsk = ({
       } catch (e) {
         console.error(e);
         await setStep(
-          "Create order",
+          "Register",
           "error",
           e instanceof Error ? e.message : "Error registering order",
         );
@@ -303,7 +305,7 @@ export const useCreateFractionalMakerAsk = ({
           </div>
         </div>
       ));
-      await setStep("Create order", "completed");
+      await setStep("Register", "completed");
     },
     onError: (e) => {
       console.error(e);
@@ -353,7 +355,6 @@ export const useBuyFractionalMakerAsk = () => {
   return useMutation({
     mutationKey: ["buyFractionalMakerAsk"],
     onError: (e) => {
-      console.error(e);
       toast({
         title: "Error",
         description: e.message,

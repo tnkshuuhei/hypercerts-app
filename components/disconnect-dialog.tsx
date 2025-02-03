@@ -6,6 +6,8 @@ import {
   DialogClose,
   DialogContent,
   DialogTitle,
+  DialogDescription,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Drawer,
@@ -15,7 +17,6 @@ import {
 } from "@/components/ui/drawer";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { truncateEthereumAddress } from "@/lib/utils";
-import { DialogTrigger } from "@radix-ui/react-dialog";
 import { Unlink, Wallet2 } from "lucide-react";
 import { useEffect } from "react";
 
@@ -69,6 +70,7 @@ export default function DisconnectDialog({
         </DialogTrigger>
 
         <DialogContent>
+          <DialogDescription hidden>Disconnect wallet</DialogDescription>
           <DialogTitle className="text-2xl py-3 tracking-tight font-semibold">
             Are you sure you want to disconnect your wallet?
           </DialogTitle>
