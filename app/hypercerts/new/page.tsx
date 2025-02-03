@@ -11,6 +11,8 @@ export default async function NewHypercertPage({
 }) {
   let formValues: HypercertFormValues | undefined;
   let parsedId: number | undefined;
+  let blueprintChainId: number | undefined;
+  let blueprintMinterAddress: `0x${string}` | undefined;
   if (searchParams.blueprintId) {
     parsedId = parseInt(searchParams.blueprintId);
     const fetchedBlueprint = await getBlueprintById(parsedId);
@@ -20,6 +22,10 @@ export default async function NewHypercertPage({
     }
 
     formValues = fetchedBlueprint.form_values as HypercertFormValues;
+    blueprintChainId = fetchedBlueprint.admins[0].chain_id
+      ? parseInt(fetchedBlueprint.admins[0].chain_id)
+      : undefined;
+    blueprintMinterAddress = fetchedBlueprint.minter_address as `0x${string}`;
   }
   return (
     <main className="flex flex-col p-8 md:px-16 pt-8 pb-24 space-y-4 flex-1 container max-w-screen-lg">
@@ -27,7 +33,12 @@ export default async function NewHypercertPage({
         New hypercert
       </h1>
       <div className="p-3"></div>
-      <HypercertMintingForm presetValues={formValues} blueprintId={parsedId} />
+      <HypercertMintingForm
+        presetValues={formValues}
+        blueprintId={parsedId}
+        blueprintChainId={blueprintChainId}
+        blueprintMinterAddress={blueprintMinterAddress}
+      />
     </main>
   );
 }

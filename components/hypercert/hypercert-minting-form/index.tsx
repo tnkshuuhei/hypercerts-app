@@ -147,13 +147,16 @@ export function HypercertMintingForm({
   presetValues,
   blueprintId,
   transferRestrictions = TransferRestrictions.FromCreatorOnly,
+  blueprintChainId,
+  blueprintMinterAddress,
 }: {
   isBlueprint?: boolean;
   presetValues?: HypercertFormValues;
   blueprintId?: number;
   transferRestrictions?: TransferRestrictions;
+  blueprintChainId?: number;
+  blueprintMinterAddress?: `0x${string}`;
 }) {
-  console.log("presetValues", presetValues);
   const [currentStep, setCurrentStep] = useState(1);
   const [language, setLanguage] = useState("en-US");
   const {
@@ -359,6 +362,8 @@ export function HypercertMintingForm({
               cardRef={cardRef}
               reset={onReset}
               isBlueprint={isBlueprint}
+              blueprintChainId={blueprintChainId}
+              blueprintMinterAddress={blueprintMinterAddress}
             />
           </form>
         </Form>

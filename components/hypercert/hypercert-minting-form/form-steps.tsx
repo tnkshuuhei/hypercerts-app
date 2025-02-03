@@ -18,7 +18,7 @@ import {
   CalendarIcon,
   Trash2Icon,
 } from "lucide-react";
-import { RefObject, useState } from "react";
+import { RefObject, useMemo, useState } from "react";
 
 import CreateAllowlistDialog from "@/components/allowlist/create-allowlist-dialog";
 import ConnectDialog from "@/components/connect-dialog";
@@ -29,11 +29,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
-import { cn } from "@/lib/utils";
+import { cn, truncateEthereumAddress } from "@/lib/utils";
 import { format } from "date-fns";
 import Link from "next/link";
 import { UseFormReturn } from "react-hook-form";
-import { useAccount } from "wagmi";
+import { useAccount, useChainId } from "wagmi";
 import { AllowlistEntry } from "@hypercerts-org/sdk";
 import {
   Table,
@@ -50,6 +50,14 @@ import {
   HyperCertFormKeys,
   HypercertFormValues,
 } from "@/components/hypercert/hypercert-minting-form/index";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { ChainFactory } from "@/lib/chainFactory";
+import EthAddress from "@/components/eth-address";
 
 // import Image from "next/image";
 
@@ -60,6 +68,8 @@ interface FormStepsProps {
   cardRef: RefObject<HTMLDivElement>;
   reset: () => void;
   isBlueprint?: boolean;
+  blueprintChainId?: number;
+  blueprintMinterAddress?: `0x${string}`;
 }
 
 const GeneralInformation = ({ form }: FormStepsProps) => {
@@ -489,10 +499,17 @@ const FormSteps = ({
   cardRef,
   reset,
   isBlueprint,
+  blueprintChainId,
+  blueprintMinterAddress,
 }: FormStepsProps) => {
   const isLastStep = currentStep === hypercertFormSteps.size;
   const { address } = useAccount();
   const [isOpen, setIsOpen] = useState(false);
+  const chainId = useChainId();
+  const isBlueprintChainIdInvalid =
+    blueprintChainId !== undefined && chainId !== blueprintChainId;
+  const isBlueprintMinterAddressInvalid =
+    blueprintMinterAddress !== undefined && address !== blueprintMinterAddress;
 
   const takeCardSnapshot = async () => {
     if (cardRef.current === null) {
@@ -531,6 +548,32 @@ const FormSteps = ({
     }
     setCurrentStep(currentStep + 1);
   };
+
+  const disableMint =
+    !isCurrentStepValid() ||
+    isBlueprintChainIdInvalid ||
+    isBlueprintMinterAddressInvalid;
+
+  const tooltipMessage = useMemo(() => {
+    if (isBlueprintChainIdInvalid && blueprintChainId !== undefined) {
+      const chain = ChainFactory.getChain(blueprintChainId);
+      return `Please switch to ${chain.name} to mint this blueprint.`;
+    }
+    if (isBlueprintMinterAddressInvalid) {
+      return (
+        <div className="flex flex-row items-center gap-2">
+          Please switch to {truncateEthereumAddress(blueprintMinterAddress)} to
+          mint this blueprint.
+        </div>
+      );
+    }
+    return "Unknown error";
+  }, [
+    isBlueprintChainIdInvalid,
+    isBlueprintMinterAddressInvalid,
+    blueprintChainId,
+    blueprintMinterAddress,
+  ]);
 
   return (
     <section className="space-y-5">
@@ -627,12 +670,25 @@ const FormSteps = ({
             <ArrowRightIcon className="w-4 h-4 ml-2" />
           </Button>
         )}
-        {isLastStep && address && (
-          <Button type="submit" disabled={!isCurrentStepValid()}>
-            {isBlueprint ? "Create blueprint" : "Mint hypercert"}
-            <ArrowRightIcon className="w-4 h-4 ml-2" />
-          </Button>
-        )}
+        {isLastStep &&
+          address &&
+          (disableMint ? (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div>
+                    <Button disabled={true}>Mint hypercert</Button>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>{tooltipMessage}</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          ) : (
+            <Button type="submit">
+              {isBlueprint ? "Create blueprint" : "Mint hypercert"}
+              <ArrowRightIcon className="w-4 h-4 ml-2" />
+            </Button>
+          ))}
         {isLastStep && !address && isCurrentStepValid() && (
           <ConnectDialog isOpen={isOpen} setIsOpen={setIsOpen} />
         )}
