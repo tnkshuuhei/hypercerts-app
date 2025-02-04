@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -23,6 +23,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { AllowListRecord } from "@/allowlists/getAllowListRecordsForAddressByClaimed";
+import UnclaimedHypercertBatchClaimButton from "../unclaimed-hypercert-butchClaim-button";
 
 export interface DataTableProps {
   columns: ColumnDef<AllowListRecord>[];
@@ -30,14 +31,11 @@ export interface DataTableProps {
 }
 
 export function UnclaimedFractionTable({ columns, data }: DataTableProps) {
-  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [sorting, setSorting] = useState<SortingState>([]);
 
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    [],
-  );
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = React.useState({});
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = useState({});
 
   const table = useReactTable({
     data: data as AllowListRecord[],
@@ -58,12 +56,27 @@ export function UnclaimedFractionTable({ columns, data }: DataTableProps) {
     },
   });
 
+  const getSelectedRecords = useCallback(() => {
+    return table.getSelectedRowModel().rows.map((row) => row.original);
+  }, [table]);
+
+  useEffect(() => {
+    const selectedRecords = getSelectedRecords();
+    console.log("Selected records:", selectedRecords);
+  }, [rowSelection, getSelectedRecords]);
+
+  const [selectedRecords, setSelectedRecords] = useState<AllowListRecord[]>([]);
+
+  useEffect(() => {
+    setSelectedRecords(getSelectedRecords());
+  }, [rowSelection, getSelectedRecords]);
+
   return (
     <div className="w-full">
       <div className="flex items-center py-4">
-        <Button variant="outline" size="sm">
-          Claim Selected
-        </Button>
+        <UnclaimedHypercertBatchClaimButton
+          allowListRecords={selectedRecords}
+        />
       </div>
       <div className="rounded-md border">
         <Table>
