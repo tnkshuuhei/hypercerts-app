@@ -1,6 +1,7 @@
 import { EmptySection } from "@/components/global/sections";
-import UnclaimedHypercertListItem from "./unclaimed-hypercert-list-item";
 import { AllowListRecord } from "@/allowlists/getAllowListRecordsForAddressByClaimed";
+import { UnclaimedFractionTable } from "./unclaimed-table/unclaimed-fraction-table";
+import { UnclaimedFractionColumns } from "./unclaimed-table/unclaimed-fraction-columns";
 
 export default async function UnclaimedHypercertsList({
   unclaimedHypercerts,
@@ -17,12 +18,10 @@ export default async function UnclaimedHypercertsList({
 
   return (
     <div className="grid grid-cols-[repeat(auto-fit,_minmax(270px,_1fr))] gap-4">
-      {unclaimedHypercerts.map((unclaimedHypercert, i) => (
-        <UnclaimedHypercertListItem
-          allowListRecordFragment={unclaimedHypercert}
-          key={i}
-        />
-      ))}
+      <UnclaimedFractionTable
+        columns={UnclaimedFractionColumns}
+        data={unclaimedHypercerts}
+      />
     </div>
   );
 }
