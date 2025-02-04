@@ -1,10 +1,10 @@
 "use client";
-import { useSearchParams } from "next/navigation";
+import { CurrencyButtons } from "@/components/currency-buttons";
 import ExploreChainFilterSelect from "@/components/explore/explore-chain-filter-select";
 import ExploreEvaluationsFilterSelect from "@/components/explore/explore-evaluations-filter-select";
 import ExploreOrderBySelect from "@/components/explore/explore-order-by-select";
-import { CurrencyButtons } from "@/components/currency-buttons";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import { useSearchParams } from "next/navigation";
 
 const ExploreFiltersLayout = () => {
   const isDesktop = useMediaQuery("(min-width: 768px)");

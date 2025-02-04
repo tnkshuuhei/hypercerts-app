@@ -1,6 +1,5 @@
-import { createPublicClient, http, PublicClient, Transport } from "viem";
+import { createPublicClient, http, Transport } from "viem";
 import { ChainFactory } from "./chainFactory";
-import { filecoinApiKey } from "@/configs/constants";
 
 interface RpcConfig {
   url: string;
@@ -20,14 +19,6 @@ class RpcConfigFactory {
 
     // Chain-specific configurations
     switch (chainId) {
-      case 314:
-      case 314159:
-        return {
-          ...baseConfig,
-          headers: {
-            Authorization: `Bearer ${filecoinApiKey}`,
-          },
-        };
       default:
         return baseConfig;
     }

@@ -20,6 +20,8 @@ const chainIcon = (chain: Chain) => {
   switch (chain?.id) {
     case 10:
       return "/chain-icons/optimism.png";
+    case 314:
+      return "/chain-icons/filecoin.png";
     case 8453:
       return "/chain-icons/base.png";
     case 84532:

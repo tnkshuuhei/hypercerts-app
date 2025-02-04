@@ -45,6 +45,15 @@ class DrpcProvider implements RpcProvider {
       42161: "arbitrum",
       421614: "arbitrum-sepolia",
     };
+
+    if (chainId === 314) {
+      return "https://filecoin.drpc.org";
+    }
+
+    if (chainId === 314159) {
+      return "https://filecoin-calibration.drpc.org";
+    }
+
     const network = networks[chainId];
     return network
       ? `https://lb.drpc.org/ogrpc?network=${network}&dkey=${drpcApiPkey}`
@@ -55,8 +64,8 @@ class DrpcProvider implements RpcProvider {
 class GlifProvider implements RpcProvider {
   getUrl(chainId: number): string | undefined {
     const urls: Record<number, string> = {
-      314: `https://node.glif.io/space07/lotus/rpc/v1`,
-      314159: `https://calibration.node.glif.io/archive/lotus/rpc/v1`,
+      314: `https://rpc.ankr.com/filecoin`,
+      314159: `https://rpc.ankr.com/filecoin_testnet`,
     };
     return urls[chainId];
   }
@@ -66,8 +75,8 @@ export class EvmClientFactory {
   private static readonly providers: RpcProvider[] = [
     new AlchemyProvider(),
     new InfuraProvider(),
-    new DrpcProvider(),
     new GlifProvider(),
+    new DrpcProvider(),
   ];
 
   static createClient(chainId: number): PublicClient {
