@@ -9,11 +9,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Send Bug Notification to Discord
-        if: github.event.label.name == 'bug'  # Correct placement of 'if'
+        if: github.event.label.name == 'bug'
         run: |
           curl -H "Content-Type: application/json" \
             -X POST \
-            -d '{
-              "content": "🐞 **Bug Report Created!**\n**Title:** '${{ github.event.issue.title }}'\n**Link:** '${{ github.event.issue.html_url }}'"
-            }' \
+            -d "{
+              \"content\": \"🐞 **Bug Report Created!**\n**Title:** ${{ github.event.issue.title }}\n**Link:** ${{ github.event.issue.html_url }}\"
+            }" \
             ${{ secrets.DISCORD_WEBHOOK_URL }}
