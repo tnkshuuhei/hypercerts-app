@@ -1,11 +1,11 @@
 "use client";
-import { useMemo } from "react";
-import { useChainId, useWalletClient } from "wagmi";
-import { HypercertExchangeClient } from "@hypercerts-org/marketplace-sdk";
+import { SUPPORTED_CHAINS } from "@/configs/constants";
+import { HYPERCERTS_API_URL_REST } from "@/configs/hypercerts";
 import { useEthersProvider } from "@/hooks/use-ethers-provider";
 import { useEthersSigner } from "@/hooks/use-ethers-signer";
-import { HYPERCERTS_API_URL_REST } from "@/configs/hypercerts";
-import { SUPPORTED_CHAINS } from "@/configs/constants";
+import { HypercertExchangeClient } from "@hypercerts-org/marketplace-sdk";
+import { useMemo } from "react";
+import { useChainId, useWalletClient } from "wagmi";
 
 export const useHypercertExchangeClient = () => {
   const { data: walletClient } = useWalletClient();
@@ -15,7 +15,9 @@ export const useHypercertExchangeClient = () => {
 
   const client = useMemo(() => {
     if (
-      !SUPPORTED_CHAINS.find((chain) => chain.id === walletClient?.chain.id)
+      !SUPPORTED_CHAINS.find((chain) => chain.id === walletClient?.chain.id) ||
+      chainId === 314 ||
+      chainId === 314159
     ) {
       return null;
     }
