@@ -1,5 +1,6 @@
 "use client";
 
+import { SUPPORTED_CHAINS } from "@/configs/constants";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   Select,
@@ -8,7 +9,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { SUPPORTED_CHAINS } from "@/configs/constants";
 
 interface ChainFilterSelectProps {
   value?: string;

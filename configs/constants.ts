@@ -4,6 +4,7 @@ import {
   base,
   baseSepolia,
   celo,
+  filecoin,
   filecoinCalibration,
   optimism,
   sepolia,
@@ -20,7 +21,13 @@ export const testNetChains = [
   baseSepolia,
   filecoinCalibration,
 ] as const;
-export const prodNetChains = [optimism, celo, base, arbitrum] as const;
+export const prodNetChains = [
+  optimism,
+  celo,
+  base,
+  arbitrum,
+  filecoin,
+] as const;
 
 export const SUPPORTED_CHAINS = (
   ENVIRONMENT === "production" ? prodNetChains : testNetChains
