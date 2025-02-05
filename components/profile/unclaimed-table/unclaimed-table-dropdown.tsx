@@ -29,15 +29,15 @@ export function UnclaimedTableDropdown<TData>({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[180px]">
-        <DropdownMenuItem>
-          <Link
-            target="_blank"
-            rel="noopener noreferrer"
-            href={`/hypercerts/${hypercertId}`}
-          >
+        <Link
+          target="_blank"
+          rel="noopener noreferrer"
+          href={`/hypercerts/${hypercertId}`}
+        >
+          <DropdownMenuItem className="cursor-pointer">
             View Hypercert
-          </Link>
-        </DropdownMenuItem>
+          </DropdownMenuItem>
+        </Link>
         <DropdownMenuItem
           className="cursor-pointer"
           onClick={(event): void => {
