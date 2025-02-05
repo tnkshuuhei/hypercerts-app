@@ -4,6 +4,9 @@ import React, { useState, useEffect, useCallback } from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
+  OnChangeFn,
+  Row,
+  RowSelectionState,
   SortingState,
   VisibilityState,
   flexRender,
@@ -33,10 +36,50 @@ export interface DataTableProps {
 
 export function UnclaimedFractionTable({ columns, data }: DataTableProps) {
   const [sorting, setSorting] = useState<SortingState>([]);
-
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
+  const [selectedChain, setSelectedChain] = useState<number | null>(null);
+  const [selectedRecords, setSelectedRecords] = useState<AllowListRecord[]>([]);
+
+  const getChainId = useCallback((hypercertId: string) => {
+    const [chainId] = hypercertId.split("-");
+    return Number(chainId);
+  }, []);
+
+  const isRowSelectable = useCallback(
+    (row: Row<AllowListRecord>) => {
+      const rowChainId = getChainId(row.original.hypercert_id!);
+      return !selectedChain || selectedChain === rowChainId;
+    },
+    [selectedChain, getChainId],
+  );
+
+  const handleRowSelectionChange: OnChangeFn<RowSelectionState> = useCallback(
+    (updaterOrValue) => {
+      let updatedSelection: RowSelectionState;
+
+      if (typeof updaterOrValue === "function") {
+        updatedSelection = updaterOrValue(rowSelection);
+      } else {
+        updatedSelection = updaterOrValue;
+      }
+
+      const selectedRows = Object.entries(updatedSelection)
+        .filter(([_, isSelected]) => isSelected)
+        .map(([rowId]) => table.getRow(rowId));
+
+      if (selectedRows.length > 0 && !selectedChain) {
+        const firstRow = selectedRows[0];
+        setSelectedChain(getChainId(firstRow.original.hypercert_id!));
+      } else if (selectedRows.length === 0) {
+        setSelectedChain(null);
+      }
+
+      setRowSelection(updatedSelection);
+    },
+    [selectedChain, getChainId, rowSelection],
+  );
 
   const table = useReactTable({
     data: data as AllowListRecord[],
@@ -48,7 +91,8 @@ export function UnclaimedFractionTable({ columns, data }: DataTableProps) {
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
+    onRowSelectionChange: handleRowSelectionChange,
+    enableRowSelection: isRowSelectable,
     state: {
       sorting,
       columnFilters,
@@ -62,13 +106,6 @@ export function UnclaimedFractionTable({ columns, data }: DataTableProps) {
   }, [table]);
 
   useEffect(() => {
-    const selectedRecords = getSelectedRecords();
-    console.log("Selected records:", selectedRecords);
-  }, [rowSelection, getSelectedRecords]);
-
-  const [selectedRecords, setSelectedRecords] = useState<AllowListRecord[]>([]);
-
-  useEffect(() => {
     setSelectedRecords(getSelectedRecords());
   }, [rowSelection, getSelectedRecords]);
 
@@ -77,6 +114,7 @@ export function UnclaimedFractionTable({ columns, data }: DataTableProps) {
       <div className="flex gap-2 items-center py-4">
         <UnclaimedHypercertBatchClaimButton
           allowListRecords={selectedRecords}
+          selectedChainId={selectedChain}
         />
         <TableToolbar table={table} />
       </div>
