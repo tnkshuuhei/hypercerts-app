@@ -93,6 +93,11 @@ export function UnclaimedFractionTable({ columns, data }: DataTableProps) {
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: handleRowSelectionChange,
     enableRowSelection: isRowSelectable,
+    initialState: {
+      pagination: {
+        pageSize: 25,
+      },
+    },
     state: {
       sorting,
       columnFilters,
