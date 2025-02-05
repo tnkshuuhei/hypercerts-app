@@ -32,7 +32,7 @@ export function TableToolbar<TData>({ table }: DataTableToolbarProps<TData>) {
         {table.getColumn("hypercert_id") && (
           <TableFilter
             column={table.getColumn("hypercert_id")}
-            title="Chains"
+            title="Filter Chains"
             options={chainOptions}
           />
         )}
