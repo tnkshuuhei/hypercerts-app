@@ -51,7 +51,7 @@ export async function generateMetadata(
 export default async function HypercertPage({ params, searchParams }: Props) {
   const { hypercertId } = params;
 
-  const [hypercert] = await Promise.all([getHypercert(hypercertId)]);
+  const hypercert = await getHypercert(hypercertId);
   const isCreatorFeedEnabledOnChain = await creatorFeedFlag();
   const isEvaluationsEnabledOnChain = await evaluationsFlag();
   const isMarketplaceListingsEnabledOnChain = await marketplaceListingsFlag();
