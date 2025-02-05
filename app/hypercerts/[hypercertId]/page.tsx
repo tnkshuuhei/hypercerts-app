@@ -17,6 +17,11 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import {
+  creatorFeedFlag,
+  evaluationsFlag,
+  marketplaceListingsFlag,
+} from "@/flags/chain-actions-flag";
 
 type Props = {
   params: { hypercertId: string };
@@ -47,6 +52,9 @@ export default async function HypercertPage({ params, searchParams }: Props) {
   const { hypercertId } = params;
 
   const [hypercert] = await Promise.all([getHypercert(hypercertId)]);
+  const isCreatorFeedEnabledOnChain = await creatorFeedFlag();
+  const isEvaluationsEnabledOnChain = await evaluationsFlag();
+  const isMarketplaceListingsEnabledOnChain = await marketplaceListingsFlag();
 
   if (!hypercert) {
     return (
@@ -54,10 +62,22 @@ export default async function HypercertPage({ params, searchParams }: Props) {
     );
   }
 
+  const defaultAccordionItems = isMarketplaceListingsEnabledOnChain
+    ? ["item-3"]
+    : isEvaluationsEnabledOnChain
+      ? ["item-2"]
+      : isCreatorFeedEnabledOnChain
+        ? ["item-1"]
+        : [];
+
   return (
     <main className="flex flex-col p-8 md:px-24 md:pt-14 pb-24 space-y-4 flex-1">
       <HypercertDetails hypercertId={hypercertId} />
-      <Accordion type="multiple" defaultValue={["item-3"]} className="w-full">
+      <Accordion
+        type="multiple"
+        defaultValue={defaultAccordionItems}
+        className="w-full"
+      >
         <AccordionItem value="item-1">
           {/* creator feed */}
           <AccordionTrigger className="uppercase text-sm text-slate-500 font-medium tracking-wider">
@@ -68,6 +88,7 @@ export default async function HypercertPage({ params, searchParams }: Props) {
               <CreatorFeedButton
                 hypercertId={hypercertId}
                 creatorAddress={hypercert.creator_address!}
+                disabledForChain={!isCreatorFeedEnabledOnChain}
               />
             </div>
             <CreatorFeeds hypercertId={hypercertId} />
@@ -86,6 +107,7 @@ export default async function HypercertPage({ params, searchParams }: Props) {
             <HypercertEvaluations
               hypercertId={hypercertId}
               searchParams={searchParams}
+              disabledForChain={!isEvaluationsEnabledOnChain}
             />
           </AccordionContent>
         </AccordionItem>
@@ -99,7 +121,10 @@ export default async function HypercertPage({ params, searchParams }: Props) {
             <div className="flex justify-end mb-4">
               <div className="flex gap-2">
                 <CurrencyButtons />
-                <ListForSaleButton hypercert={hypercert} />
+                <ListForSaleButton
+                  hypercert={hypercert}
+                  disabledForChain={!isMarketplaceListingsEnabledOnChain}
+                />
               </div>
             </div>
             <HypercertListings
