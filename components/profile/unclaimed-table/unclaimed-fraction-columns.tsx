@@ -12,6 +12,8 @@ import { UnclaimedTableDropdown } from "./unclaimed-table-dropdown";
 import UnclaimedHypercertClaimButton from "../unclaimed-hypercert-claim-button";
 import { Badge } from "@/components/ui/badge";
 import { FormattedUnits } from "@/components/formatted-units";
+import { Button } from "@/components/ui/button";
+import { ArrowUpDown } from "lucide-react";
 
 const columnHelper = createColumnHelper<AllowListRecord>();
 
@@ -58,13 +60,13 @@ export const UnclaimedFractionColumns = [
             height={100}
           />
           <div className="flex flex-col">
-            <div className="flex space-x-2">
+            <div className="flex space-x-2 max-w-[500px]">
               {chain && (
                 <Badge variant="outline" className="w-max">
                   {chain.name}
                 </Badge>
               )}
-              <span className="max-w-[500px] truncate font-medium">
+              <span className="truncate font-medium">
                 {/* {metadata?.title} */}
                 {hypercertId}
               </span>
@@ -90,14 +92,36 @@ export const UnclaimedFractionColumns = [
     },
   }),
   columnHelper.accessor("units", {
-    header: "Claimable Units",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Claimable Units
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
     cell: ({ row }) => {
       const units = row.getValue("units");
       return <FormattedUnits>{units as string}</FormattedUnits>;
     },
   }),
   columnHelper.accessor("total_units", {
-    header: "Total Units",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Total Units
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
     cell: ({ row }) => {
       const totalUnits = row.getValue("total_units");
       return <FormattedUnits>{totalUnits as string}</FormattedUnits>;
