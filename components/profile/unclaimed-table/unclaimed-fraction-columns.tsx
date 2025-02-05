@@ -78,6 +78,15 @@ export const UnclaimedFractionColumns = [
         </div>
       );
     },
+    filterFn: (
+      row: { getValue: (columnId: string) => string },
+      id: string,
+      filterValue: string[],
+    ) => {
+      if (!filterValue?.length) return true;
+      const [chainId] = row.getValue("hypercert_id").split("-");
+      return filterValue.includes(chainId);
+    },
   }),
   columnHelper.display({
     id: "action",

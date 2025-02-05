@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/table";
 import { AllowListRecord } from "@/allowlists/getAllowListRecordsForAddressByClaimed";
 import UnclaimedHypercertBatchClaimButton from "../unclaimed-hypercert-butchClaim-button";
+import { TableToolbar } from "./table-toolbar";
 
 export interface DataTableProps {
   columns: ColumnDef<AllowListRecord>[];
@@ -73,10 +74,11 @@ export function UnclaimedFractionTable({ columns, data }: DataTableProps) {
 
   return (
     <div className="w-full">
-      <div className="flex items-center py-4">
+      <div className="flex gap-2 items-center py-4">
         <UnclaimedHypercertBatchClaimButton
           allowListRecords={selectedRecords}
         />
+        <TableToolbar table={table} />
       </div>
       <div className="rounded-md border">
         <Table>
