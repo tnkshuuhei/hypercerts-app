@@ -128,7 +128,7 @@ export default function UnclaimedHypercertBatchClaimButton({
         <Button
           variant={"outline"}
           size="sm"
-          disabled={!account.isConnected}
+          disabled={!account.isConnected || !selectedChainId}
           onClick={() => {
             if (!selectedChainId)
               return errorToast("Hypercert is not selected");
