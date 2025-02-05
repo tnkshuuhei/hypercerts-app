@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useEffect } from "react";
 import { Column } from "@tanstack/react-table";
 import { Check, PlusCircle } from "lucide-react";
 
@@ -20,6 +20,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
+import { useAccount } from "wagmi";
 
 interface DataTableFacetedFilterProps<TData, TValue> {
   column?: Column<TData, TValue>;
@@ -36,9 +37,25 @@ export function TableFilter<TData, TValue>({
   title,
   options,
 }: DataTableFacetedFilterProps<TData, TValue>) {
+  const { chain } = useAccount();
   const facets = column?.getFacetedUniqueValues();
   const selectedValues = new Set(column?.getFilterValue() as string[]);
 
+  // Set default chain filter to user connected chain when component mounts
+  useEffect(() => {
+    if (chain?.id && column && !column.getFilterValue()) {
+      const chainIdStr = chain.id.toString();
+
+      // Check if the connected chain is in the available options
+      const isValidChain = options.some(
+        (option) => option.value === chainIdStr,
+      );
+
+      if (isValidChain) {
+        column.setFilterValue([chainIdStr]);
+      }
+    }
+  }, [chain?.id, column, options]);
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -131,10 +148,22 @@ export function TableFilter<TData, TValue>({
                 <CommandSeparator />
                 <CommandGroup>
                   <CommandItem
-                    onSelect={() => column?.setFilterValue(undefined)}
+                    onSelect={() => {
+                      // Reset to connected chain if available
+                      if (
+                        chain?.id &&
+                        options.some(
+                          (option) => option.value === chain.id.toString(),
+                        )
+                      ) {
+                        column?.setFilterValue([chain.id.toString()]);
+                      } else {
+                        column?.setFilterValue(undefined);
+                      }
+                    }}
                     className="justify-center text-center"
                   >
-                    Clear filters
+                    Reset to connected chain
                   </CommandItem>
                 </CommandGroup>
               </>
