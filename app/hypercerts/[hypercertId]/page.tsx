@@ -62,13 +62,14 @@ export default async function HypercertPage({ params, searchParams }: Props) {
     );
   }
 
-  const defaultAccordionItems = isMarketplaceListingsEnabledOnChain
-    ? ["marketplace-listings"]
-    : isEvaluationsEnabledOnChain
-      ? ["evaluations"]
-      : isCreatorFeedEnabledOnChain
-        ? ["creator-feed"]
-        : [];
+  const getDefaultAccordionItems = () => {
+    if (isMarketplaceListingsEnabledOnChain) return ["marketplace-listings"];
+    if (isEvaluationsEnabledOnChain) return ["evaluations"];
+    if (isCreatorFeedEnabledOnChain) return ["creator-feed"];
+    return [];
+  };
+
+  const defaultAccordionItems = getDefaultAccordionItems();
 
   return (
     <main className="flex flex-col p-8 md:px-24 md:pt-14 pb-24 space-y-4 flex-1">
