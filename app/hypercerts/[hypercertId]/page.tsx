@@ -2,15 +2,15 @@ import { Metadata, ResolvingMetadata } from "next";
 
 import { getHypercert } from "@/hypercerts/getHypercert";
 
-import HypercertDetails from "@/components/hypercert/hypercert-details";
-import EvaluateButton from "@/components/hypercert/evaluate-button";
-import { CurrencyButtons } from "@/components/currency-buttons";
-import { ListForSaleButton } from "@/components/marketplace/list-for-sale-button";
-import ErrorState from "@/components/global/error-state";
-import HypercertListings from "@/components/marketplace/hypercert-listings";
-import HypercertEvaluations from "@/components/evaluations/hypercert-evaluations";
 import CreatorFeedButton from "@/components/creator-feed/creator-feed-button";
 import CreatorFeeds from "@/components/creator-feed/creator-feeds";
+import { CurrencyButtons } from "@/components/currency-buttons";
+import HypercertEvaluations from "@/components/evaluations/hypercert-evaluations";
+import ErrorState from "@/components/global/error-state";
+import EvaluateButton from "@/components/hypercert/evaluate-button";
+import HypercertDetails from "@/components/hypercert/hypercert-details";
+import HypercertListings from "@/components/marketplace/hypercert-listings";
+import { ListForSaleButton } from "@/components/marketplace/list-for-sale-button";
 import {
   Accordion,
   AccordionContent,
@@ -63,11 +63,11 @@ export default async function HypercertPage({ params, searchParams }: Props) {
   }
 
   const defaultAccordionItems = isMarketplaceListingsEnabledOnChain
-    ? ["item-3"]
+    ? ["marketplace-listings"]
     : isEvaluationsEnabledOnChain
-      ? ["item-2"]
+      ? ["evaluations"]
       : isCreatorFeedEnabledOnChain
-        ? ["item-1"]
+        ? ["creator-feed"]
         : [];
 
   return (
@@ -78,7 +78,7 @@ export default async function HypercertPage({ params, searchParams }: Props) {
         defaultValue={defaultAccordionItems}
         className="w-full"
       >
-        <AccordionItem value="item-1">
+        <AccordionItem value="creator-feed">
           {/* creator feed */}
           <AccordionTrigger className="uppercase text-sm text-slate-500 font-medium tracking-wider">
             CREATOR&apos;S FEED
@@ -96,7 +96,7 @@ export default async function HypercertPage({ params, searchParams }: Props) {
         </AccordionItem>
 
         {/* evaluations */}
-        <AccordionItem value="item-2">
+        <AccordionItem value="evaluations">
           <AccordionTrigger className="uppercase text-sm text-slate-500 font-medium tracking-wider">
             Evaluations
           </AccordionTrigger>
@@ -113,7 +113,7 @@ export default async function HypercertPage({ params, searchParams }: Props) {
         </AccordionItem>
 
         {/* marketplace */}
-        <AccordionItem value="item-3">
+        <AccordionItem value="marketplace-listings">
           <AccordionTrigger className="uppercase text-sm text-slate-500 font-medium tracking-wider">
             Marketplace
           </AccordionTrigger>
