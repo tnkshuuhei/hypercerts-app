@@ -4,7 +4,7 @@ import { AllowListRecord } from "@/allowlists/getAllowListRecordsForAddressByCla
 import { Button } from "../ui/button";
 import { useHypercertClient } from "@/hooks/use-hypercert-client";
 import { waitForTransactionReceipt } from "viem/actions";
-import { useAccount, useWalletClient } from "wagmi";
+import { useAccount, useSwitchChain, useWalletClient } from "wagmi";
 import { useRouter } from "next/navigation";
 import { Row } from "@tanstack/react-table";
 import { useStepProcessDialogContext } from "../global/step-process-dialog";
@@ -26,6 +26,9 @@ export default function UnclaimedHypercertClaimButton({
   const [isLoading, setIsLoading] = useState(false);
   const { setDialogStep, setSteps, setOpen, setTitle, setExtraContent } =
     useStepProcessDialogContext();
+  const { switchChain } = useSwitchChain();
+  const selectedHypercert = allowListRecord.original;
+  const hypercertChainId = selectedHypercert?.hypercert_id?.split("-")[0];
 
   const claimHypercert = async () => {
     setIsLoading(true);
@@ -52,9 +55,9 @@ export default function UnclaimedHypercertClaimButton({
     }
 
     if (
-      !allowListRecord.original?.units ||
-      !allowListRecord.original?.proof ||
-      !allowListRecord.original?.token_id
+      !selectedHypercert?.units ||
+      !selectedHypercert?.proof ||
+      !selectedHypercert?.token_id
     ) {
       throw new Error("Invalid allow list record");
     }
@@ -65,9 +68,9 @@ export default function UnclaimedHypercertClaimButton({
     try {
       await setDialogStep("claiming", "active");
       const tx = await client.mintClaimFractionFromAllowlist(
-        BigInt(allowListRecord.original?.token_id),
-        BigInt(allowListRecord.original?.units),
-        allowListRecord.original?.proof as `0x${string}`[],
+        BigInt(selectedHypercert?.token_id),
+        BigInt(selectedHypercert?.units),
+        selectedHypercert?.proof as `0x${string}`[],
         undefined,
       );
       console.log(tx);
@@ -87,13 +90,13 @@ export default function UnclaimedHypercertClaimButton({
         await setDialogStep("route", "active");
         const extraContent = createExtraContent(
           receipt,
-          allowListRecord.original?.hypercert_id!,
+          selectedHypercert?.hypercert_id!,
           account.chain,
         );
         setExtraContent(extraContent);
         await setDialogStep("done", "completed");
         await revalidatePathServerAction([
-          `/hypercerts/${allowListRecord.original?.hypercert_id}`,
+          `/hypercerts/${selectedHypercert?.hypercert_id}`,
           `/profile/${account.address}`,
           `/profile/${account.address}?tab=hypercerts-claimable`,
         ]);
@@ -110,16 +113,27 @@ export default function UnclaimedHypercertClaimButton({
       setIsLoading(false);
     }
   };
+
   return (
     <Button
       variant={"outline"}
       size={"sm"}
-      onClick={claimHypercert}
+      onClick={() => {
+        if (hypercertChainId === account.chainId?.toString()) {
+          claimHypercert();
+        } else {
+          switchChain({
+            chainId: Number(hypercertChainId),
+          });
+        }
+      }}
       disabled={
-        allowListRecord.original?.user_address !== account.address || isLoading
+        selectedHypercert?.user_address !== account.address || isLoading
       }
     >
-      Claim
+      {hypercertChainId === account.chainId?.toString()
+        ? "Claim"
+        : `Switch chain`}
     </Button>
   );
 }

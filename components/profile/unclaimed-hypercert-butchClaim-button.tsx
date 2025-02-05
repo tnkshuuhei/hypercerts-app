@@ -4,12 +4,14 @@ import { AllowListRecord } from "@/allowlists/getAllowListRecordsForAddressByCla
 import { Button } from "../ui/button";
 import { useHypercertClient } from "@/hooks/use-hypercert-client";
 import { waitForTransactionReceipt } from "viem/actions";
-import { useAccount, useWalletClient } from "wagmi";
+import { useAccount, useSwitchChain, useWalletClient } from "wagmi";
 import { useRouter } from "next/navigation";
 import { useStepProcessDialogContext } from "../global/step-process-dialog";
 import { revalidatePathServerAction } from "@/app/actions/revalidatePathServerAction";
 import { useState } from "react";
 import { Hex, ByteArray } from "viem";
+import { errorToast } from "@/lib/errorToast";
+import { ChainFactory } from "@/lib/chainFactory";
 
 interface TransformedClaimData {
   hypercertTokenIds: bigint[];
@@ -31,8 +33,10 @@ function transformAllowListRecords(
 
 export default function UnclaimedHypercertBatchClaimButton({
   allowListRecords,
+  selectedChainId,
 }: {
   allowListRecords: AllowListRecord[];
+  selectedChainId: number | null;
 }) {
   const { client } = useHypercertClient();
   const { data: walletClient } = useWalletClient();
@@ -41,6 +45,11 @@ export default function UnclaimedHypercertBatchClaimButton({
   const [isLoading, setIsLoading] = useState(false);
   const { setDialogStep, setSteps, setOpen, setTitle } =
     useStepProcessDialogContext();
+  const { switchChain } = useSwitchChain();
+
+  const selectedChain = selectedChainId
+    ? ChainFactory.getChain(selectedChainId)
+    : null;
 
   const claimHypercert = async () => {
     setIsLoading(true);
@@ -99,19 +108,38 @@ export default function UnclaimedHypercertBatchClaimButton({
     }
   };
   return (
-    <Button
-      variant={"outline"}
-      size={"sm"}
-      onClick={claimHypercert}
-      disabled={
-        isLoading ||
-        !allowListRecords.length ||
-        !account ||
-        !client ||
-        account.address !== allowListRecords[0].user_address
-      }
-    >
-      Claim Selected
-    </Button>
+    <>
+      {account.chainId === selectedChainId ? (
+        <Button
+          variant={"outline"}
+          size={"sm"}
+          onClick={claimHypercert}
+          disabled={
+            isLoading ||
+            !allowListRecords.length ||
+            !account ||
+            !client ||
+            account.address !== allowListRecords[0].user_address
+          }
+        >
+          Claim Selected
+        </Button>
+      ) : (
+        <Button
+          variant={"outline"}
+          size="sm"
+          disabled={!account.isConnected}
+          onClick={() => {
+            if (!selectedChainId)
+              return errorToast("Hypercert is not selected");
+            switchChain({ chainId: selectedChainId });
+          }}
+        >
+          {selectedChainId
+            ? `Switch to ${selectedChain?.name}`
+            : "Select Hypercert"}
+        </Button>
+      )}
+    </>
   );
 }
