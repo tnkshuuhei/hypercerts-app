@@ -4,7 +4,6 @@ import React from "react";
 import Image from "next/image";
 import { ColumnDef } from "@tanstack/react-table";
 import { createColumnHelper } from "@tanstack/react-table";
-import { AllowListRecord } from "@/allowlists/getAllowListRecordsForAddressByClaimed";
 import TimeFrame from "@/components/hypercert/time-frame";
 import { ChainFactory } from "@/lib/chainFactory";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -14,8 +13,9 @@ import { Badge } from "@/components/ui/badge";
 import { FormattedUnits } from "@/components/formatted-units";
 import Link from "next/link";
 import { TooltipInfo } from "@/components/tooltip-info";
+import { UnclaimedFraction } from "../unclaimed-hypercerts-list";
 
-const columnHelper = createColumnHelper<AllowListRecord>();
+const columnHelper = createColumnHelper<UnclaimedFraction>();
 
 export const UnclaimedFractionColumns = [
   columnHelper.accessor("id", {
@@ -44,7 +44,8 @@ export const UnclaimedFractionColumns = [
     header: "Hypercert",
     id: "hypercert_id",
     cell: ({ row }) => {
-      const hypercertId = row.getValue("hypercert_id") as string;
+      const hypercertId = row.original.hypercert_id as string;
+      const metadata = row.original.metadata;
       const [chainId] = hypercertId.split("-");
       const chain = ChainFactory.getChain(Number(chainId));
 
@@ -73,11 +74,14 @@ export const UnclaimedFractionColumns = [
                   </Badge>
                 )}
                 <span className="truncate font-medium text-sm sm:text-base max-w-[200px] sm:max-w-[300px] lg:max-w-[400px]">
-                  {hypercertId}
+                  {metadata?.name}
                 </span>
               </div>
               <div className="text-xs sm:text-sm text-gray-600 mt-1">
-                Jun 26, 2024 — Jun 27, 2024
+                <TimeFrame
+                  from={metadata?.work_timeframe_from}
+                  to={metadata?.work_timeframe_to}
+                />
               </div>
             </div>
           </div>
@@ -151,4 +155,4 @@ export const UnclaimedFractionColumns = [
       );
     },
   }),
-] as ColumnDef<AllowListRecord>[];
+] as ColumnDef<UnclaimedFraction>[];

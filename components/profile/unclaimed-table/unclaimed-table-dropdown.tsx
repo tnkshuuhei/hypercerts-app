@@ -1,6 +1,5 @@
 "use client";
 
-import { AllowListRecord } from "@/allowlists/getAllowListRecordsForAddressByClaimed";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -11,9 +10,10 @@ import {
 import { Row } from "@tanstack/react-table";
 import Link from "next/link";
 import { MoreHorizontal } from "lucide-react";
+import { UnclaimedFraction } from "../unclaimed-hypercerts-list";
 
 interface DataTableRowActionsProps<TData> {
-  row: Row<TData & AllowListRecord>;
+  row: Row<TData & UnclaimedFraction>;
 }
 
 export function UnclaimedTableDropdown<TData>({

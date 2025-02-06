@@ -25,14 +25,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { AllowListRecord } from "@/allowlists/getAllowListRecordsForAddressByClaimed";
 import UnclaimedHypercertBatchClaimButton from "../unclaimed-hypercert-butchClaim-button";
 import { TableToolbar } from "./table-toolbar";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import { UnclaimedFraction } from "../unclaimed-hypercerts-list";
 
 export interface DataTableProps {
-  columns: ColumnDef<AllowListRecord>[];
-  data: readonly AllowListRecord[];
+  columns: ColumnDef<UnclaimedFraction>[];
+  data: UnclaimedFraction[];
 }
 
 export function UnclaimedFractionTable({ columns, data }: DataTableProps) {
@@ -41,7 +41,9 @@ export function UnclaimedFractionTable({ columns, data }: DataTableProps) {
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
   const [selectedChain, setSelectedChain] = useState<number | null>(null);
-  const [selectedRecords, setSelectedRecords] = useState<AllowListRecord[]>([]);
+  const [selectedRecords, setSelectedRecords] = useState<UnclaimedFraction[]>(
+    [],
+  );
 
   const isMobile = useMediaQuery("(max-width: 640px)");
 
@@ -65,7 +67,7 @@ export function UnclaimedFractionTable({ columns, data }: DataTableProps) {
   // Determines if a row can be selected based on chain compatibility
   // This prevents selection of hypercerts from different chains simultaneously
   const isRowSelectable = useCallback(
-    (row: Row<AllowListRecord>) => {
+    (row: Row<UnclaimedFraction>) => {
       const rowChainId = getChainId(row.original.hypercert_id!);
       // Allow selection if no chain is selected yet or if chains match
       return !selectedChain || selectedChain === rowChainId;
@@ -103,7 +105,7 @@ export function UnclaimedFractionTable({ columns, data }: DataTableProps) {
   );
 
   const table = useReactTable({
-    data: data as AllowListRecord[],
+    data: data as UnclaimedFraction[],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
