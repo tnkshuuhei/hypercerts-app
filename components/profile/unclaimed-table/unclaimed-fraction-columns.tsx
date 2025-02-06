@@ -14,6 +14,7 @@ import { FormattedUnits } from "@/components/formatted-units";
 import Link from "next/link";
 import { TooltipInfo } from "@/components/tooltip-info";
 import { UnclaimedFraction } from "../unclaimed-hypercerts-list";
+import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
 
 const columnHelper = createColumnHelper<UnclaimedFraction>();
 
@@ -111,15 +112,15 @@ export const UnclaimedFractionColumns = [
       );
     },
     cell: ({ row }) => {
-      const percentage =
-        (BigInt(row.original.units!) * BigInt(100) * BigInt(100)) /
-        BigInt(row.original.total_units!);
-      const calculatedPercentage = Number(percentage) / 100;
+      const calculatedPercentage = calculateBigIntPercentage(
+        row.original.units as string,
+        row.original.total_units as string,
+      );
 
       const displayPercentage =
-        calculatedPercentage < 1
+        calculatedPercentage! < 1
           ? "<1"
-          : Math.round(calculatedPercentage).toString();
+          : Math.round(calculatedPercentage!).toString();
 
       return (
         <div className="flex flex-col space-y-1 text-sm sm:text-base">

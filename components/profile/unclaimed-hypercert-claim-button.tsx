@@ -34,14 +34,14 @@ export default function UnclaimedHypercertClaimButton({
     setIsLoading(true);
     setOpen(true);
     setSteps([
-      { id: "preparing", description: "Preparing to claim hypercert..." },
-      { id: "claiming", description: "Claiming hypercert on-chain..." },
+      { id: "preparing", description: "Preparing to claim fraction..." },
+      { id: "claiming", description: "Claiming fraction on-chain..." },
       { id: "confirming", description: "Waiting for on-chain confirmation" },
-      { id: "route", description: "Creating your new hypercert's link..." },
+      { id: "route", description: "Creating your new fraction's link..." },
       { id: "done", description: "Claiming complete!" },
     ]);
 
-    setTitle("Claim Hypercert from Allowlist");
+    setTitle("Claim fraction from Allowlist");
     if (!client) {
       throw new Error("No client found");
     }
@@ -77,7 +77,7 @@ export default function UnclaimedHypercertClaimButton({
 
       if (!tx) {
         await setDialogStep("claiming", "error");
-        throw new Error("Failed to claim hypercert");
+        throw new Error("Failed to claim fraction");
       }
 
       await setDialogStep("confirming", "active");
@@ -97,8 +97,8 @@ export default function UnclaimedHypercertClaimButton({
         await setDialogStep("done", "completed");
         await revalidatePathServerAction([
           `/hypercerts/${selectedHypercert?.hypercert_id}`,
-          `/profile/${account.address}`,
           `/profile/${account.address}?tab=hypercerts-claimable`,
+          `/profile/${account.address}?tab=hypercerts-owned`,
         ]);
       } else if (receipt.status == "reverted") {
         await setDialogStep("confirming", "error", "Transaction reverted");

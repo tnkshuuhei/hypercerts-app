@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { useStepProcessDialogContext } from "../global/step-process-dialog";
 import { revalidatePathServerAction } from "@/app/actions/revalidatePathServerAction";
 import { useState } from "react";
-import { Hex, ByteArray } from "viem";
+import { Hex, ByteArray, getAddress } from "viem";
 import { errorToast } from "@/lib/errorToast";
 import { ChainFactory } from "@/lib/chainFactory";
 
@@ -55,12 +55,12 @@ export default function UnclaimedHypercertBatchClaimButton({
     setIsLoading(true);
     setOpen(true);
     setSteps([
-      { id: "preparing", description: "Preparing to claim hypercert..." },
-      { id: "claiming", description: "Claiming hypercert on-chain..." },
+      { id: "preparing", description: "Preparing to claim fractions..." },
+      { id: "claiming", description: "Claiming fractions on-chain..." },
       { id: "confirming", description: "Waiting for on-chain confirmation" },
       { id: "done", description: "Claiming complete!" },
     ]);
-    setTitle("Claim Hypercert from Allowlist");
+    setTitle("Claim fractions from Allowlist");
     if (!client) {
       throw new Error("No client found");
     }
@@ -81,7 +81,7 @@ export default function UnclaimedHypercertBatchClaimButton({
       console.log(tx);
       if (!tx) {
         await setDialogStep("claiming", "error");
-        throw new Error("Failed to claim hypercert");
+        throw new Error("Failed to claim fractions");
       }
       await setDialogStep("confirming", "active");
       const receipt = await waitForTransactionReceipt(walletClient, {
@@ -91,8 +91,8 @@ export default function UnclaimedHypercertBatchClaimButton({
       if (receipt.status == "success") {
         await setDialogStep("done", "completed");
         await revalidatePathServerAction([
-          `/profile/${account.address}`,
           `/profile/${account.address}?tab=hypercerts-claimable`,
+          `/profile/${account.address}?tab=hypercerts-owned`,
         ]);
       } else if (receipt.status == "reverted") {
         await setDialogStep("confirming", "error", "Transaction reverted");
@@ -111,7 +111,7 @@ export default function UnclaimedHypercertBatchClaimButton({
     <>
       {account.chainId === selectedChainId ? (
         <Button
-          variant={"outline"}
+          variant={"default"}
           size={"sm"}
           onClick={claimHypercert}
           disabled={
@@ -119,7 +119,8 @@ export default function UnclaimedHypercertBatchClaimButton({
             !allowListRecords.length ||
             !account ||
             !client ||
-            account.address !== allowListRecords[0].user_address
+            account.address !==
+              getAddress(allowListRecords[0].user_address as string)
           }
         >
           Claim Selected
@@ -130,14 +131,13 @@ export default function UnclaimedHypercertBatchClaimButton({
           size="sm"
           disabled={!account.isConnected || !selectedChainId}
           onClick={() => {
-            if (!selectedChainId)
-              return errorToast("Hypercert is not selected");
+            if (!selectedChainId) return errorToast("Fraction is not selected");
             switchChain({ chainId: selectedChainId });
           }}
         >
           {selectedChainId
             ? `Switch to ${selectedChain?.name}`
-            : "Select Hypercert"}
+            : "Select fraction"}
         </Button>
       )}
     </>
