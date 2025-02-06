@@ -10,7 +10,7 @@ import ExploreListSkeleton from "@/components/explore/explore-list-skeleton";
 import { ProfileSubTabKey, subTabs } from "@/app/profile/[address]/tabs";
 import { SubTabsWithCount } from "@/components/profile/sub-tabs-with-count";
 import { getHypercertsByOwner } from "@/hypercerts/getHypercertsByOwner";
-import { getHypercert } from "@/hypercerts/getHypercert";
+import { getHypercertMetadata } from "@/hypercerts/getHypercertMetadata";
 
 const HypercertsTabContentInner = async ({
   address,
@@ -39,10 +39,18 @@ const HypercertsTabContentInner = async ({
     }
     const hypercertsWithMetadata = await Promise.all(
       res.data.map(async (record): Promise<UnclaimedFraction> => {
-        const hypercert = await getHypercert(record.hypercert_id as string);
+        const metadata = await getHypercertMetadata(
+          record.hypercert_id as string,
+        );
+        if (!metadata) {
+          return {
+            ...record,
+            metadata: null,
+          };
+        }
         return {
           ...record,
-          metadata: hypercert?.metadata || null,
+          metadata: metadata?.data,
         };
       }),
     );

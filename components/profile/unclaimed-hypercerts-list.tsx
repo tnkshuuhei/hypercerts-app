@@ -2,10 +2,10 @@ import { EmptySection } from "@/components/global/sections";
 import { AllowListRecord } from "@/allowlists/getAllowListRecordsForAddressByClaimed";
 import { UnclaimedFractionTable } from "./unclaimed-table/unclaimed-fraction-table";
 import { UnclaimedFractionColumns } from "./unclaimed-table/unclaimed-fraction-columns";
-import { HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
+import { HypercertMetadata } from "@/hypercerts/fragments/hypercert-metadata.fragment";
 
 export type UnclaimedFraction = AllowListRecord & {
-  metadata: HypercertFull["metadata"];
+  metadata: HypercertMetadata | null;
 };
 
 export default async function UnclaimedHypercertsList({
