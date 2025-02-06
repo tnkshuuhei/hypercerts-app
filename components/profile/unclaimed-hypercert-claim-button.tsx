@@ -116,7 +116,9 @@ export default function UnclaimedHypercertClaimButton({
 
   return (
     <Button
-      variant={"outline"}
+      variant={
+        hypercertChainId === account.chainId?.toString() ? "default" : "outline"
+      }
       size={"sm"}
       onClick={() => {
         if (hypercertChainId === account.chainId?.toString()) {

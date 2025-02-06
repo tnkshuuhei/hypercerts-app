@@ -12,8 +12,8 @@ import { UnclaimedTableDropdown } from "./unclaimed-table-dropdown";
 import UnclaimedHypercertClaimButton from "../unclaimed-hypercert-claim-button";
 import { Badge } from "@/components/ui/badge";
 import { FormattedUnits } from "@/components/formatted-units";
-import { Button } from "@/components/ui/button";
-import { ArrowUpDown } from "lucide-react";
+import Link from "next/link";
+import { TooltipInfo } from "@/components/tooltip-info";
 
 const columnHelper = createColumnHelper<AllowListRecord>();
 
@@ -41,43 +41,47 @@ export const UnclaimedFractionColumns = [
     enableHiding: false,
   }),
   columnHelper.accessor("hypercert_id", {
-    header: "Title",
+    header: "Hypercert",
     id: "hypercert_id",
     cell: ({ row }) => {
       const hypercertId = row.getValue("hypercert_id") as string;
       const [chainId] = hypercertId.split("-");
       const chain = ChainFactory.getChain(Number(chainId));
-      // TODO: get title from metadata
-      // TODO: get work timeframe from metadata
 
       return (
-        <div className="flex items-center space-x-2">
-          <Image
-            src={`/api/hypercerts/${hypercertId}/image`}
-            alt={hypercertId || ""}
-            className="object-cover object-top w-[100px] h-[100px]"
-            width={100}
-            height={100}
-          />
-          <div className="flex flex-col">
-            <div className="flex space-x-2 max-w-[500px]">
-              {chain && (
-                <Badge variant="outline" className="w-max">
-                  {chain.name}
-                </Badge>
-              )}
-              <span className="truncate font-medium">
-                {/* {metadata?.title} */}
-                {hypercertId}
-              </span>
+        <Link
+          href={`/hypercerts/${hypercertId}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="cursor-pointer block w-full"
+        >
+          <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
+            <div className="w-full sm:w-auto">
+              <Image
+                src={`/api/hypercerts/${hypercertId}/image`}
+                alt={hypercertId || ""}
+                className="object-cover object-top w-full sm:w-24 h-24 sm:h-24 rounded"
+                width={100}
+                height={100}
+              />
             </div>
-            {/* <TimeFrame
-              from={metadata?.work_timeframe_from}
-              to={metadata?.work_timeframe_to}
-            /> */}
-            <div>Jun 26, 2024 — Jun 27, 2024</div>
+            <div className="flex flex-col flex-grow min-w-0">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-1 sm:space-y-0 sm:space-x-2">
+                {chain && (
+                  <Badge variant="outline" className="w-max text-xs sm:text-sm">
+                    {chain.name}
+                  </Badge>
+                )}
+                <span className="truncate font-medium text-sm sm:text-base max-w-[200px] sm:max-w-[300px] lg:max-w-[400px]">
+                  {hypercertId}
+                </span>
+              </div>
+              <div className="text-xs sm:text-sm text-gray-600 mt-1">
+                Jun 26, 2024 — Jun 27, 2024
+              </div>
+            </div>
           </div>
-        </div>
+        </Link>
       );
     },
     filterFn: (
@@ -87,56 +91,64 @@ export const UnclaimedFractionColumns = [
     ) => {
       if (!filterValue?.length) return true;
       const [chainId] = row.getValue(id).split("-");
-      const result = filterValue.includes(chainId);
-      return result;
+      return filterValue.includes(chainId);
     },
   }),
   columnHelper.accessor("units", {
-    header: ({ column }) => {
+    header: () => {
       return (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Claimable Units
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
+        <div className="flex flex-row items-center space-x-1">
+          <span>Claimable fraction</span>
+          <TooltipInfo
+            tooltipText="Your claimable portion of the total hypercert units. For example, 50% means you can claim half of the total units issued for this hypercert."
+            className="w-4 h-4"
+          />
+        </div>
       );
     },
     cell: ({ row }) => {
-      const units = row.getValue("units");
-      return <FormattedUnits>{units as string}</FormattedUnits>;
-    },
-  }),
-  columnHelper.accessor("total_units", {
-    header: ({ column }) => {
+      const percentage =
+        (BigInt(row.original.units!) * BigInt(100) * BigInt(100)) /
+        BigInt(row.original.total_units!);
+      const calculatedPercentage = Number(percentage) / 100;
+
+      const displayPercentage =
+        calculatedPercentage < 1
+          ? "<1"
+          : Math.round(calculatedPercentage).toString();
+
       return (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Total Units
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
+        <div className="flex flex-col space-y-1 text-sm sm:text-base">
+          <span className="font-medium">{displayPercentage}%</span>
+          <span className="flex items-center space-x-1 text-gray-600">
+            <FormattedUnits>{row.original.units as string}</FormattedUnits>
+            {" / "}
+            <FormattedUnits>
+              {row.original.total_units as string}
+            </FormattedUnits>
+          </span>
+        </div>
       );
     },
+  }),
+  columnHelper.display({
+    id: "claim",
     cell: ({ row }) => {
-      const totalUnits = row.getValue("total_units");
-      return <FormattedUnits>{totalUnits as string}</FormattedUnits>;
+      return (
+        <div className="w-full sm:w-auto">
+          <UnclaimedHypercertClaimButton allowListRecord={row} />
+        </div>
+      );
     },
   }),
   columnHelper.display({
-    id: "action",
+    id: "actions",
     cell: ({ row }) => {
-      return <UnclaimedHypercertClaimButton allowListRecord={row} />;
-    },
-  }),
-  columnHelper.display({
-    id: "action",
-    cell: ({ row }) => {
-      return <UnclaimedTableDropdown row={row} />;
+      return (
+        <div className="w-full sm:w-auto">
+          <UnclaimedTableDropdown row={row} />
+        </div>
+      );
     },
   }),
 ] as ColumnDef<AllowListRecord>[];

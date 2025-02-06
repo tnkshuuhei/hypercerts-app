@@ -28,6 +28,7 @@ import {
 import { AllowListRecord } from "@/allowlists/getAllowListRecordsForAddressByClaimed";
 import UnclaimedHypercertBatchClaimButton from "../unclaimed-hypercert-butchClaim-button";
 import { TableToolbar } from "./table-toolbar";
+import { useMediaQuery } from "@/hooks/use-media-query";
 
 export interface DataTableProps {
   columns: ColumnDef<AllowListRecord>[];
@@ -41,6 +42,19 @@ export function UnclaimedFractionTable({ columns, data }: DataTableProps) {
   const [rowSelection, setRowSelection] = useState({});
   const [selectedChain, setSelectedChain] = useState<number | null>(null);
   const [selectedRecords, setSelectedRecords] = useState<AllowListRecord[]>([]);
+
+  const isMobile = useMediaQuery("(max-width: 640px)");
+
+  // Hide units and actions columns on mobile
+  useEffect(() => {
+    if (isMobile) {
+      setColumnVisibility((prev) => ({
+        ...prev,
+        units: false,
+        actions: false,
+      }));
+    }
+  }, [isMobile]);
 
   // Utility function to extract chain ID from hypercert_id
   const getChainId = useCallback((hypercertId: string) => {
@@ -125,7 +139,7 @@ export function UnclaimedFractionTable({ columns, data }: DataTableProps) {
 
   return (
     <div className="w-full">
-      <div className="flex gap-2 items-center py-4">
+      <div className="flex gap-2 py-4 flex-col lg:flex-row">
         <UnclaimedHypercertBatchClaimButton
           allowListRecords={selectedRecords}
           selectedChainId={selectedChain}
@@ -185,7 +199,7 @@ export function UnclaimedFractionTable({ columns, data }: DataTableProps) {
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
           {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
+          {table.getFilteredRowModel().rows.length} hypercert(s) selected.
         </div>
         <div className="space-x-2">
           <Button
