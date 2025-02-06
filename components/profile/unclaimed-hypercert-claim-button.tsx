@@ -82,7 +82,6 @@ export default function UnclaimedHypercertClaimButton({
 
       await setDialogStep("confirming", "active");
       const receipt = await waitForTransactionReceipt(walletClient, {
-        confirmations: 3,
         hash: tx,
       });
 
@@ -111,6 +110,7 @@ export default function UnclaimedHypercertClaimButton({
       console.error(error);
     } finally {
       setIsLoading(false);
+      setOpen(false);
     }
   };
 

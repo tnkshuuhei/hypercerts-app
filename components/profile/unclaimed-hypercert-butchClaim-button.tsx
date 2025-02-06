@@ -85,7 +85,6 @@ export default function UnclaimedHypercertBatchClaimButton({
       }
       await setDialogStep("confirming", "active");
       const receipt = await waitForTransactionReceipt(walletClient, {
-        confirmations: 3,
         hash: tx,
       });
       if (receipt.status == "success") {
@@ -105,6 +104,7 @@ export default function UnclaimedHypercertBatchClaimButton({
       console.error(error);
     } finally {
       setIsLoading(false);
+      setOpen(false);
     }
   };
   return (
