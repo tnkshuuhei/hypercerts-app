@@ -24,9 +24,7 @@ import { RefObject, useMemo, useState } from "react";
 
 import CreateAllowlistDialog from "@/components/allowlist/create-allowlist-dialog";
 import ConnectDialog from "@/components/connect-dialog";
-import {
-  MAX_FILE_SIZE
-} from "@/components/creator-feed/creator-feed-drawer";
+import { MAX_FILE_SIZE } from "@/components/creator-feed/creator-feed-drawer";
 import { FormattedUnits } from "@/components/formatted-units";
 import { useStepProcessDialogContext } from "@/components/global/step-process-dialog";
 import {
@@ -62,7 +60,7 @@ import {
 } from "@/components/ui/tooltip";
 import { useToast } from "@/components/ui/use-toast";
 import {
-  DEFAULT_NUM_FRACTIONS,
+  DEFAULT_NUM_UNITS,
   HYPERCERTS_API_URL_REST,
 } from "@/configs/hypercerts";
 import { ChainFactory } from "@/lib/chainFactory";
@@ -349,7 +347,7 @@ const DatesAndPeople = ({ form }: FormStepsProps) => {
 
 const calculatePercentageBigInt = (
   units: bigint,
-  total: bigint = DEFAULT_NUM_FRACTIONS,
+  total: bigint = DEFAULT_NUM_UNITS,
 ) => {
   return Number((units * BigInt(10000)) / total) / 100;
 };
@@ -511,6 +509,12 @@ const AdvancedAndSubmit = ({ form, isBlueprint }: FormStepsProps) => {
                     setAllowlistEntries={setAllowlistEntries}
                     open={createDialogOpen}
                     setOpen={setCreateDialogOpen}
+                    initialValues={allowlistEntries?.map((entry) => ({
+                      address: entry.address,
+                      percentage: calculatePercentageBigInt(
+                        entry.units,
+                      ).toString(),
+                    }))}
                   />
                 </div>
                 {!!allowlistEntries?.length && (
