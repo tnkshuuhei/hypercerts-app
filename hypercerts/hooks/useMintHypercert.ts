@@ -87,7 +87,11 @@ export const useMintHypercert = () => {
         );
       }
 
-      const extraContent = createExtraContent(receipt, hypercertId, chain);
+      const extraContent = createExtraContent({
+        receipt,
+        hypercertId,
+        chain: chain!,
+      });
       setExtraContent(extraContent);
 
       await setDialogStep("done", "completed");

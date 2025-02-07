@@ -63,8 +63,6 @@ export default function UnclaimedHypercertClaimButton({
     }
     await setDialogStep("preparing, active");
 
-    console.log(allowListRecord);
-
     try {
       await setDialogStep("claiming", "active");
       const tx = await client.mintClaimFractionFromAllowlist(
@@ -73,7 +71,6 @@ export default function UnclaimedHypercertClaimButton({
         selectedHypercert?.proof as `0x${string}`[],
         undefined,
       );
-      console.log(tx);
 
       if (!tx) {
         await setDialogStep("claiming", "error");
@@ -87,11 +84,11 @@ export default function UnclaimedHypercertClaimButton({
 
       if (receipt.status == "success") {
         await setDialogStep("route", "active");
-        const extraContent = createExtraContent(
-          receipt,
-          selectedHypercert?.hypercert_id!,
-          account.chain,
-        );
+        const extraContent = createExtraContent({
+          receipt: receipt,
+          hypercertId: selectedHypercert?.hypercert_id!,
+          chain: account.chain!,
+        });
         setExtraContent(extraContent);
         await setDialogStep("done", "completed");
         await revalidatePathServerAction([
@@ -102,7 +99,6 @@ export default function UnclaimedHypercertClaimButton({
       } else if (receipt.status == "reverted") {
         await setDialogStep("confirming", "error", "Transaction reverted");
       }
-      console.log({ receipt });
       setTimeout(() => {
         refresh();
       }, 5000);
@@ -110,7 +106,6 @@ export default function UnclaimedHypercertClaimButton({
       console.error(error);
     } finally {
       setIsLoading(false);
-      setOpen(false);
     }
   };
 

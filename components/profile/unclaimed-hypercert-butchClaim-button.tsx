@@ -12,6 +12,7 @@ import { useState } from "react";
 import { Hex, ByteArray, getAddress } from "viem";
 import { errorToast } from "@/lib/errorToast";
 import { ChainFactory } from "@/lib/chainFactory";
+import { createExtraContent } from "../global/extra-content";
 
 interface TransformedClaimData {
   hypercertTokenIds: bigint[];
@@ -43,7 +44,7 @@ export default function UnclaimedHypercertBatchClaimButton({
   const account = useAccount();
   const { refresh } = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const { setDialogStep, setSteps, setOpen, setTitle } =
+  const { setDialogStep, setSteps, setOpen, setTitle, setExtraContent } =
     useStepProcessDialogContext();
   const { switchChain } = useSwitchChain();
 
@@ -73,12 +74,10 @@ export default function UnclaimedHypercertBatchClaimButton({
 
     const claimData = transformAllowListRecords(allowListRecords);
     await setDialogStep("preparing, active");
-    console.log(allowListRecords);
     try {
       await setDialogStep("claiming", "active");
 
       const tx = await client.batchClaimFractionsFromAllowlists(claimData);
-      console.log(tx);
       if (!tx) {
         await setDialogStep("claiming", "error");
         throw new Error("Failed to claim fractions");
@@ -89,6 +88,11 @@ export default function UnclaimedHypercertBatchClaimButton({
       });
       if (receipt.status == "success") {
         await setDialogStep("done", "completed");
+        const extraContent = createExtraContent({
+          receipt,
+          chain: account?.chain!,
+        });
+        setExtraContent(extraContent);
         await revalidatePathServerAction([
           `/profile/${account.address}?tab=hypercerts-claimable`,
           `/profile/${account.address}?tab=hypercerts-owned`,
@@ -96,7 +100,6 @@ export default function UnclaimedHypercertBatchClaimButton({
       } else if (receipt.status == "reverted") {
         await setDialogStep("confirming", "error", "Transaction reverted");
       }
-      console.log({ receipt });
       setTimeout(() => {
         refresh();
       }, 5000);
@@ -104,9 +107,16 @@ export default function UnclaimedHypercertBatchClaimButton({
       console.error(error);
     } finally {
       setIsLoading(false);
-      setOpen(false);
     }
   };
+
+  const isBatchClaimDisabled =
+    isLoading ||
+    !allowListRecords.length ||
+    !account ||
+    !client ||
+    account.address !== getAddress(allowListRecords[0].user_address as string);
+
   return (
     <>
       {account.chainId === selectedChainId ? (
@@ -114,14 +124,7 @@ export default function UnclaimedHypercertBatchClaimButton({
           variant={"default"}
           size={"sm"}
           onClick={claimHypercert}
-          disabled={
-            isLoading ||
-            !allowListRecords.length ||
-            !account ||
-            !client ||
-            account.address !==
-              getAddress(allowListRecords[0].user_address as string)
-          }
+          disabled={isBatchClaimDisabled}
         >
           Claim Selected
         </Button>

@@ -2,11 +2,15 @@ import { Button } from "@/components/ui/button";
 import type { Chain, TransactionReceipt } from "viem";
 import { generateBlockExplorerLink } from "@/lib/utils";
 
-export const createExtraContent = (
-  receipt: TransactionReceipt,
-  hypercertId?: string,
-  chain?: Chain,
-) => {
+export const createExtraContent = ({
+  receipt,
+  hypercertId,
+  chain,
+}: {
+  receipt: TransactionReceipt;
+  hypercertId?: string;
+  chain: Chain;
+}) => {
   const receiptButton = receipt && (
     <>
       <a
