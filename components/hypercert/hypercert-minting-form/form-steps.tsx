@@ -21,6 +21,7 @@ import {
   X,
 } from "lucide-react";
 import { RefObject, useMemo, useState } from "react";
+import rehypeSanitize from "rehype-sanitize";
 
 import CreateAllowlistDialog from "@/components/allowlist/create-allowlist-dialog";
 import ConnectDialog from "@/components/connect-dialog";
@@ -137,6 +138,9 @@ const GeneralInformation = ({ form }: FormStepsProps) => {
                     commands.orderedListCommand,
                     commands.codeBlock,
                   ]}
+                  previewOptions={{
+                    rehypePlugins: [[rehypeSanitize]],
+                  }}
                 />
               </div>
             </FormControl>
