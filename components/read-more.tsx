@@ -6,8 +6,9 @@ import {
   CollapsibleTrigger,
 } from "./ui/collapsible";
 
-import { useState } from "react";
 import MDEditor from "@uiw/react-md-editor";
+import { useState } from "react";
+import rehypeSanitize from "rehype-sanitize";
 
 export default function ReadMore({
   text,
@@ -52,7 +53,7 @@ export default function ReadMore({
       {!isOpen && <MDEditor.Markdown source={cutoffText} />}
       <Collapsible onOpenChange={setIsOpen}>
         <CollapsibleContent>
-          <MDEditor.Markdown source={text} />
+          <MDEditor.Markdown source={text} rehypePlugins={[rehypeSanitize]} />
         </CollapsibleContent>
         <CollapsibleTrigger className="text-blue-600 hover:underline text-xs lg:text-sm">
           {isOpen ? "Read less" : "Read more"}
