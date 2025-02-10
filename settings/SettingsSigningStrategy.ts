@@ -1,8 +1,9 @@
 import { SettingsFormValues } from "@/components/settings/settings-form";
+import { Address } from "viem";
 
 export abstract class SettingsSigningStrategy {
   constructor(
-    protected address: `0x${string}`,
+    protected address: Address,
     protected chainId: number,
   ) {}
 

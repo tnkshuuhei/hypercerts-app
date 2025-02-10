@@ -5,13 +5,14 @@ import { HYPERCERTS_API_URL_REST } from "@/configs/hypercerts";
 import { signMessage } from "@/lib/sign-api-message";
 
 import { SettingsSigningStrategy } from "./SettingsSigningStrategy";
+import { Address } from "viem";
 
 const STEP_1 = "step1";
 const STEP_2 = "step2";
 
 export class EOASettingsSigningStrategy extends SettingsSigningStrategy {
   constructor(
-    address: `0x${string}`,
+    address: Address,
     chainId: number,
     private dialogContext: ReturnType<typeof useStepProcessDialogContext>,
   ) {
