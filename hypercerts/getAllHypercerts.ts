@@ -155,6 +155,9 @@ filteredIds.add(
 filteredIds.add(
   "314-0xc756B203cA9e13BAB3a93F1dA756bb19ac3C395b-2381976568446569244243622252022377480192",
 );
+filteredIds.add(
+  "314-0xc756B203cA9e13BAB3a93F1dA756bb19ac3C395b-680564733841876926926749214863536422912",
+);
 
 export async function getAllHypercerts({
   first,
