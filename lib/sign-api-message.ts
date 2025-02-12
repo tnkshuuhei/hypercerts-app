@@ -1,11 +1,11 @@
-import { type SignTypedDataParameters } from "viem";
+import { Address, type SignTypedDataParameters } from "viem";
 import { signTypedData } from "@wagmi/core";
 
 import { config as wagmiConfig } from "@/configs/wagmi";
 import { hypercertApiSigningDomain } from "@/configs/constants";
 
 export async function signMessage(
-  signerAddress: `0x${string}`,
+  signerAddress: Address,
   chainId: number,
   config: Pick<SignTypedDataParameters, "types" | "primaryType" | "message">,
 ): Promise<`0x${string}`> {
