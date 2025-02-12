@@ -79,63 +79,69 @@ export default async function HypercertPage({ params, searchParams }: Props) {
         defaultValue={defaultAccordionItems}
         className="w-full"
       >
-        <AccordionItem value="creator-feed">
-          {/* creator feed */}
-          <AccordionTrigger className="uppercase text-sm text-slate-500 font-medium tracking-wider">
-            CREATOR&apos;S FEED
-          </AccordionTrigger>
-          <AccordionContent>
-            <div className="flex justify-end mb-4">
-              <CreatorFeedButton
-                hypercertId={hypercertId}
-                creatorAddress={hypercert.creator_address!}
-                disabledForChain={!isCreatorFeedEnabledOnChain}
-              />
-            </div>
-            <CreatorFeeds hypercertId={hypercertId} />
-          </AccordionContent>
-        </AccordionItem>
-
-        {/* evaluations */}
-        <AccordionItem value="evaluations">
-          <AccordionTrigger className="uppercase text-sm text-slate-500 font-medium tracking-wider">
-            Evaluations
-          </AccordionTrigger>
-          <AccordionContent>
-            <div className="flex justify-end mb-4">
-              <EvaluateButton hypercertId={hypercertId} />
-            </div>
-            <HypercertEvaluations
-              hypercertId={hypercertId}
-              searchParams={searchParams}
-              disabledForChain={!isEvaluationsEnabledOnChain}
-            />
-          </AccordionContent>
-        </AccordionItem>
-
-        {/* marketplace */}
-        <AccordionItem value="marketplace-listings">
-          <AccordionTrigger className="uppercase text-sm text-slate-500 font-medium tracking-wider">
-            Marketplace
-          </AccordionTrigger>
-          <AccordionContent>
-            <div className="flex justify-end mb-4">
-              <div className="flex gap-2">
-                <CurrencyButtons />
-                <ListForSaleButton
-                  hypercert={hypercert}
-                  disabledForChain={!isMarketplaceListingsEnabledOnChain}
+        <div id="creator-feed" className="w-full">
+          <AccordionItem value="creator-feed">
+            {/* creator feed */}
+            <AccordionTrigger className="uppercase text-sm text-slate-500 font-medium tracking-wider">
+              CREATOR&apos;S FEED
+            </AccordionTrigger>
+            <AccordionContent>
+              <div className="flex justify-end mb-4">
+                <CreatorFeedButton
+                  hypercertId={hypercertId}
+                  creatorAddress={hypercert.creator_address!}
+                  disabledForChain={!isCreatorFeedEnabledOnChain}
                 />
               </div>
-            </div>
-            <HypercertListings
-              hypercertId={hypercertId}
-              initialHypercert={hypercert}
-              searchParams={searchParams}
-              invalidated={false}
-            />
-          </AccordionContent>
-        </AccordionItem>
+              <CreatorFeeds hypercertId={hypercertId} />
+            </AccordionContent>
+          </AccordionItem>
+        </div>
+
+        {/* evaluations */}
+        <div id="evaluations" className="w-full">
+          <AccordionItem value="evaluations">
+            <AccordionTrigger className="uppercase text-sm text-slate-500 font-medium tracking-wider">
+              Evaluations
+            </AccordionTrigger>
+            <AccordionContent>
+              <div className="flex justify-end mb-4">
+                <EvaluateButton hypercertId={hypercertId} />
+              </div>
+              <HypercertEvaluations
+                hypercertId={hypercertId}
+                searchParams={searchParams}
+                disabledForChain={!isEvaluationsEnabledOnChain}
+              />
+            </AccordionContent>
+          </AccordionItem>
+        </div>
+
+        {/* marketplace */}
+        <div id="marketplace-listings" className="w-full">
+          <AccordionItem value="marketplace-listings">
+            <AccordionTrigger className="uppercase text-sm text-slate-500 font-medium tracking-wider">
+              Marketplace
+            </AccordionTrigger>
+            <AccordionContent>
+              <div className="flex justify-end mb-4">
+                <div className="flex gap-2">
+                  <CurrencyButtons />
+                  <ListForSaleButton
+                    hypercert={hypercert}
+                    disabledForChain={!isMarketplaceListingsEnabledOnChain}
+                  />
+                </div>
+              </div>
+              <HypercertListings
+                hypercertId={hypercertId}
+                initialHypercert={hypercert}
+                searchParams={searchParams}
+                invalidated={false}
+              />
+            </AccordionContent>
+          </AccordionItem>
+        </div>
       </Accordion>
     </main>
   );
