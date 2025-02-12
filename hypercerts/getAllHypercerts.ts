@@ -192,10 +192,12 @@ export async function getAllHypercerts({
     [],
   );
 
-  const totalCount = Math.max(
-    0,
-    (res.hypercerts.count ?? 0) - filteredIds.size,
-  );
+  const difference = res.hypercerts?.count
+    ? res.hypercerts?.count - data.length
+    : 0;
+  const totalCount = res.hypercerts?.count
+    ? res.hypercerts?.count - difference
+    : 0;
 
   return {
     count: totalCount,
