@@ -1,5 +1,5 @@
 import { useAccount, useChainId, useWalletClient } from "wagmi";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import {
   addressesByNetwork,
   CreateMakerAskOutput,
@@ -22,7 +22,6 @@ import {
 import { decodeContractError } from "@/lib/decodeContractError";
 import { useHypercertExchangeClient } from "@/hooks/use-hypercert-exchange-client";
 import { toast } from "@/components/ui/use-toast";
-import { getFractionsByHypercert } from "@/hypercerts/getFractionsByHypercert";
 import { getCurrencyByAddress } from "@/marketplace/utils";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -32,8 +31,8 @@ import { useRouter } from "next/navigation";
 import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
 import { ExternalLink } from "lucide-react";
 import React, { useEffect } from "react";
-import { clearCacheAfterListing } from "@/app/actions/clearCacheAfterListing";
 import { revalidatePathServerAction } from "@/app/actions/revalidatePathServerAction";
+
 export const useCreateOrderInSupabase = () => {
   const chainId = useChainId();
   const { client: hypercertExchangeClient } = useHypercertExchangeClient();
@@ -50,7 +49,6 @@ export const useCreateOrderInSupabase = () => {
       signature: string;
       quoteType: QuoteType;
       hypercertId: string;
-      // currency: string;
     }) => {
       if (!chainId) {
         throw new Error("No chainId");
