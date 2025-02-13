@@ -15,6 +15,7 @@ import { InfoSection } from "../global/sections";
 import PageSkeleton from "./page-skeleton";
 import { cache, Suspense } from "react";
 import { getHypercertState } from "@/hypercerts/getHypercertState";
+import { getOrders } from "@/marketplace/getOpenOrders";
 
 function HypercertDetailsNotFound() {
   return <InfoSection>Hypercert not found</InfoSection>;
@@ -38,6 +39,9 @@ export default async function HypercertDetails({
   hypercertId: string;
 }) {
   const hypercert = await getHypercertDetails(hypercertId);
+  const orders = await getOrders({ filter: { hypercertId: hypercertId } });
+
+  const isListed = orders?.data?.length > 0 && orders?.count > 0;
 
   if (!hypercert) {
     return <HypercertDetailsNotFound />;
@@ -57,7 +61,7 @@ export default async function HypercertDetails({
                 {hypercert?.metadata?.name || "[Untitled]"}
               </h1>
               <div className="flex space-x-2">
-                <BuyButton />
+                <BuyButton isListed={isListed} />
                 <MutationButtons hypercert={hypercert} />
               </div>
             </div>
