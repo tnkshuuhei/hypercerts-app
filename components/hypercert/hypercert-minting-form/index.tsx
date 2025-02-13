@@ -20,11 +20,7 @@ import { formatDate } from "@/lib/utils";
 import { z } from "zod";
 import { isAddress } from "viem";
 import { useCreateBlueprint } from "@/blueprints/hooks/createBlueprint";
-import isURL from "validator/lib/isURL";
-
-const isValidImageData = (value: string) => {
-  return value.startsWith("data:image/") || isURL(value);
-};
+import { isValidImageData } from "@/components/image-uploader";
 
 const formSchema = z.object({
   blueprint_minter_address: z.string().refine((data) => isAddress(data), {

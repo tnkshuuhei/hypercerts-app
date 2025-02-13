@@ -3,6 +3,11 @@ import React from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Upload } from "lucide-react";
+import isURL from "validator/lib/isURL";
+
+export const isValidImageData = (value: string) => {
+  return value.startsWith("data:image/") || isURL(value);
+};
 
 export const base64ToBlob = (base64String: string) => {
   // remove header
