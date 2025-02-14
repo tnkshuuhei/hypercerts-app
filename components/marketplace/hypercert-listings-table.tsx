@@ -10,10 +10,13 @@ import {
 } from "@/components/ui/table";
 import { useToast } from "@/components/ui/use-toast";
 import { DEFAULT_DISPLAY_CURRENCY } from "@/configs/hypercerts";
+// TODO: Is there a way to silence these errors?
+// We could extract the types to a separate file and make a note why these errors occur,
+// so that the next person stumbling over this doesn't try to solve them to no avail.
 import { HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
+import { OrderFragment } from "@/marketplace/fragments/order.fragment";
 import { useAccountStore } from "@/lib/account-store";
 import { cn } from "@/lib/utils";
-import { OrderFragment } from "@/marketplace/fragments/order.fragment";
 import { CancelOrderParams, useCancelOrder } from "@/marketplace/hooks";
 import {
   flexRender,
