@@ -198,7 +198,7 @@ const GeneralInformation = ({ form }: FormStepsProps) => {
               </div>
             </FormControl>
             <FormMessage />
-            <FormDescription>The URL to your project logo</FormDescription>
+            <FormDescription>Upload your project logo</FormDescription>
           </FormItem>
         )}
       />
@@ -233,7 +233,7 @@ const GeneralInformation = ({ form }: FormStepsProps) => {
             </FormControl>
             <FormMessage />
             <FormDescription>
-              The URL to an image to be displayed as the banner
+              The image to be displayed as the banner
             </FormDescription>
           </FormItem>
         )}
