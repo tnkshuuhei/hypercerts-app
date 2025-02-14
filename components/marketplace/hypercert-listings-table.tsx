@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/table";
 import { useToast } from "@/components/ui/use-toast";
 import { DEFAULT_DISPLAY_CURRENCY } from "@/configs/hypercerts";
-import { useHypercertExchangeClient } from "@/hooks/use-hypercert-exchange-client";
 import { HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
 import { cn } from "@/lib/utils";
 import { OrderFragment } from "@/marketplace/fragments/order.fragment";
@@ -46,8 +45,7 @@ export default function HypercertListingsTable({
   initialHypercert: HypercertFull;
   searchParams: Record<string, string>;
 }) {
-  const { client: hypercertExchangeClient } = useHypercertExchangeClient();
-  const { address, chainId: connectedChainId } = useAccount();
+  const { address } = useAccount();
   const [chainId] = hypercertId.split("-");
   const router = useRouter();
   const { toast } = useToast();
@@ -57,17 +55,6 @@ export default function HypercertListingsTable({
   >(null);
 
   const displayCurrency = searchParams?.currency || DEFAULT_DISPLAY_CURRENCY;
-
-  const refreshOrderValidity = async (tokenId: string) => {
-    if (!hypercertExchangeClient || !connectedChainId) {
-      console.log("No hypercert exchange client or invalid chain ID");
-      return;
-    }
-    await hypercertExchangeClient.api.updateOrderValidity(
-      [BigInt(tokenId)],
-      connectedChainId,
-    );
-  };
 
   const { mutateAsync: cancelOrderMutation } = useCancelOrder();
 
