@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 
-export function BuyButton() {
+export function BuyButton({ isListed }: { isListed: boolean }) {
   const handleClick = () => {
     const listingsSection = document.getElementById("marketplace-listings");
     if (listingsSection) {
@@ -12,5 +12,11 @@ export function BuyButton() {
     }
   };
 
-  return <Button onClick={handleClick}>Buy</Button>;
+  return (
+    <Button onClick={handleClick} disabled={!isListed}>
+      Buy
+    </Button>
+  );
 }
+
+export default BuyButton;
