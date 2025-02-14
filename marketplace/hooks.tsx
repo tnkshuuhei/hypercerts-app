@@ -567,6 +567,7 @@ export const useBuyFractionalMakerAsk = () => {
   });
 };
 
+// TODO: Move this and all the other types in here to types.ts
 export interface CancelOrderParams {
   nonce: bigint;
   tokenId: string;
