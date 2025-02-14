@@ -11,6 +11,7 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import { DEFAULT_DISPLAY_CURRENCY } from "@/configs/hypercerts";
 import { HypercertFull } from "@/hypercerts/fragments/hypercert-full.fragment";
+import { useAccountStore } from "@/lib/account-store";
 import { cn } from "@/lib/utils";
 import { OrderFragment } from "@/marketplace/fragments/order.fragment";
 import { CancelOrderParams, useCancelOrder } from "@/marketplace/hooks";
@@ -45,7 +46,9 @@ export default function HypercertListingsTable({
   initialHypercert: HypercertFull;
   searchParams: Record<string, string>;
 }) {
-  const { address } = useAccount();
+  const { address: connectedAddress } = useAccount();
+  const { selectedAccount } = useAccountStore();
+  const activeAddress = selectedAccount?.address || connectedAddress;
   const [chainId] = hypercertId.split("-");
   const router = useRouter();
   const { toast } = useToast();
@@ -109,7 +112,7 @@ export default function HypercertListingsTable({
       id: "action",
       cell: (row: any) => {
         const order = row.row.original;
-        const isOwner = address && order.signer === address;
+        const isOwner = activeAddress && order.signer === activeAddress;
         const isProcessing = order.orderNonce === activeOrderNonce;
         const isCancelling = order.orderNonce === cancellingOrderNonce;
 
@@ -171,13 +174,13 @@ export default function HypercertListingsTable({
               ) : (
                 <Button
                   disabled={
-                    !address ||
+                    !activeAddress ||
                     order.chainId !== chainId ||
                     !!activeOrderNonce ||
                     !!cancellingOrderNonce
                   }
                 >
-                  {!address ? "Connect wallet" : "Buy"}
+                  {!activeAddress ? "Connect wallet" : "Buy"}
                 </Button>
               )
             }
