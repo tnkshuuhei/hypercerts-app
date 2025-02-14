@@ -1,37 +1,26 @@
 import { useAccount, useChainId, useWalletClient } from "wagmi";
 import { useMutation } from "@tanstack/react-query";
 import {
-  addressesByNetwork,
   CreateMakerAskOutput,
-  Currency,
   Maker,
   QuoteType,
-  Taker,
-  utils,
-  WETHAbi,
 } from "@hypercerts-org/marketplace-sdk";
 import { useHypercertClient } from "@/hooks/use-hypercert-client";
 import { useStepProcessDialogContext } from "@/components/global/step-process-dialog";
 import { parseClaimOrFractionId } from "@hypercerts-org/sdk";
-import { isAddress, parseUnits, zeroAddress } from "viem";
-import { readContract, waitForTransactionReceipt } from "viem/actions";
-import {
-  CreateFractionalOfferFormValues,
-  MarketplaceOrder,
-} from "@/marketplace/types";
-import { decodeContractError } from "@/lib/decodeContractError";
+import { isAddress, parseUnits } from "viem";
+import { waitForTransactionReceipt } from "viem/actions";
+import { CreateFractionalOfferFormValues } from "@/marketplace/types";
 import { useHypercertExchangeClient } from "@/hooks/use-hypercert-exchange-client";
 import { toast } from "@/components/ui/use-toast";
 import { getCurrencyByAddress } from "@/marketplace/utils";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { generateBlockExplorerLink } from "@/lib/utils";
-import { SUPPORTED_CHAINS } from "@/configs/constants";
 import { useRouter } from "next/navigation";
-import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
-import { ExternalLink } from "lucide-react";
 import React, { useEffect } from "react";
 import { revalidatePathServerAction } from "@/app/actions/revalidatePathServerAction";
+import { useBuyFractionalStrategy } from "./useBuyFractionalStrategy";
+import { BuyFractionalMakerAskParams } from "./types";
 
 export const useCreateOrderInSupabase = () => {
   const chainId = useChainId();
@@ -311,44 +300,8 @@ export const useCreateFractionalMakerAsk = ({
   });
 };
 
-export const useGetCurrentERC20Allowance = () => {
-  const chainId = useChainId();
-  const { address } = useAccount();
-  const hypercertsExchangeAddress =
-    addressesByNetwork[utils.asDeployedChain(chainId)].EXCHANGE_V2;
-
-  const { data: walletClient } = useWalletClient();
-
-  return async (currency: `0x${string}`) => {
-    if (!walletClient) {
-      return BigInt(0);
-    }
-
-    const data = await readContract(walletClient, {
-      abi: WETHAbi,
-      address: currency as `0x${string}`,
-      functionName: "allowance",
-      args: [address, hypercertsExchangeAddress],
-    });
-
-    return data as bigint;
-  };
-};
-
 export const useBuyFractionalMakerAsk = () => {
-  const { client: hypercertExchangeClient } = useHypercertExchangeClient();
-
-  const chainId = useChainId();
-  const {
-    setDialogStep: setStep,
-    setSteps,
-    setOpen,
-    setExtraContent,
-  } = useStepProcessDialogContext();
-  const { data: walletClientData } = useWalletClient();
-  const { address } = useAccount();
-  const getCurrentERC20Allowance = useGetCurrentERC20Allowance();
-  const router = useRouter();
+  const strategy = useBuyFractionalStrategy();
 
   return useMutation({
     mutationKey: ["buyFractionalMakerAsk"],
@@ -359,210 +312,8 @@ export const useBuyFractionalMakerAsk = () => {
         duration: 5000,
       });
     },
-    mutationFn: async ({
-      order,
-      unitAmount,
-      pricePerUnit,
-      hypercertName,
-      totalUnitsInHypercert,
-    }: {
-      order: MarketplaceOrder;
-      unitAmount: bigint;
-      pricePerUnit: string;
-      hypercertName?: string | null;
-      totalUnitsInHypercert?: bigint;
-    }) => {
-      if (!hypercertExchangeClient) {
-        setOpen(false);
-        throw new Error("No client");
-      }
-
-      if (!chainId) {
-        setOpen(false);
-        throw new Error("No chain id");
-      }
-
-      if (!walletClientData) {
-        setOpen(false);
-        throw new Error("No wallet client data");
-      }
-
-      setSteps([
-        {
-          id: "Setting up order execution",
-          description: "Setting up order execution",
-        },
-        {
-          id: "ERC20",
-          description: "Setting approval",
-        },
-        {
-          id: "Transfer manager",
-          description: "Approving transfer manager",
-        },
-        {
-          id: "Awaiting buy signature",
-          description: "Awaiting buy signature",
-        },
-        {
-          id: "Awaiting confirmation",
-          description: "Awaiting confirmation",
-        },
-      ]);
-      setOpen(true);
-
-      let currency: Currency | undefined;
-      let takerOrder: Taker;
-      try {
-        await setStep("Setting up order execution");
-        currency = getCurrencyByAddress(order.chainId, order.currency);
-
-        if (!currency) {
-          throw new Error(
-            `Invalid currency ${order.currency} on chain ${order.chainId}`,
-          );
-        }
-
-        takerOrder = hypercertExchangeClient.createFractionalSaleTakerBid(
-          order,
-          address,
-          unitAmount.toString(),
-          pricePerUnit,
-        );
-      } catch (e) {
-        await setStep(
-          "Setting up order execution",
-          "error",
-          e instanceof Error ? e.message : "Error setting up order execution",
-        );
-        console.error(e);
-        throw new Error("Error setting up order execution");
-      }
-
-      if (!currency) {
-        throw new Error(
-          `Invalid currency ${order.currency} on chain ${order.chainId}`,
-        );
-      }
-
-      const totalPrice = BigInt(order.price) * unitAmount;
-      try {
-        await setStep("ERC20");
-        if (currency.address !== zeroAddress) {
-          const currentAllowance = await getCurrentERC20Allowance(
-            order.currency as `0x${string}`,
-          );
-
-          if (currentAllowance < totalPrice) {
-            const approveTx = await hypercertExchangeClient.approveErc20(
-              order.currency,
-              totalPrice,
-            );
-            await waitForTransactionReceipt(walletClientData, {
-              hash: approveTx.hash as `0x${string}`,
-            });
-          }
-        }
-      } catch (e) {
-        await setStep(
-          "ERC20",
-          "error",
-          e instanceof Error ? e.message : "Approval error",
-        );
-        console.error(e);
-        throw new Error("Approval error");
-      }
-
-      try {
-        await setStep("Transfer manager");
-        const isTransferManagerApproved =
-          await hypercertExchangeClient.isTransferManagerApproved();
-        if (!isTransferManagerApproved) {
-          const transferManagerApprove = await hypercertExchangeClient
-            .grantTransferManagerApproval()
-            .call();
-          await waitForTransactionReceipt(walletClientData, {
-            hash: transferManagerApprove.hash as `0x${string}`,
-          });
-        }
-      } catch (e) {
-        await setStep(
-          "Transfer manager",
-          "error",
-          e instanceof Error ? e.message : "Error approving transfer manager",
-        );
-        console.error(e);
-        throw new Error("Approval error");
-      }
-
-      try {
-        await setStep("Setting up order execution");
-        const overrides =
-          currency.address === zeroAddress ? { value: totalPrice } : undefined;
-        const { call } = hypercertExchangeClient.executeOrder(
-          order,
-          takerOrder,
-          order.signature,
-          undefined,
-          overrides,
-        );
-        await setStep("Awaiting buy signature");
-        const tx = await call();
-        await setStep("Awaiting confirmation");
-        await waitForTransactionReceipt(walletClientData, {
-          hash: tx.hash as `0x${string}`,
-        });
-        const chain = SUPPORTED_CHAINS.find((x) => x.id === order.chainId);
-        await setStep("Awaiting confirmation", "completed");
-        const message =
-          hypercertName && totalUnitsInHypercert !== undefined ? (
-            <span>
-              Congratulations, you successfully bought{" "}
-              <b>
-                {calculateBigIntPercentage(unitAmount, totalUnitsInHypercert)}%
-              </b>{" "}
-              of <b>{hypercertName}</b>.
-            </span>
-          ) : (
-            "Your transaction was successful"
-          );
-
-        setExtraContent(() => (
-          <div className="flex flex-col space-y-2">
-            <p className="text-lg font-medium">Success</p>
-            <p className="text-sm font-medium">{message}</p>
-            <div className="flex space-x-4 py-4 justify-center">
-              <Button
-                onClick={() => {
-                  router.push(`/hypercerts/${order.hypercert_id}`);
-                  window.location.reload();
-                  setOpen(false);
-                }}
-              >
-                View hypercert
-              </Button>
-              <Button asChild>
-                <Link
-                  href={generateBlockExplorerLink(chain, tx.hash)}
-                  target="_blank"
-                >
-                  View transaction <ExternalLink size={14} className="ml-2" />
-                </Link>
-              </Button>
-            </div>
-            <p className="text-sm font-medium">
-              New ownership will not be immediately visible on the Hypercerts
-              page, but will be visible in 5-10 minutes.
-            </p>
-          </div>
-        ));
-      } catch (e) {
-        const decodedMessage = decodeContractError(e, "Error buying listing");
-        await setStep("Awaiting confirmation", "error", decodedMessage);
-
-        console.error(e);
-        throw new Error(decodedMessage);
-      }
+    mutationFn: async (ask: BuyFractionalMakerAskParams) => {
+      await strategy().execute(ask);
     },
   });
 };
