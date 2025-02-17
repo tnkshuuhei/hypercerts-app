@@ -141,7 +141,7 @@ export class SafeBuyFractionalStrategy extends BuyFractionalStrategy {
     try {
       await setStep("Transfer manager");
       const isTransferManagerApproved =
-        await this.exchangeClient.isTransferManagerApproved();
+        await this.exchangeClient.isTransferManagerApprovedSafe(this.address);
       // FIXME: this shouldn't be here, unless we're missing something
       if (!isTransferManagerApproved) {
         console.debug("Approving transfer manager");
