@@ -21,6 +21,7 @@ import React, { useEffect } from "react";
 import { revalidatePathServerAction } from "@/app/actions/revalidatePathServerAction";
 import { useBuyFractionalStrategy } from "./useBuyFractionalStrategy";
 import { BuyFractionalMakerAskParams } from "./types";
+import { useAccountStore } from "@/lib/account-store";
 
 export const useCreateOrderInSupabase = () => {
   const chainId = useChainId();
@@ -72,7 +73,9 @@ export const useCreateFractionalMakerAsk = ({
 
   const chainId = useChainId();
   const client = useHypercertClient();
-  const { address } = useAccount();
+  const { address: connectedAddress } = useAccount();
+  const { selectedAccount } = useAccountStore();
+  const activeAddress = selectedAccount?.address || connectedAddress;
   const { data: walletClientData } = useWalletClient();
 
   const {
@@ -98,7 +101,7 @@ export const useCreateFractionalMakerAsk = ({
         throw new Error("Chain ID not initialized");
       }
 
-      if (!address) {
+      if (!activeAddress) {
         throw new Error("Address not initialized");
       }
 
@@ -258,7 +261,7 @@ export const useCreateFractionalMakerAsk = ({
         await createOrder({
           order: maker,
           signature: signature,
-          signer: address,
+          signer: activeAddress,
           quoteType: QuoteType.Ask,
           hypercertId,
         });
@@ -276,7 +279,7 @@ export const useCreateFractionalMakerAsk = ({
           <p className="text-sm font-medium">Order created successfully</p>
           <div className="flex space-x-4">
             <Button asChild>
-              <Link href={`/profile/${address}?tab=marketplace-listings`}>
+              <Link href={`/profile/${activeAddress}?tab=marketplace-listings`}>
                 View my listings
               </Link>
             </Button>

@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { SUPPORTED_CHAINS } from "@/configs/constants";
 import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
 import { decodeContractError } from "@/lib/decodeContractError";
-import { generateBlockExplorerLink } from "@/lib/utils";
+import { generateBlockExplorerLink, generateSafeAppLink } from "@/lib/utils";
 
 import { BuyFractionalStrategy } from "./BuyFractionalStrategy";
 import { MarketplaceOrder } from "./types";
@@ -57,19 +57,19 @@ export class SafeBuyFractionalStrategy extends BuyFractionalStrategy {
       },
       {
         id: "ERC20",
-        description: "Setting approval",
+        description: "Setting approval on Safe",
       },
       {
         id: "Transfer manager",
-        description: "Approving transfer manager",
+        description: "Approving transfer manager on Safe",
       },
       {
-        id: "Awaiting buy signature",
-        description: "Submitting buy transaction",
+        id: "Submitting order",
+        description: "Submitting buy transaction to Safe transaction queue",
       },
       {
-        id: "Awaiting confirmation",
-        description: "Awaiting confirmation",
+        id: "Transaction queued",
+        description: "Transaction(s) queued on Safe",
       },
     ]);
     setOpen(true);
@@ -119,13 +119,12 @@ export class SafeBuyFractionalStrategy extends BuyFractionalStrategy {
         // TODO: if this is not approved yet, we need to create a Safe TX and drop out of this
         // dialog early, so that the next invocation runs through this check without stopping.
         if (currentAllowance < totalPrice) {
-          const approveTx = await this.exchangeClient.approveErc20(
+          console.debug("Approving ERC20");
+          await this.exchangeClient.approveErc20Safe(
+            this.address,
             order.currency,
             totalPrice,
           );
-          await waitForTransactionReceipt(this.walletClient.data, {
-            hash: approveTx.hash as `0x${string}`,
-          });
         }
       }
     } catch (e) {
@@ -145,12 +144,10 @@ export class SafeBuyFractionalStrategy extends BuyFractionalStrategy {
         await this.exchangeClient.isTransferManagerApproved();
       // FIXME: this shouldn't be here, unless we're missing something
       if (!isTransferManagerApproved) {
-        const transferManagerApprove = await this.exchangeClient
-          .grantTransferManagerApproval()
-          .call();
-        await waitForTransactionReceipt(this.walletClient.data, {
-          hash: transferManagerApprove.hash as `0x${string}`,
-        });
+        console.debug("Approving transfer manager");
+        await this.exchangeClient.grantTransferManagerApprovalSafe(
+          this.address,
+        );
       }
     } catch (e) {
       await setStep(
@@ -163,39 +160,29 @@ export class SafeBuyFractionalStrategy extends BuyFractionalStrategy {
     }
 
     try {
-      await setStep("Setting up order execution");
+      await setStep("Submitting order");
       const overrides =
         currency.address === zeroAddress ? { value: totalPrice } : undefined;
-      const { call } = this.exchangeClient.executeOrder(
+      await this.exchangeClient.executeOrderSafe(
+        this.address,
         order,
         takerOrder,
         order.signature,
-        undefined,
         overrides,
       );
-      await setStep("Awaiting buy signature");
-      const tx = await call();
-      await setStep("Awaiting confirmation");
-      // TODO: we don't need to wait, as it's async and signers have to sign.
-      // We should just skip ahead and not show success message, but notify users
-      // to sign and print a url to the transaction in the safe app.
-      await waitForTransactionReceipt(this.walletClient.data, {
-        hash: tx.hash as `0x${string}`,
-      });
+
+      await setStep("Transaction queued");
+
       const chain = SUPPORTED_CHAINS.find((x) => x.id === order.chainId);
-      await setStep("Awaiting confirmation", "completed");
-      const message =
-        hypercertName && totalUnitsInHypercert !== undefined ? (
-          <span>
-            Congratulations, you successfully bought{" "}
-            <b>
-              {calculateBigIntPercentage(unitAmount, totalUnitsInHypercert)}%
-            </b>{" "}
-            of <b>{hypercertName}</b>.
-          </span>
-        ) : (
-          "Your transaction was successful"
-        );
+
+      const message = (
+        <span>
+          Transaction requests are submitted to the connected Safe.
+          <br />
+          <br />
+          You can view the transactions in the Safe application
+        </span>
+      );
 
       setExtraContent(() => (
         <div className="flex flex-col space-y-2">
@@ -213,10 +200,10 @@ export class SafeBuyFractionalStrategy extends BuyFractionalStrategy {
             </Button>
             <Button asChild>
               <Link
-                href={generateBlockExplorerLink(chain, tx.hash)}
+                href={generateSafeAppLink(chain, this.address)}
                 target="_blank"
               >
-                View transaction <ExternalLink size={14} className="ml-2" />
+                View Safe <ExternalLink size={14} className="ml-2" />
               </Link>
             </Button>
           </div>
