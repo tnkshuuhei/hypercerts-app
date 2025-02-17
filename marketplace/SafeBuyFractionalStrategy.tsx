@@ -1,15 +1,10 @@
 import { Currency, Taker } from "@hypercerts-org/marketplace-sdk";
-import Link from "next/link";
-import { ExternalLink } from "lucide-react";
 import { zeroAddress } from "viem";
-import { waitForTransactionReceipt } from "viem/actions";
 
-import { Button } from "@/components/ui/button";
 import { SUPPORTED_CHAINS } from "@/configs/constants";
-import { calculateBigIntPercentage } from "@/lib/calculateBigIntPercentage";
 import { decodeContractError } from "@/lib/decodeContractError";
-import { generateBlockExplorerLink, generateSafeAppLink } from "@/lib/utils";
 
+import { ExtraContent } from "@/components/global/extra-content";
 import { BuyFractionalStrategy } from "./BuyFractionalStrategy";
 import { MarketplaceOrder } from "./types";
 import { getCurrencyByAddress } from "./utils";
@@ -185,33 +180,14 @@ export class SafeBuyFractionalStrategy extends BuyFractionalStrategy {
       );
 
       setExtraContent(() => (
-        <div className="flex flex-col space-y-2">
-          <p className="text-lg font-medium">Success</p>
-          <p className="text-sm font-medium">{message}</p>
-          <div className="flex space-x-4 py-4 justify-center">
-            <Button
-              onClick={() => {
-                this.router.push(`/hypercerts/${order.hypercert_id}`);
-                window.location.reload();
-                setOpen(false);
-              }}
-            >
-              View hypercert
-            </Button>
-            <Button asChild>
-              <Link
-                href={generateSafeAppLink(chain, this.address)}
-                target="_blank"
-              >
-                View Safe <ExternalLink size={14} className="ml-2" />
-              </Link>
-            </Button>
-          </div>
-          <p className="text-sm font-medium">
-            New ownership will not be immediately visible on the Hypercerts
-            page, but will be visible in 5-10 minutes.
-          </p>
-        </div>
+        <ExtraContent
+          message={message}
+          hypercertId={order.hypercert_id}
+          onClose={() => setOpen(false)}
+          chain={chain!}
+          isSafe={true}
+          safeAddress={this.address as `0x${string}`}
+        />
       ));
     } catch (e) {
       const decodedMessage = decodeContractError(e, "Error buying listing");
