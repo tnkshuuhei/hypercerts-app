@@ -17,3 +17,11 @@ export interface CreateFractionalOfferFormValues {
   startDateTime: number;
   endDateTime: number;
 }
+
+export interface BuyFractionalMakerAskParams {
+  order: MarketplaceOrder;
+  unitAmount: bigint;
+  pricePerUnit: string;
+  hypercertName?: string | null;
+  totalUnitsInHypercert?: bigint;
+}
