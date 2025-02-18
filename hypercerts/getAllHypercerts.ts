@@ -147,7 +147,16 @@ filteredIds.add(
   "42220-0x16bA53B74c234C870c61EFC04cD418B8f2865959-27222589353675077077069968594541456916480",
 );
 filteredIds.add(
-  "10-0x822F17A9A5EeCFd66dBAFf7946a8071C265D1d07-16604758658641034201622290718847993414418432 ",
+  "10-0x822F17A9A5EeCFd66dBAFf7946a8071C265D1d07-16604758658641034201622290718847993414418432",
+);
+filteredIds.add(
+  "314-0xc756B203cA9e13BAB3a93F1dA756bb19ac3C395b-2041694201525630780780247644590609268736",
+);
+filteredIds.add(
+  "314-0xc756B203cA9e13BAB3a93F1dA756bb19ac3C395b-2381976568446569244243622252022377480192",
+);
+filteredIds.add(
+  "314-0xc756B203cA9e13BAB3a93F1dA756bb19ac3C395b-680564733841876926926749214863536422912",
 );
 
 export async function getAllHypercerts({
@@ -183,10 +192,12 @@ export async function getAllHypercerts({
     [],
   );
 
-  const totalCount = Math.max(
-    0,
-    (res.hypercerts.count ?? 0) - filteredIds.size,
-  );
+  const difference = res.hypercerts?.count
+    ? res.hypercerts?.count - data.length
+    : 0;
+  const totalCount = res.hypercerts?.count
+    ? res.hypercerts?.count - difference
+    : 0;
 
   return {
     count: totalCount,
