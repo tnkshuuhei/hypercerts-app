@@ -37,6 +37,7 @@ import {
   readAsBase64,
 } from "../image-uploader";
 import { HYPERCERTS_API_URL_REST } from "@/configs/hypercerts";
+import isURL from "validator/lib/isURL";
 
 const formSchema = z.object({
   displayName: z.string().max(30, "Max. 30 characters").optional(),
@@ -88,8 +89,10 @@ export const SettingsForm = () => {
 
   const onSubmit = async (data: SettingsFormValues) => {
     try {
-      if (data.avatar) {
+      // if data.avatar is not an url, that means the user has uploaded a new image
+      if (data.avatar && !isURL(data.avatar)) {
         const formData = new FormData();
+
         const blob = base64ToBlob(data.avatar);
         const file = new File([blob], "avatar.jpg", {
           type: "image/jpeg",
@@ -193,8 +196,8 @@ export const SettingsForm = () => {
 
   const isSubmitDisabled =
     form.formState.isSubmitting ||
-    isFormDisabled ||
     !form.formState.isValid ||
+    isFormDisabled ||
     !form.formState.isDirty;
 
   const shouldShowAvatar =
