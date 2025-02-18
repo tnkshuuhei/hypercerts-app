@@ -8,6 +8,7 @@ import { useStepProcessDialogContext } from "@/components/global/step-process-di
 import { BuyFractionalStrategy } from "./BuyFractionalStrategy";
 import { EOABuyFractionalStrategy } from "./EOABuyFractionalStrategy";
 import { SafeBuyFractionalStrategy } from "./SafeBuyFractionalStrategy";
+import { Address, getAddress, isAddress } from "viem";
 
 export const useBuyFractionalStrategy = (): (() => BuyFractionalStrategy) => {
   const { address, chainId } = useAccount();
@@ -20,17 +21,20 @@ export const useBuyFractionalStrategy = (): (() => BuyFractionalStrategy) => {
   const activeAddress = selectedAccount?.address || address;
 
   return () => {
-    if (!activeAddress) throw new Error("No address found");
+    if (!activeAddress || !isAddress(activeAddress))
+      throw new Error("No address found");
     if (!chainId) throw new Error("No chainId found");
     if (!exchangeClient) throw new Error("No HypercertExchangeClient found");
     if (!walletClient) throw new Error("No walletClient found");
     if (!dialogContext) throw new Error("No dialogContext found");
     if (!router) throw new Error("No router found");
 
+    const buyerAddress = getAddress(activeAddress);
+
     if (selectedAccount?.type === "safe") {
       if (!selectedAccount) throw new Error("No selected account found");
       return new SafeBuyFractionalStrategy(
-        activeAddress,
+        buyerAddress,
         chainId,
         exchangeClient,
         dialogContext,
@@ -40,7 +44,7 @@ export const useBuyFractionalStrategy = (): (() => BuyFractionalStrategy) => {
     }
 
     return new EOABuyFractionalStrategy(
-      activeAddress,
+      buyerAddress,
       chainId,
       exchangeClient,
       dialogContext,
