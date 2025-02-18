@@ -35,14 +35,14 @@ const formSchema = z.object({
     .string()
     .min(1, "Please upload a logo image")
     .refine(
-      isValidImageData,
+      (value) => !value || isValidImageData(value),
       "Please upload a valid image file or provide a valid URL",
     ),
   banner: z
     .string()
     .min(1, "Please upload a banner image")
     .refine(
-      isValidImageData,
+      (value) => !value || isValidImageData(value),
       "Please upload a valid image file or provide a valid URL",
     ),
   description: z
