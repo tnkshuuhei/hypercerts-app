@@ -10,10 +10,11 @@ import type { AppRouterInstance } from "next/dist/shared/lib/app-router-context.
 import { useStepProcessDialogContext } from "@/components/global/step-process-dialog";
 
 import { MarketplaceOrder } from "./types";
+import { Address } from "viem";
 
 export abstract class BuyFractionalStrategy {
   constructor(
-    protected address: `0x${string}`,
+    protected address: Address,
     protected chainId: number,
     protected exchangeClient: HypercertExchangeClient,
     protected dialogContext: ReturnType<typeof useStepProcessDialogContext>,
