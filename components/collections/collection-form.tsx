@@ -25,19 +25,15 @@ import request from "graphql-request";
 import { isValidHypercertId } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { parseClaimOrFractionId } from "@hypercerts-org/sdk";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import React, { ReactNode } from "react";
-import { ExternalLink, InfoIcon, LoaderCircle } from "lucide-react";
+import { ExternalLink, InfoIcon, LoaderCircle, Trash2Icon } from "lucide-react";
 import Link from "next/link";
 import { useCreateHyperboard, useUpdateHyperboard } from "@/collections/hooks";
 import { useBlueprintsByIds } from "@/blueprints/hooks/useBlueprintsByIds";
 import { BlueprintFragment } from "@/blueprints/blueprint.fragment";
 import { isParseableNumber } from "@/lib/isParseableInteger";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { ImageUploader, readAsBase64 } from "../image-uploader";
 
 const idSchema = z
   .string()
@@ -78,7 +74,11 @@ const formSchema = z
         z.object({
           entryId: idSchema,
           factor: z.union([
-            z.number().int().min(1, "Factor must be greater than 0"),
+            z
+              .number()
+              .int("Enter whole numbers only")
+              .min(1, "Factor must be greater than 0")
+              .max(100_000_000, "Factor must be less than 100,000,000"),
             z.literal("").refine((value) => {
               return value !== "";
             }, "Factor is required"),
@@ -96,14 +96,18 @@ const formSchema = z
           path: ["hypercerts"],
         },
       ),
-    backgroundImg: z.union([z.literal(""), z.string().trim().url()]).optional(),
+    backgroundImg: z.string().optional(),
     borderColor: z
       .string()
       .regex(/^#(?:[0-9a-f]{3}){1,2}$/i, "Must be a color hex code")
       .min(1, "Border color is required"),
     newId: idSchema,
     newFactor: z.union([
-      z.number().int().min(1, "Factor must be greater than 0"),
+      z
+        .number()
+        .int("Enter whole numbers only")
+        .min(1, "Factor must be greater than 0")
+        .max(100_000_000, "Factor must be less than 100,000,000"),
       z.literal("").refine((value) => {
         return value !== "";
       }, "Factor is required"),
@@ -330,10 +334,10 @@ export const CollectionForm = ({
                               {index === 0 && (
                                 <FormLabel>
                                   Hypercert ID{" "}
-                                  <InfoTooltip>
+                                  <InfoPopover>
                                     You can find the Hypercert ID on the view
                                     page of the hypercert.
-                                  </InfoTooltip>
+                                  </InfoPopover>
                                 </FormLabel>
                               )}
                               <FormControl>
@@ -355,12 +359,12 @@ export const CollectionForm = ({
                               {index === 0 && (
                                 <FormLabel>
                                   Factor{" "}
-                                  <InfoTooltip>
+                                  <InfoPopover>
                                     You can adjust the relative importance of a
                                     hypercert within this collection, which will
                                     be visually represented on the hyperboard.
                                     The default is 1 for each hypercert.
-                                  </InfoTooltip>
+                                  </InfoPopover>
                                 </FormLabel>
                               )}
                               <FormControl>
@@ -418,11 +422,11 @@ export const CollectionForm = ({
                         {!fields.length && (
                           <FormLabel>
                             Hypercert or blueprint ID*{" "}
-                            <InfoTooltip>
+                            <InfoPopover>
                               You can find the Hypercert or blueprint ID on the
                               view page of the hypercert or in the profile
                               blueprints overview.
-                            </InfoTooltip>
+                            </InfoPopover>
                           </FormLabel>
                         )}
                         <FormControl>
@@ -440,12 +444,12 @@ export const CollectionForm = ({
                         {!fields.length && (
                           <FormLabel>
                             Factor*{" "}
-                            <InfoTooltip>
+                            <InfoPopover>
                               You can adjust the relative importance of a
                               hypercert within this collection, which will be
                               visually represented on the hyperboard. The
                               default is 1 for each hypercert.
-                            </InfoTooltip>
+                            </InfoPopover>
                           </FormLabel>
                         )}
                         <FormControl>
@@ -498,20 +502,41 @@ export const CollectionForm = ({
                   <FormItem>
                     <FormLabel>
                       Background image URL{" "}
-                      <InfoTooltip>
+                      <InfoPopover>
                         For best results use an aspect ratio of 16:9. The best
                         resolution depends on where it will be shown; we
                         recommend at least 1600x900 px.
-                      </InfoTooltip>
+                      </InfoPopover>
                     </FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <div className="flex flex-row items-center gap-x-4">
+                        <ImageUploader
+                          handleImage={async (e) => {
+                            if (e.target.files) {
+                              const file: File | null = e.target.files[0];
+                              const base64 = await readAsBase64(file);
+                              form.setValue("backgroundImg", base64);
+                            }
+                          }}
+                          inputId="backgroundImg-upload"
+                        />
+                        <Button
+                          type="button"
+                          size={"icon"}
+                          variant={"destructive"}
+                          disabled={!field.value}
+                          onClick={() => form.setValue("backgroundImg", "")}
+                        >
+                          <Trash2Icon className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
               {backgroundImg && (
+                // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={backgroundImg}
                   className="max-h-80"
@@ -610,18 +635,16 @@ const HypercertErrorMessages = ({
   );
 };
 
-const InfoTooltip = ({ children }: { children: ReactNode }) => {
+const InfoPopover = ({ children }: { children: ReactNode }) => {
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger>
-          <InfoIcon
-            size={"16px"}
-            style={{ marginBottom: "-3px", marginLeft: "4px" }}
-          />
-        </TooltipTrigger>
-        <TooltipContent>{children}</TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <Popover>
+      <PopoverTrigger>
+        <InfoIcon
+          size={"16px"}
+          style={{ marginBottom: "-3px", marginLeft: "4px" }}
+        />
+      </PopoverTrigger>
+      <PopoverContent className="text-sm">{children}</PopoverContent>
+    </Popover>
   );
 };

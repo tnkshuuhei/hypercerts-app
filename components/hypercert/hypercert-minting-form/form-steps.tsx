@@ -73,6 +73,7 @@ import { ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { UseFormReturn } from "react-hook-form";
 import { useAccount, useChainId } from "wagmi";
+import { ImageUploader, readAsBase64 } from "@/components/image-uploader";
 
 // import Image from "next/image";
 
@@ -174,10 +175,30 @@ const GeneralInformation = ({ form }: FormStepsProps) => {
           <FormItem>
             <FormLabel>Logo</FormLabel>
             <FormControl>
-              <Input {...field} placeholder="https://" />
+              <div className="flex flex-row items-center gap-x-4">
+                <ImageUploader
+                  handleImage={async (e) => {
+                    if (e.target.files) {
+                      const file: File | null = e.target.files[0];
+                      const base64 = await readAsBase64(file);
+                      form.setValue("logo", base64);
+                    }
+                  }}
+                  inputId={"logo-upload"}
+                />
+                <Button
+                  type="button"
+                  size={"icon"}
+                  variant={"destructive"}
+                  disabled={!field.value}
+                  onClick={() => form.setValue("logo", "")}
+                >
+                  <Trash2Icon className="w-4 h-4" />
+                </Button>
+              </div>
             </FormControl>
             <FormMessage />
-            <FormDescription>The URL to your project logo</FormDescription>
+            <FormDescription>Upload your project logo</FormDescription>
           </FormItem>
         )}
       />
@@ -188,11 +209,31 @@ const GeneralInformation = ({ form }: FormStepsProps) => {
           <FormItem>
             <FormLabel>Banner image</FormLabel>
             <FormControl>
-              <Input {...field} placeholder="https://" />
+              <div className="flex flex-row items-center gap-x-4">
+                <ImageUploader
+                  handleImage={async (e) => {
+                    if (e.target.files) {
+                      const file: File | null = e.target.files[0];
+                      const base64 = await readAsBase64(file);
+                      form.setValue("banner", base64);
+                    }
+                  }}
+                  inputId={"banner-upload"}
+                />
+                <Button
+                  type="button"
+                  size={"icon"}
+                  variant={"destructive"}
+                  disabled={!field.value}
+                  onClick={() => form.setValue("banner", "")}
+                >
+                  <Trash2Icon className="w-4 h-4" />
+                </Button>
+              </div>
             </FormControl>
             <FormMessage />
             <FormDescription>
-              The URL to an image to be displayed as the banner
+              The image to be displayed as the banner
             </FormDescription>
           </FormItem>
         )}
@@ -726,6 +767,13 @@ export const hypercertFormSteps = new Map([
   [3, { title: "Mint", fields: ["acceptTerms"] } as FormStep],
 ]);
 
+const renderStepTitle = (title: string, isBlueprint?: boolean) => {
+  if (isBlueprint && title === "Mint") {
+    return "Send";
+  }
+  return title;
+};
+
 const FormSteps = ({
   form,
   currentStep,
@@ -845,7 +893,7 @@ const FormSteps = ({
               >
                 {step}
               </Badge>
-              <p className="md:ml-2">{title}</p>
+              <p className="md:ml-2">{renderStepTitle(title, isBlueprint)}</p>
             </div>
           ))}
         </div>
