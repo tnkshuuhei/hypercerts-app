@@ -42,11 +42,11 @@ const formSchema = z.object({
   displayName: z.string().max(30, "Max. 30 characters").optional(),
   avatar: z
     .string()
+    .optional()
     .refine(
-      isValidImageData,
+      (value) => !value || isValidImageData(value),
       "Please upload a valid image file or provide a valid URL",
-    )
-    .optional(),
+    ),
 });
 
 export type SettingsFormValues = z.infer<typeof formSchema>;
@@ -133,8 +133,15 @@ export const SettingsForm = () => {
       form.setValue(
         "displayName",
         userData?.user?.display_name || ensName || "",
+        {
+          shouldValidate: true,
+          shouldDirty: true,
+        },
       );
-      form.setValue("avatar", userData?.user?.avatar || ensAvatar || "");
+      form.setValue("avatar", userData?.user?.avatar || ensAvatar || "", {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
       await refetchUser();
     } catch (error) {
       if (errorHasReason(error)) {
@@ -185,7 +192,10 @@ export const SettingsForm = () => {
   const isFormDisabled = isLoading || !!pendingUpdate;
 
   const isSubmitDisabled =
-    form.formState.isSubmitting || !form.formState.isValid || isFormDisabled;
+    form.formState.isSubmitting ||
+    isFormDisabled ||
+    !form.formState.isValid ||
+    !form.formState.isDirty;
 
   const shouldShowAvatar =
     avatar && !form.formState.isValidating && !form.formState.errors.avatar;
@@ -309,7 +319,10 @@ export const SettingsForm = () => {
                         if (e.target.files) {
                           const file: File | null = e.target.files[0];
                           const base64 = await readAsBase64(file);
-                          form.setValue("avatar", base64);
+                          form.setValue("avatar", base64, {
+                            shouldValidate: true,
+                            shouldDirty: true,
+                          });
                         }
                       }}
                       inputId="avatar-upload"
@@ -320,7 +333,12 @@ export const SettingsForm = () => {
                       size={"icon"}
                       variant={"destructive"}
                       disabled={isFormDisabled || !avatar}
-                      onClick={() => form.setValue("avatar", "")}
+                      onClick={() =>
+                        form.setValue("avatar", "", {
+                          shouldValidate: true,
+                          shouldDirty: true,
+                        })
+                      }
                     >
                       <Trash2Icon className="w-4 h-4" />
                     </Button>
